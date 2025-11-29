@@ -73,3 +73,9 @@ export const getMedicines = async ({
         totalPages: Math.ceil(filtered.length / limit),
     };
 };
+
+export const getMedicineById = async (id: number | string) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+
+    return MEDICINES.find((m) => m.id === Number(id));
+};

@@ -1,4 +1,5 @@
 export interface Medicine {
+    id: number;
     name: string;
     activeIngredient: string;
     unit: string;
