@@ -96,7 +96,7 @@ export function ReusableTable<T>({
   const { currentPage, totalPages, rowsPerPage } = pagination;
 
   return (
-    <div className="flex flex-col justify-between min-h-[570px] gap-5">
+    <div className="flex flex-col justify-between min-h-[500px] gap-5">
       <div className="border-app-azure-100 rounded-[10px] border">
         <Table>
           <TableHeader>

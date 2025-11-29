@@ -1,22 +1,120 @@
 "use client";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import { FileText, Pill } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
+const items = [
+  {
+    title: "Patients",
+    url: "admin/patients/patients-list",
+    icon: <FileText />,
+  },
+  {
+    title: "Medicines",
+    url: "admin/medicines/medicine-list",
+    icon: <Pill />,
+  },
+];
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const names = pathname.split("/");
+
+  function generateBreadcrumbs(pathname: string) {
+    const segments = pathname.split("/").filter(Boolean);
+
+    let path = "";
+    return segments.map((segment, index) => {
+      path += "/" + segment;
+
+      const name = segment
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+
+      return {
+        name,
+        href: path,
+        isLast: index === segments.length - 1,
+      };
+    });
+  }
+
+  const breadcrumbs = generateBreadcrumbs(pathname);
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex ">
-        {/* sidebar */}
-        <div className="w-[255px] bg-blue-50 h-lvh">Sidebar</div>
-        <div className="flex-1">
-          <div className="w-full h-14 bg-blue-100 ">Header</div>
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarContent>
+            <SidebarGroup>
+              <div className="h-[114px]">Logo here</div>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {items.map((item) => {
+                    const isActive =
+                      names[2].toUpperCase() === item.title.toUpperCase();
+                    return (
+                      <Link
+                        key={item.title}
+                        href={`/${item.url}`}
+                        className={`h-[50px] flex gap-[13px] items-center rounded-xl  hover:bg-[#F0F4F9] px-[7px] ${
+                          isActive
+                            ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
+                            : "bg-white"
+                        }`}
+                      >
+                        {item.icon}
+                        {item.title}
+                      </Link>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+        <main className="flex-1">
+          <div className="w-full h-14 border-b-app-azure-100 border flex items-center gap-5">
+            <SidebarTrigger />
+            <Breadcrumb>
+              <BreadcrumbList>
+                {breadcrumbs.map((item) => (
+                  <React.Fragment key={item.href}>
+                    <BreadcrumbItem>
+                      {item.isLast ? (
+                        <p className="text-app-primary-blue-700">{item.name}</p>
+                      ) : (
+                        <p>{item.name}</p>
+                      )}
+                    </BreadcrumbItem>
+                    {!item.isLast && <BreadcrumbSeparator />}
+                  </React.Fragment>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
           <div className="p-[50px]">{children}</div>
-        </div>
-      </div>
+        </main>
+      </SidebarProvider>
     </QueryClientProvider>
   );
 }

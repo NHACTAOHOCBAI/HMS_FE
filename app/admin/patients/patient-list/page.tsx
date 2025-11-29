@@ -5,6 +5,15 @@ import { useState } from "react";
 import { Patient, PatientStatus } from "@/interfaces/patient";
 import { usePatient } from "@/hooks/queries/usePatient";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 const statusClass: Record<PatientStatus, string> = {
   New: "bg-green-100 text-green-700 hover:bg-green-100/80",
   Waiting: "bg-indigo-100 text-indigo-700 hover:bg-indigo-100/80",
@@ -60,6 +69,32 @@ const UserTablePage = () => {
 
   return (
     <div>
+      <div className="mb-5 flex items-center gap-5">
+        <Input className="h-[50px] rounded-[30px] w-[460px]" />
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="Gender" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="male">Male</SelectItem>
+            <SelectItem value="female">Female</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="new">New</SelectItem>
+            <SelectItem value="waiting">Waiting</SelectItem>
+            <SelectItem value="inVist">In Vist</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inActive">In Active</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button className="ml-auto">New Patient</Button>
+      </div>
       <ReusableTable
         data={data?.items ?? []}
         columns={userColumns}
