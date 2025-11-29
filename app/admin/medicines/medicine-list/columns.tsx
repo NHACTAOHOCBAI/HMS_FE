@@ -46,11 +46,12 @@ export const medicineColumns: Column<Medicine>[] = [
                     </Link>
 
                     {/* ✏ Edit */}
-                    <DropdownMenuItem onClick={() => console.log("Edit", medicine.id)}>
-                        <Pencil className="w-4 h-4 mr-2" />
-                        Edit
-                    </DropdownMenuItem>
-
+                    <Link href={`/admin/medicines/${medicine.id}/update-medicine`}>
+                        <DropdownMenuItem onClick={() => console.log("Edit", medicine.id)}>
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit
+                        </DropdownMenuItem>
+                    </Link>
                     {/* 🗑 Delete */}
                     <DropdownMenuItem
                         className="text-red-600 focus:text-red-600"
