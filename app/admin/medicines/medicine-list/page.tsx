@@ -5,9 +5,11 @@ import { Column, ReusableTable } from "../../_components/MyTable";
 import { useState } from "react";
 import { Medicine } from "@/interfaces/medicine";
 import { Input } from "@/components/ui/input";
-import { CategoryFilter } from "../../_components/CategoryFilter";
 import { useCategory } from "@/hooks/queries/useCategory";
 import { useDebounce } from "@/hooks/useDebounce";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { CategoryFilter } from "../../_components/CategoryFilter";
 
 export const medicineColumns: Column<Medicine>[] = [
     { key: "id", label: "Id" },
@@ -58,6 +60,9 @@ export default function MedicineListPage() {
 
                     <CategoryFilter categories={categories ?? []} />
                 </div>
+                <Link href="/admin/medicines/add-medicine">
+                    <Button>Add Medicine</Button>
+                </Link>
             </div>
 
             <ReusableTable
