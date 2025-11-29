@@ -39,21 +39,37 @@ const MEDICINES = generateMockMedicines();
 export const getMedicines = async ({
     page,
     limit,
+    search = ""
 }: {
     page: number;
     limit: number;
+    search?: string;
 }) => {
-    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+    await new Promise((r) => setTimeout(r, 300)); // simulate latency
 
+    // 🔎 Normalize search text
+    const keyword = search.trim().toLowerCase();
+
+    // 🔍 Filter trước → paginate sau
+    const filtered = keyword
+        ? MEDICINES.filter((m) =>
+            [m.name, m.activeIngredient, m.description]
+                .filter(Boolean)
+                .some((field) =>
+                    field!.toLowerCase().includes(keyword)
+                )
+        )
+        : MEDICINES;
+
+    // ▶ Pagination
     const start = (page - 1) * limit;
     const end = start + limit;
-
-    const paginated = MEDICINES.slice(start, end);
+    const paginated = filtered.slice(start, end);
 
     return {
         items: paginated,
-        totalItems: MEDICINES.length,
+        totalItems: filtered.length,
         currentPage: page,
-        totalPages: Math.ceil(MEDICINES.length / limit),
+        totalPages: Math.ceil(filtered.length / limit),
     };
 };

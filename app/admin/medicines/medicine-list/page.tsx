@@ -1,4 +1,5 @@
 "use client";
+
 import { useMedicine } from "@/hooks/queries/useMedicine";
 import { Column, ReusableTable } from "../../_components/MyTable";
 import { useState } from "react";
@@ -6,16 +7,16 @@ import { Medicine } from "@/interfaces/medicine";
 import { Input } from "@/components/ui/input";
 import { CategoryFilter } from "../../_components/CategoryFilter";
 import { useCategory } from "@/hooks/queries/useCategory";
+import { useDebounce } from "@/hooks/useDebounce";
+
 export const medicineColumns: Column<Medicine>[] = [
     { key: "id", label: "Id" },
-
     { key: "name", label: "Name" },
     { key: "purchasePrice", label: "Purchase Price" },
     { key: "sellingPrice", label: "Selling Price" },
     { key: "expiresAt", label: "Expires At" },
     { key: "unit", label: "Unit" },
     { key: "quantity", label: "Quantity" },
-
 
     {
         key: "action",
@@ -29,25 +30,38 @@ export const medicineColumns: Column<Medicine>[] = [
     },
 ];
 
-
 export default function MedicineListPage() {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(6);
+    const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 400);
 
     const { data: categories } = useCategory();
+    const { data, isLoading } = useMedicine(page, limit, debouncedSearch);
 
-    const { data, isLoading } = useMedicine(page, limit);
+
+
     return (
         <div>
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Input type="search" placeholder={"Search..."}
-                        className="w-[300px]" />
+                    <Input
+                        type="search"
+                        placeholder="Search..."
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setPage(1); // reset page khi search
+                        }}
+                        className="w-[300px]"
+                    />
+
                     <CategoryFilter categories={categories ?? []} />
                 </div>
             </div>
+
             <ReusableTable
-                data={data?.items ?? []}
+                data={data?.items || []}
                 columns={medicineColumns}
                 loading={isLoading}
                 pagination={{
@@ -59,7 +73,7 @@ export default function MedicineListPage() {
                 onPageChange={(p) => setPage(p)}
                 onRowsPerPageChange={(size) => {
                     setLimit(size);
-                    setPage(1); // reset page
+                    setPage(1);
                 }}
             />
         </div>
