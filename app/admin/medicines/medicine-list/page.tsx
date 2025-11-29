@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Medicine } from "@/interfaces/medicine";
 import { Input } from "@/components/ui/input";
 import { CategoryFilter } from "../../_components/CategoryFilter";
+import { useCategory } from "@/hooks/queries/useCategory";
 export const medicineColumns: Column<Medicine>[] = [
     { key: "id", label: "Id" },
 
@@ -28,16 +29,12 @@ export const medicineColumns: Column<Medicine>[] = [
     },
 ];
 
-const categories = [
-    { id: "1", name: "Antibiotics" },
-    { id: "2", name: "Analgesics" },
-    { id: "3", name: "Antipyretics" },
-    { id: "4", name: "Antihistamines" }]
 
 export default function MedicineListPage() {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(6);
 
+    const { data: categories } = useCategory();
 
     const { data, isLoading } = useMedicine(page, limit);
     return (
@@ -46,7 +43,7 @@ export default function MedicineListPage() {
                 <div className="flex items-center gap-4">
                     <Input type="search" placeholder={"Search..."}
                         className="w-[300px]" />
-                    <CategoryFilter categories={categories} />
+                    <CategoryFilter categories={categories ?? []} />
                 </div>
             </div>
             <ReusableTable
