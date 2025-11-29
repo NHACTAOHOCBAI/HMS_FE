@@ -22,7 +22,7 @@ import React from "react";
 const items = [
   {
     title: "Patients",
-    url: "admin/patients/patients-list",
+    url: "admin/patients/patient-list",
     icon: <FileText />,
   },
   {
