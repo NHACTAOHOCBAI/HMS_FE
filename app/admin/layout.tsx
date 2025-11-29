@@ -13,7 +13,7 @@ export default function AdminLayout({
         {/* sidebar */}
         <div className="w-[255px] bg-blue-50 h-lvh">Sidebar</div>
         <div className="flex-1">
-          <div className="w-full h-[56px] bg-blue-100 ">Header</div>
+          <div className="w-full h-14 bg-blue-100 ">Header</div>
           <div className="p-[50px]">{children}</div>
         </div>
       </div>

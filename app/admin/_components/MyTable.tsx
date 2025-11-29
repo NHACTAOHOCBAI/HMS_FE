@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type Column<T> = {
   key: keyof T | string;
@@ -89,7 +96,7 @@ export function ReusableTable<T>({
   const { currentPage, totalPages, rowsPerPage } = pagination;
 
   return (
-    <div>
+    <div className="flex flex-col justify-between min-h-[570px] gap-5">
       <div className="border-app-azure-100 rounded-[10px] border">
         <Table>
           <TableHeader>
@@ -141,31 +148,23 @@ export function ReusableTable<T>({
       </div>
 
       {/* Pagination UI giữ nguyên */}
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between ">
         {/* Rows per page */}
         <div className="flex items-center space-x-2 text-sm">
           <span>Rows per page</span>
-          <div className="relative">
-            <select
-              value={rowsPerPage}
-              onChange={(e) => onRowsPerPageChange(+e.target.value)}
-              className="appearance-none border rounded-md px-3 py-1 bg-white pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value={6}>6</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg
-                className="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
-          </div>
+          <Select
+            value={rowsPerPage.toString()}
+            onValueChange={(v) => onRowsPerPageChange(+v)}
+          >
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="6">6</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="20">20</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Pagination */}
