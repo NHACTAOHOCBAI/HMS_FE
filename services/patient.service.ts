@@ -25,7 +25,7 @@ const generateMockUsers = (): Patient[] => {
 };
 
 const PATIENTS = generateMockUsers();
-export const getPatients = async ({
+const getPatients = async ({
   page,
   limit,
 }: {
@@ -46,3 +46,18 @@ export const getPatients = async ({
     totalPages: Math.ceil(PATIENTS.length / limit),
   };
 };
+const createPatient = async (data: {
+  fullName: string;
+  dob: string;
+  gender: string;
+  phoneNumber: string;
+  email: string;
+  homeAddress: string;
+  cardId: string;
+  contactName: string;
+  relationshipToPatient: string;
+  contactPhone: string;
+}) => {
+  console.log(data);
+};
+export { createPatient, getPatients };

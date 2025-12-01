@@ -14,6 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { FileText, Pill } from "lucide-react";
 import Link from "next/link";
@@ -114,6 +115,7 @@ export default function AdminLayout({
           </div>
           <div className="p-[50px]">{children}</div>
         </main>
+        <Toaster />
       </SidebarProvider>
     </QueryClientProvider>
   );
