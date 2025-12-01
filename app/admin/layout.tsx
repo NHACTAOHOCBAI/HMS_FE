@@ -13,13 +13,19 @@ import {
   SidebarMenu,
   SidebarProvider,
   SidebarTrigger,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FileText, Pill } from "lucide-react";
+import { FileText, Pill, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+
 const items = [
   {
     title: "Patients",
@@ -31,7 +37,27 @@ const items = [
     url: "admin/medicines/medicine-list",
     icon: <Pill />,
   },
+  {
+    title: "Employees",
+    url: "admin/employees",
+    icon: <Users />,
+    items: [
+      {
+        title: "Employee lists",
+        url: "admin/employees",
+      },
+      {
+        title: "Scheduling",
+        url: "admin/employees/scheduling",
+      },
+      {
+        title: "Attendance",
+        url: "admin/employees/attendance",
+      },
+    ],
+  },
 ];
+
 export default function AdminLayout({
   children,
 }: {
@@ -67,25 +93,45 @@ export default function AdminLayout({
         <Sidebar>
           <SidebarContent>
             <SidebarGroup>
-              <div className="h-[114px]">Logo here</div>
+              <div className="h-[114px] flex items-center justify-center font-bold text-xl">HMS Admin</div>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {items.map((item) => {
                     const isActive =
-                      names[2].toUpperCase() === item.title.toUpperCase();
+                      names[2]?.toUpperCase() === item.title.toUpperCase();
+
                     return (
-                      <Link
-                        key={item.title}
-                        href={`/${item.url}`}
-                        className={`h-[50px] flex gap-[13px] items-center rounded-xl  hover:bg-[#F0F4F9] px-[7px] ${
-                          isActive
-                            ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
-                            : "bg-white"
-                        }`}
-                      >
-                        {item.icon}
-                        {item.title}
-                      </Link>
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive && !item.items}
+                          className="h-[50px] rounded-xl px-[7px]"
+                        >
+                          <Link href={`/${item.url}`}>
+                            {item.icon}
+                            <span>{item.title}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                        {item.items && isActive && (
+                          <SidebarMenuSub>
+                            {item.items.map((subItem) => {
+                              const isSubActive = pathname === `/${subItem.url}`;
+                              return (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={isSubActive}
+                                  >
+                                    <Link href={`/${subItem.url}`}>
+                                      <span>{subItem.title}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              );
+                            })}
+                          </SidebarMenuSub>
+                        )}
+                      </SidebarMenuItem>
                     );
                   })}
                 </SidebarMenu>
@@ -94,7 +140,7 @@ export default function AdminLayout({
           </SidebarContent>
         </Sidebar>
         <main className="flex-1">
-          <div className="w-full h-14 border-b-app-azure-100 border flex items-center gap-5">
+          <div className="w-full h-14 border-b-app-azure-100 border flex items-center gap-5 px-4">
             <SidebarTrigger />
             <Breadcrumb>
               <BreadcrumbList>
