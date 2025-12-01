@@ -30,7 +30,7 @@ export default function MedicineListPage() {
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
-            setPage(1); // reset page khi search
+            setPage(1); 
           }}
         />
         <CategoryFilter categories={categories ?? []} />
