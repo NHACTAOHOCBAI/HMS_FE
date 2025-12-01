@@ -1,7 +1,6 @@
-"use client";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
+import MyDatePicker from "@/app/admin/_components/MyDatePicker";
+import { AddPatientSchema } from "@/app/admin/patients/add-patient/page";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -11,50 +10,25 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import MyDatePicker from "@/app/admin/_components/MyDatePicker";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { useCreatePatient } from "@/hooks/queries/usePatient";
-import { toast } from "sonner";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import z from "zod";
 
-export const AddPatientSchema = z.object({
-  fullName: z.string("full name is required"),
-  dob: z.string("dob is required"),
-  gender: z.string("gender is required"),
-  phoneNumber: z.string("phone number is required"),
-  email: z.string("email is required").email("email is invalid"),
-  homeAddress: z.string("home address is required"),
-  cardId: z.string("card id is required"),
-  contactName: z.string("contact name is required"),
-  relationshipToPatient: z.string("relationship to patient is required"),
-  contactPhone: z.string("contact phone is required"),
-  allergies: z.string().optional(),
-  medicalHistory: z.string().optional(),
-});
-
-const AddPatient = () => {
+const PersonalInformationTab = () => {
   const form = useForm<z.infer<typeof AddPatientSchema>>({
     resolver: zodResolver(AddPatientSchema),
     defaultValues: {
       gender: "male",
     },
   });
-  const { mutate: createItem, isPending } = useCreatePatient();
   const onSubmit = (data: z.infer<typeof AddPatientSchema>) => {
-    createItem(data, {
-      onSuccess: () => {
-        toast.success("Patient has been created");
-      },
-      onError: (error) => {
-        toast.error(`Ohh!!! ${error.message}`);
-      },
-      onSettled: () => {},
-    });
+    console.log(data);
   };
-
   return (
-    <div className="w-[830px] bg-white rounded-[12px] border border-[#E2E8F0] p-6 mx-auto">
+    <div className=" mx-auto">
       <Form {...form}>
         {/* FORM START */}
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -258,10 +232,50 @@ const AddPatient = () => {
               </div>
             </div>
           </div>
-          {/* Buttons */}
+          {/* Medical history */}
+          <div className="mt-10 bg-white rounded-[12px] border border-[#E2E8F0] mx-auto">
+            <p className="p-6 font-semibold text-[20px] border-b border-[#E2E8F0]">
+              Medical History
+            </p>
+            <div className="p-6 space-y-5">
+              <div className="flex gap-[100px]">
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="allergies"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Allergies</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <FormField
+                    control={form.control}
+                    name="medicalHistory"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Medical history</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="flex gap-3 mt-5">
             <Button type="button" variant={"outline"} className="ml-auto">
-              Cancel
+              Reset
             </Button>
             <Button type="submit">Save</Button>
           </div>
@@ -270,5 +284,4 @@ const AddPatient = () => {
     </div>
   );
 };
-
-export default AddPatient;
+export default PersonalInformationTab;
