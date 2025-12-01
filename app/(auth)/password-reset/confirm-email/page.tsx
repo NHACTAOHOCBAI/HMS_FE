@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Hotel, Mail, ArrowLeft } from "lucide-react";
+import { Hotel, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const PasswordResetPage = () => {
@@ -67,17 +67,17 @@ const PasswordResetPage = () => {
           <div className="w-full max-w-[416px] bg-[rgba(255,255,255,0.95)] border border-[rgba(0,0,0,0.1)] rounded-[14px] shadow-sm">
             {/* Card Header */}
             <div className="px-6 pt-6 pb-0">
-              <h2 className="text-2xl font-medium text-neutral-950 tracking-[-0.3125px] text-center mb-4">
+              <h2 className="text-base font-medium text-neutral-950 tracking-[-0.3125px] text-center mb-1.5">
                 Reset Password
               </h2>
-              <p className="text-base font-normal text-[#616161] tracking-[-0.3125px] text-center leading-6">
+              <p className="text-base font-normal text-[#717182] tracking-[-0.3125px] text-center">
                 Enter your email address and we&apos;ll send you a reset link
               </p>
             </div>
 
             {/* Card Content - Form */}
-            <div className="px-6 py-6 mt-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="px-6 py-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Error Message */}
                 {errorMessage && (
                   <div className="bg-error-100 border border-error-600 text-error-600 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
@@ -90,31 +90,28 @@ const PasswordResetPage = () => {
                 <div className="space-y-2">
                   <label
                     htmlFor="email"
-                    className="block text-base font-semibold text-neutral-950 tracking-[-0.1504px]"
+                    className="block text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
                   >
                     Email Address
                   </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#717182]" />
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="h-11 bg-white border-[#e0e0e0] rounded-lg pl-11 pr-3 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
-                      placeholder="your.email@hospital.com"
-                      disabled={isLoading}
-                    />
-                  </div>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                    placeholder="your.email@hospital.com"
+                    disabled={isLoading}
+                  />
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full h-11 bg-sky-600 hover:bg-sky-700 text-white text-base font-semibold tracking-[-0.1504px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-9 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isLoading}
                 >
                   {isLoading ? "Sending..." : "Send Reset Link"}
@@ -138,20 +135,20 @@ const PasswordResetPage = () => {
           <div className="w-full max-w-[416px] bg-[rgba(255,255,255,0.95)] border border-[rgba(0,0,0,0.1)] rounded-[14px] shadow-sm">
             {/* Card Header */}
             <div className="px-6 pt-6 pb-0">
-              <h2 className="text-2xl font-medium text-neutral-950 tracking-[-0.3125px] text-center mb-4 leading-8">
+              <h2 className="text-base font-medium text-neutral-950 tracking-[-0.3125px] text-center mb-1.5">
                 Check Your Email
               </h2>
-              <p className="text-base font-normal text-[#616161] tracking-[-0.3125px] text-center leading-6">
+              <p className="text-base font-normal text-[#717182] tracking-[-0.3125px] text-center">
                 We&apos;ve sent a password reset link to your email address
               </p>
             </div>
 
             {/* Card Content */}
-            <div className="px-6 py-6 mt-6">
-              <div className="space-y-6">
+            <div className="px-6 py-6">
+              <div className="space-y-4">
                 {/* Info Box */}
-                <div className="bg-[#e6f0fa] rounded-[10px] px-4 pt-4 pb-0">
-                  <p className="text-base font-normal text-[#0d47a1] leading-6 pb-4">
+                <div className="bg-[#e6f0fa] rounded-lg px-4 py-3">
+                  <p className="text-sm font-normal text-[#0d47a1]">
                     If an account exists for{" "}
                     <span className="font-semibold">{submittedEmail}</span>, you
                     will receive a password reset link shortly.
@@ -159,13 +156,13 @@ const PasswordResetPage = () => {
                 </div>
 
                 {/* Try Again Section */}
-                <div className="space-y-3">
-                  <p className="text-base font-normal text-[#616161] tracking-[-0.1504px] text-center leading-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-normal text-[#717182] tracking-[-0.1504px] text-center">
                     Didn&apos;t receive the email?
                   </p>
                   <button
                     onClick={handleTryAgain}
-                    className="w-full h-11 bg-white border border-sky-600 text-sky-600 text-base font-semibold tracking-[-0.1504px] rounded-lg transition-colors duration-200 hover:bg-sky-50"
+                    className="w-full h-9 bg-white border border-sky-600 text-sky-600 text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200 hover:bg-sky-50"
                   >
                     Try Again
                   </button>
@@ -174,10 +171,10 @@ const PasswordResetPage = () => {
             </div>
 
             {/* Card Footer */}
-            <div className="border-t border-[#e0e0e0] px-6 py-6 flex flex-col items-center">
+            <div className="border-t border-[rgba(0,0,0,0.1)] px-6 py-6 flex flex-col items-center">
               <button
                 onClick={() => router.push("/login")}
-                className="flex items-center gap-2 text-base font-normal text-sky-600 hover:text-sky-700 tracking-[-0.1504px] transition-colors"
+                className="flex items-center gap-2 text-sm font-medium text-sky-600 hover:text-sky-700 tracking-[-0.1504px] transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Sign In

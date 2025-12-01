@@ -176,7 +176,7 @@ const LoginPage = () => {
           {/* Card Footer */}
           <div className="border-t border-[rgba(0,0,0,0.1)] px-6 py-6 flex flex-col items-center gap-3">
             <a
-              href="/password-reset"
+              href="/password-reset/confirm-email"
               className="text-sm font-medium text-sky-600 hover:text-sky-700 tracking-[-0.1504px]"
             >
               Forgot password?

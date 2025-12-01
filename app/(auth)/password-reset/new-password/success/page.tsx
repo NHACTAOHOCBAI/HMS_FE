@@ -33,33 +33,33 @@ const ResetSuccessPage = () => {
         <div className="w-full max-w-[416px] bg-[rgba(255,255,255,0.95)] border border-[rgba(0,0,0,0.1)] rounded-[14px] shadow-sm">
           {/* Card Header with Success Icon */}
           <div className="px-6 pt-6 pb-0">
-            <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-4">
               {/* Success Icon */}
-              <div className="bg-[#e6f0fa] rounded-full w-20 h-20 flex items-center justify-center">
+              <div className="bg-[#e6f0fa] rounded-full w-16 h-16 flex items-center justify-center">
                 <CheckCircle2
-                  className="w-12 h-12 text-green-600"
+                  className="w-10 h-10 text-green-600"
                   strokeWidth={2}
                 />
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl font-medium text-neutral-950 tracking-[-0.3125px] text-center leading-8">
+              <h2 className="text-base font-medium text-neutral-950 tracking-[-0.3125px] text-center mb-1.5">
                 Password Reset Successful
               </h2>
 
               {/* Description */}
-              <p className="text-base font-normal text-[#616161] tracking-[-0.3125px] text-center leading-6">
+              <p className="text-base font-normal text-[#717182] tracking-[-0.3125px] text-center">
                 Your password has been changed successfully
               </p>
             </div>
           </div>
 
           {/* Card Content */}
-          <div className="px-6 py-6 mt-6">
-            <div className="space-y-6">
+          <div className="px-6 py-6">
+            <div className="space-y-4">
               {/* Info Box */}
-              <div className="bg-[#e6f0fa] rounded-[10px] px-4 pt-4 pb-0">
-                <p className="text-base font-normal text-[#0d47a1] leading-6 pb-4 text-center">
+              <div className="bg-[#e6f0fa] rounded-lg px-4 py-3">
+                <p className="text-sm font-normal text-[#0d47a1] text-center">
                   You can now sign in with your new password
                 </p>
               </div>
@@ -67,7 +67,7 @@ const ResetSuccessPage = () => {
               {/* Go to Sign In Button */}
               <button
                 onClick={() => router.push("/login")}
-                className="w-full h-11 bg-sky-600 hover:bg-sky-700 text-white text-base font-semibold tracking-[-0.1504px] rounded-lg transition-colors duration-200"
+                className="w-full h-9 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200"
               >
                 Go to Sign In
               </button>

@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Hotel, Lock, Eye, EyeOff } from "lucide-react";
+import { Hotel, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const ResetPasswordPage = () => {
@@ -36,7 +36,10 @@ const ResetPasswordPage = () => {
     });
   };
 
-  const handlePasswordChange = (field: "newPassword" | "confirmPassword", value: string) => {
+  const handlePasswordChange = (
+    field: "newPassword" | "confirmPassword",
+    value: string
+  ) => {
     setPasswords((prev) => ({ ...prev, [field]: value }));
     if (field === "newPassword") {
       validatePassword(value);
@@ -102,17 +105,17 @@ const ResetPasswordPage = () => {
         <div className="w-full max-w-[416px] bg-[rgba(255,255,255,0.95)] border border-[rgba(0,0,0,0.1)] rounded-[14px] shadow-sm">
           {/* Card Header */}
           <div className="px-6 pt-6 pb-0">
-            <h2 className="text-2xl font-medium text-neutral-950 tracking-[-0.3125px] text-center mb-4 leading-8">
+            <h2 className="text-base font-medium text-neutral-950 tracking-[-0.3125px] text-center mb-1.5">
               Reset Your Password
             </h2>
-            <p className="text-base font-normal text-[#616161] tracking-[-0.3125px] text-center leading-6">
+            <p className="text-base font-normal text-[#717182] tracking-[-0.3125px] text-center">
               Please enter your new password below
             </p>
           </div>
 
           {/* Card Content - Form */}
-          <div className="px-6 py-6 mt-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="px-6 py-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Error Message */}
               {errorMessage && (
                 <div className="bg-error-100 border border-error-600 text-error-600 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
@@ -125,12 +128,11 @@ const ResetPasswordPage = () => {
               <div className="space-y-2">
                 <label
                   htmlFor="newPassword"
-                  className="block text-base font-semibold text-neutral-950 tracking-[-0.1504px]"
+                  className="block text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
                 >
                   New Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#717182]" />
                   <Input
                     id="newPassword"
                     name="newPassword"
@@ -138,8 +140,10 @@ const ResetPasswordPage = () => {
                     autoComplete="new-password"
                     required
                     value={passwords.newPassword}
-                    onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
-                    className="h-11 bg-white border-[#e0e0e0] rounded-lg pl-11 pr-11 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                    onChange={(e) =>
+                      handlePasswordChange("newPassword", e.target.value)
+                    }
+                    className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
                     placeholder="Enter your new password"
                     disabled={isLoading}
                   />
@@ -150,9 +154,9 @@ const ResetPasswordPage = () => {
                     disabled={isLoading}
                   >
                     {showNewPassword ? (
-                      <EyeOff className="h-5 w-5 text-[#717182] hover:text-neutral-950" />
+                      <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
                     ) : (
-                      <Eye className="h-5 w-5 text-[#717182] hover:text-neutral-950" />
+                      <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
                     )}
                   </button>
                 </div>
@@ -162,12 +166,11 @@ const ResetPasswordPage = () => {
               <div className="space-y-2">
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-base font-semibold text-neutral-950 tracking-[-0.1504px]"
+                  className="block text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
                 >
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[#717182]" />
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -175,8 +178,10 @@ const ResetPasswordPage = () => {
                     autoComplete="new-password"
                     required
                     value={passwords.confirmPassword}
-                    onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
-                    className="h-11 bg-white border-[#e0e0e0] rounded-lg pl-11 pr-11 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                    onChange={(e) =>
+                      handlePasswordChange("confirmPassword", e.target.value)
+                    }
+                    className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
                     placeholder="Re-enter your new password"
                     disabled={isLoading}
                   />
@@ -187,40 +192,56 @@ const ResetPasswordPage = () => {
                     disabled={isLoading}
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-[#717182] hover:text-neutral-950" />
+                      <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
                     ) : (
-                      <Eye className="h-5 w-5 text-[#717182] hover:text-neutral-950" />
+                      <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
                     )}
                   </button>
                 </div>
               </div>
 
               {/* Password Requirements Box */}
-              <div className="bg-[#e6f0fa] rounded-[10px] px-4 pt-4 pb-0">
-                <p className="text-sm font-normal text-[#0d47a1] leading-5 pb-2">
+              <div className="bg-[#e6f0fa] rounded-lg px-4 py-3">
+                <p className="text-xs font-normal text-[#0d47a1] pb-2">
                   Password must contain:
                 </p>
-                <ul className="space-y-1.5 pb-4">
-                  <li className="flex items-center gap-2 text-sm text-[#0d47a1] leading-5">
-                    <span className={validations.minLength ? "opacity-100" : "opacity-40"}>
+                <ul className="space-y-1">
+                  <li className="flex items-center gap-2 text-xs text-[#0d47a1]">
+                    <span
+                      className={
+                        validations.minLength ? "opacity-100" : "opacity-40"
+                      }
+                    >
                       {validations.minLength ? "●" : "○"}
                     </span>
                     <span>At least 8 characters</span>
                   </li>
-                  <li className="flex items-center gap-2 text-sm text-[#0d47a1] leading-5">
-                    <span className={validations.hasUpperLower ? "opacity-100" : "opacity-40"}>
+                  <li className="flex items-center gap-2 text-xs text-[#0d47a1]">
+                    <span
+                      className={
+                        validations.hasUpperLower ? "opacity-100" : "opacity-40"
+                      }
+                    >
                       {validations.hasUpperLower ? "●" : "○"}
                     </span>
                     <span>Uppercase and lowercase letters</span>
                   </li>
-                  <li className="flex items-center gap-2 text-sm text-[#0d47a1] leading-5">
-                    <span className={validations.hasNumber ? "opacity-100" : "opacity-40"}>
+                  <li className="flex items-center gap-2 text-xs text-[#0d47a1]">
+                    <span
+                      className={
+                        validations.hasNumber ? "opacity-100" : "opacity-40"
+                      }
+                    >
                       {validations.hasNumber ? "●" : "○"}
                     </span>
                     <span>At least one number</span>
                   </li>
-                  <li className="flex items-center gap-2 text-sm text-[#0d47a1] leading-5">
-                    <span className={validations.hasSpecial ? "opacity-100" : "opacity-40"}>
+                  <li className="flex items-center gap-2 text-xs text-[#0d47a1]">
+                    <span
+                      className={
+                        validations.hasSpecial ? "opacity-100" : "opacity-40"
+                      }
+                    >
                       {validations.hasSpecial ? "●" : "○"}
                     </span>
                     <span>At least one special character</span>
@@ -231,7 +252,7 @@ const ResetPasswordPage = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full h-11 bg-sky-600 hover:bg-sky-700 text-white text-base font-semibold tracking-[-0.1504px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-9 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoading}
               >
                 {isLoading ? "Resetting Password..." : "Reset Password"}
