@@ -1,19 +1,13 @@
-import type { Medicine } from "@/interfaces/medicine";
+import { MedicineFiltersState } from "@/app/admin/medicines/page";
+import type { MedicineResponse } from "@/interfaces/medicine";
 
-const mockCategories = [
-    "antibiotic",
-    "painkiller",
-    "vitamin",
-    "supplement",
-    "fever",
-];
 
 // Random helper
 const random = (min: number, max: number) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
 
-const generateMockMedicines = (): Medicine[] => {
-    const list: Medicine[] = [];
+const generateMockMedicines = (): MedicineResponse[] => {
+    const list: MedicineResponse[] = [];
 
     for (let i = 1; i <= 50; i++) {
         list.push({
@@ -27,8 +21,12 @@ const generateMockMedicines = (): Medicine[] => {
             purchasePrice: random(10000, 50000),
             sellingPrice: random(60000, 100000),
             expiresAt: `202${random(4, 6)}-0${random(1, 9)}-15T00:00:00Z`,
-            categoryId: mockCategories[i % mockCategories.length],
-        } as Medicine);
+            category: {
+                id: random(1, 6),
+                name: `Category ${random(1, 6)}`,
+                description: `Description for category ${random(1, 6)}`
+            },
+        } as MedicineResponse);
     }
 
     return list;
@@ -36,15 +34,8 @@ const generateMockMedicines = (): Medicine[] => {
 
 const MEDICINES = generateMockMedicines();
 
-export const getMedicines = async ({
-    page,
-    limit,
-    search = ""
-}: {
-    page: number;
-    limit: number;
-    search?: string;
-}) => {
+export const getMedicines = async ({ search, categoryId, sortBy, sortOrder, page, limit }: MedicineFiltersState
+) => {
     await new Promise((r) => setTimeout(r, 300)); // simulate latency
 
     // 🔎 Normalize search text
@@ -78,4 +69,12 @@ export const getMedicineById = async (id: number | string) => {
     await new Promise((r) => setTimeout(r, 500)); // simulate latency
 
     return MEDICINES.find((m) => m.id === Number(id));
+};
+export const createMedicine = async (data: Partial<MedicineResponse>) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+
+    return {
+        ...data,
+        id: MEDICINES.length + 1,
+    };
 };

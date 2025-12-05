@@ -1,16 +1,19 @@
-import { getMedicineById, getMedicines } from "@/services/medicine.service";
-import { useQuery } from "@tanstack/react-query";
-export const useMedicine = (page: number, limit: number, search?: string) => {
+import { MedicineFiltersState } from "@/app/admin/medicines/page";
+import { createMedicine, getMedicines } from "@/services/medicine.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+export const useMedicines = (filters: MedicineFiltersState) => {
     return useQuery({
-        queryKey: ["medicines", page, limit, search],
-        queryFn: () => getMedicines({ page, limit, search }),
+        queryKey: ["medicines", filters],
+        queryFn: () => getMedicines(filters),
         // keepPreviousData: true,
     });
 };
-export const useMedicineById = (id: number | string) => {
-    return useQuery({
-        queryKey: ["medicine", id],
-        queryFn: () => getMedicineById(id),
-        enabled: !!id,
+export const useCreateMedicine = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: createMedicine,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["medicines"] })
+        },
     });
-};
+}

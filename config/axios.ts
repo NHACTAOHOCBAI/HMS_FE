@@ -10,6 +10,11 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    const token = process.env.NEXT_PUBLIC_API_TOKEN;
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
     return config;
   },
   function (error) {

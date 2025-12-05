@@ -1,41 +1,55 @@
-import type { Category } from "@/interfaces/category";
+// src/api/categories.ts
 
-// Danh sách tên danh mục
-const mockCategoryNames = [
-    "Antibiotic",
-    "Painkiller",
-    "Vitamin",
-    "Supplement",
-    "Fever Relief",
-    "Digestive",
-    "Cough & Cold",
-    "Allergy",
-    "Heart Health",
-    "Diabetes Care",
-];
+import { Category, CATEGORY_MOCK_DATA } from "@/interfaces/category";
 
-// Tạo danh mục mock
-const generateMockCategories = (): Category[] => {
-    const list: Category[] = [];
+// Hàm lấy danh sách Category (có hỗ trợ tìm kiếm và phân trang giả lập)
+export const getCategories = async ({
+    page,
+    limit,
+    search = ""
+}: {
+    page: number;
+    limit: number;
+    search?: string;
+}) => {
+    await new Promise((r) => setTimeout(r, 300)); // simulate latency
 
-    for (let i = 1; i <= 20; i++) {
-        list.push({
-            id: i,
-            name: mockCategoryNames[i % mockCategoryNames.length],
-            description:
-                i % 2 === 0
-                    ? `Description for category ${mockCategoryNames[i % mockCategoryNames.length]}`
-                    : null,
-        } as Category);
-    }
+    // 🔎 Normalize search text
+    const keyword = search.trim().toLowerCase();
 
-    return list;
+    // 🔍 Filter trước → paginate sau
+    const filtered = keyword
+        ? CATEGORY_MOCK_DATA.filter((c) =>
+            [c.name, c.description]
+                .filter(Boolean)
+                .some((field) =>
+                    field!.toLowerCase().includes(keyword)
+                )
+        )
+        : CATEGORY_MOCK_DATA;
+
+    // ▶ Pagination
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginated = filtered.slice(start, end);
+
+    return {
+        items: paginated,
+        totalItems: filtered.length,
+        currentPage: page,
+        totalPages: Math.ceil(filtered.length / limit),
+    };
 };
 
-const CATEGORIES = generateMockCategories();
+// Hàm lấy Category theo ID
+export const getCategoryById = async (id: number | string) => {
+    await new Promise((r) => setTimeout(r, 200)); // simulate shorter latency
 
-export const getCategories = async () => {
-    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+    return CATEGORY_MOCK_DATA.find((c) => c.id === Number(id));
+};
 
-    return CATEGORIES;
+// Hàm lấy tất cả Categories (thường dùng cho Dropdown/Select)
+export const getAllCategories = async (): Promise<Category[]> => {
+    await new Promise((r) => setTimeout(r, 100));
+    return CATEGORY_MOCK_DATA;
 };
