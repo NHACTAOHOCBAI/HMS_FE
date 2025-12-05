@@ -46,3 +46,7 @@ export const getPatients = async (params: TableParams) => {
     },
   };
 };
+export const createPatient = async (data: { fullName: string }) => {
+  console.log("Creating patient with data:", data);
+  return true;
+};

@@ -12,7 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { userColumns } from "@/app/admin/patients/patient-list/columns";
 import { useTableParams } from "@/hooks/useTableParams";
+import { useState } from "react";
+import { AddPatientDialog } from "@/app/admin/patients/add-patient/AddPatientDialog";
 const UserTablePage = () => {
+  const [openNew, setOpenNew] = useState(false);
   const {
     params,
     debouncedSearch,
@@ -30,55 +33,60 @@ const UserTablePage = () => {
   });
 
   return (
-    <div>
-      <div className="mb-5 flex items-center gap-5">
-        <Input
-          placeholder="Search patient..."
-          className="h-[50px] rounded-[30px] w-[460px]"
-          onChange={(e) => updateSearch(e.target.value)}
+    <>
+      <div>
+        <div className="mb-5 flex items-center gap-5">
+          <Input
+            placeholder="Search patient..."
+            className="h-[50px] rounded-[30px] w-[460px]"
+            onChange={(e) => updateSearch(e.target.value)}
+          />
+
+          <Select onValueChange={(v) => updateFilter("gender", v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select onValueChange={(v) => updateFilter("status", v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="new">New</SelectItem>
+              <SelectItem value="waiting">Waiting</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button onClick={() => setOpenNew(true)} className="ml-auto">
+            New Patient
+          </Button>
+        </div>
+
+        <ReusableTable
+          data={data?.data.content ?? []}
+          columns={userColumns}
+          loading={isLoading}
+          pagination={{
+            currentPage: params.page,
+            totalPages: data?.data.totalPages ?? 1,
+            rowsPerPage: params.limit,
+            totalItems: data?.data.totalElements ?? 0,
+          }}
+          onPageChange={updatePage}
+          onRowsPerPageChange={updateLimit}
+          onSort={updateSort}
+          sortBy={params.sortBy}
+          sortOrder={params.sortOrder as "asc" | "desc" | undefined}
         />
-
-        <Select onValueChange={(v) => updateFilter("gender", v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Gender" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="male">Male</SelectItem>
-            <SelectItem value="female">Female</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select onValueChange={(v) => updateFilter("status", v)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="new">New</SelectItem>
-            <SelectItem value="waiting">Waiting</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button className="ml-auto">New Patient</Button>
       </div>
-
-      <ReusableTable
-        data={data?.data.content ?? []}
-        columns={userColumns}
-        loading={isLoading}
-        pagination={{
-          currentPage: params.page,
-          totalPages: data?.data.totalPages ?? 1,
-          rowsPerPage: params.limit,
-          totalItems: data?.data.totalElements ?? 0,
-        }}
-        onPageChange={updatePage}
-        onRowsPerPageChange={updateLimit}
-        onSort={updateSort}
-        sortBy={params.sortBy}
-        sortOrder={params.sortOrder as "asc" | "desc" | undefined}
-      />
-    </div>
+      <AddPatientDialog open={openNew} setOpen={setOpenNew} />
+    </>
   );
 };
 
