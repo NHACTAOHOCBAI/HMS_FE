@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,7 +10,7 @@ import {
   AlertCircle,
   Pill,
   Tag,
-  MoreHorizontal
+  MoreHorizontal,
 } from "lucide-react";
 
 // --- SHADCN IMPORTS (Giả định bạn đã cài đặt đủ) ---
@@ -40,49 +39,22 @@ import { MedicineResponse } from "@/interfaces/medicine";
 import { Category } from "@/interfaces/category";
 import MedicineDialog from "./components/MedicineDialog";
 import CategoryDialog from "./components/CategoryDialog";
-export type MedicineFiltersState = {
-  search: string;
-  categoryId: string;
-  sortBy: string;
-  sortOrder: "asc" | "desc";
-  page: number;
-  limit: number;
-};
+import Medicines from "@/app/admin/medicines/components/Medicines";
+
 export default function Medicine() {
-  const [activeTab, setActiveTab] = useState<"medicines" | "categories">("medicines");
+  const [activeTab, setActiveTab] = useState<"medicines" | "categories">(
+    "medicines"
+  );
   // Data States
-
-  const [filters, setFilters] = useState<MedicineFiltersState>({
-    search: "",
-    categoryId: "",
-    sortBy: "createdAt",
-    sortOrder: "desc",
-    page: 1,
-    limit: 6,
-  });
-
-
-
-  const { data: medicines, isLoading: isLoadingMedicines } = useMedicines(filters);
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
 
   // Modal State
   const [isMedicineModalOpen, setIsMedicineModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [editingMedicine, setEditingMedicine] = useState<MedicineResponse | null>(null);
+  const [editingMedicine, setEditingMedicine] =
+    useState<MedicineResponse | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  //helper functions
-  const isExpiringSoon = (expiresAt: string) => {
-    const today = new Date();
-    const expiryDate = new Date(expiresAt);
-    const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
-  };
-
-  const isExpired = (expiresAt: string) => {
-    return new Date(expiresAt) < new Date();
-  };
   // Medicine Actions
   const handleOpenMedicineModal = (medicine?: MedicineResponse) => {
     if (medicine) {
@@ -93,7 +65,6 @@ export default function Medicine() {
     setIsMedicineModalOpen(true);
   };
 
-
   const handleOpenCategoryModal = (category?: Category) => {
     if (category) {
       setEditingCategory(category);
@@ -101,18 +72,26 @@ export default function Medicine() {
       setEditingCategory(null);
     }
     setIsCategoryModalOpen(true);
-  }
+  };
 
   return (
     <div className="space-y-6 p-6 bg-gray-50/50 min-h-screen">
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Quản lý Thuốc</h1>
-          <p className="text-muted-foreground">Theo dõi kho thuốc và danh mục phân loại</p>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            Quản lý Thuốc
+          </h1>
+          <p className="text-muted-foreground">
+            Theo dõi kho thuốc và danh mục phân loại
+          </p>
         </div>
         <Button
-          onClick={() => activeTab === "medicines" ? handleOpenMedicineModal() : handleOpenCategoryModal()}
+          onClick={() =>
+            activeTab === "medicines"
+              ? handleOpenMedicineModal()
+              : handleOpenCategoryModal()
+          }
           className="bg-blue-600 hover:bg-blue-700 shadow-sm"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -121,7 +100,11 @@ export default function Medicine() {
       </div>
 
       {/* MAIN CONTENT TABS */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "medicines" | "categories")} className="w-full space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as "medicines" | "categories")}
+        className="w-full space-y-6"
+      >
         <div className="flex items-center justify-between border-b pb-2">
           <TabsList>
             <TabsTrigger value="medicines" className="gap-2 px-4">
@@ -136,57 +119,14 @@ export default function Medicine() {
         </div>
 
         {/* FILTERS BAR */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-lg border shadow-sm">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={activeTab === "medicines" ? "Tìm thuốc, hoạt chất..." : "Tìm danh mục..."}
-              className="pl-9"
-              value={filters.search}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  search: e.target.value,
-                  page: 1, // reset page khi search
-                }))
-              }
-            />
-          </div>
-
-          {activeTab === "medicines" && (
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">Lọc theo:</span>
-              <Select
-                // value={filters.categoryId}
-                onValueChange={(value) => {
-                  setFilters((prev) => ({
-                    ...prev,
-                    categoryId: value === "all" ? "" : value, // Nếu chọn "Tất cả", đặt categoryId là ""
-                    page: 1, // Reset về trang đầu tiên khi filter
-                  }));
-                }}
-              >
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Tất cả danh mục" />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* Tùy chọn "Tất cả" */}
-                  <SelectItem value="all">Tất cả ({medicines?.items.length || 0})</SelectItem>
-                  {/* Danh sách các danh mục */}
-                  {categories?.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id.toString()}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-        </div>
 
         {/* MEDICINES TAB CONTENT */}
         <TabsContent value="medicines" className="m-0">
-          <div className="rounded-md border bg-white shadow-sm overflow-hidden">
+          <Medicines
+            isMedicineModalOpen={isMedicineModalOpen}
+            setIsMedicineModalOpen={setIsMedicineModalOpen}
+          />
+          {/* <div className="rounded-md border bg-white shadow-sm overflow-hidden">
             <Table>
               <TableHeader className="bg-gray-50">
                 <TableRow>
@@ -260,12 +200,12 @@ export default function Medicine() {
                 )}
               </TableBody>
             </Table>
-          </div>
+          </div> */}
         </TabsContent>
 
         {/* CATEGORIES TAB CONTENT */}
         <TabsContent value="categories" className="m-0">
-          <div className="rounded-md border bg-white shadow-sm overflow-hidden">
+          {/* <div className="rounded-md border bg-white shadow-sm overflow-hidden">
             <Table>
               <TableHeader className="bg-gray-50">
                 <TableRow>
@@ -276,57 +216,70 @@ export default function Medicine() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {categories && categories.map((category) => {
-                  const count = medicines?.items.filter(m => m.category?.id === category.id).length;
-                  return (
-                    <TableRow key={category.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-                            <Tag className="h-4 w-4" />
+                {categories &&
+                  categories.map((category) => {
+                    const count = medicines?.items.filter(
+                      (m) => m.category?.id === category.id
+                    ).length;
+                    return (
+                      <TableRow key={category.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                              <Tag className="h-4 w-4" />
+                            </div>
+                            <span className="font-medium text-gray-900">
+                              {category.name}
+                            </span>
                           </div>
-                          <span className="font-medium text-gray-900">{category.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-gray-500">{category.description}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className="hover:bg-blue-100 bg-blue-50 text-blue-700 border-blue-200">
-                          {count} thuốc
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost" size="icon"
-                            className="h-8 w-8 text-blue-600 hover:bg-blue-50"
-                            onClick={() => handleOpenCategoryModal(category)}
+                        </TableCell>
+                        <TableCell className="text-gray-500">
+                          {category.description}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="secondary"
+                            className="hover:bg-blue-100 bg-blue-50 text-blue-700 border-blue-200"
                           >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost" size="icon"
-                            className="h-8 w-8 text-red-500 hover:bg-red-50"
-                          // onClick={() => handleDeleteCategoryConfirm(category.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                            {count} thuốc
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                              onClick={() => handleOpenCategoryModal(category)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-red-500 hover:bg-red-50"
+                              // onClick={() => handleDeleteCategoryConfirm(category.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
               </TableBody>
             </Table>
-          </div>
+          </div> */}
         </TabsContent>
       </Tabs>
       {/* ---- MEDICINE DIALOG (FORM) --- */}
-      <MedicineDialog
+      {/* <MedicineDialog
         isMedicineModalOpen={isMedicineModalOpen}
         setIsMedicineModalOpen={setIsMedicineModalOpen}
         editingMedicine={editingMedicine}
         setEditingMedicine={setEditingMedicine}
-        categories={categories} />
+        categories={categories}
+      /> */}
 
       {/* --- CATEGORY DIALOG (FORM) --- */}
       <CategoryDialog
@@ -336,6 +289,5 @@ export default function Medicine() {
         setEditingCategory={setEditingCategory}
       />
     </div>
-
   );
 }
