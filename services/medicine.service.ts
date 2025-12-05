@@ -1,4 +1,5 @@
-import type { Medicine, MedicineResponse } from "@/interfaces/medicine";
+import { MedicineFiltersState } from "@/app/admin/medicines/page";
+import type { MedicineResponse } from "@/interfaces/medicine";
 
 
 // Random helper
@@ -33,15 +34,8 @@ const generateMockMedicines = (): MedicineResponse[] => {
 
 const MEDICINES = generateMockMedicines();
 
-export const getMedicines = async ({
-    page,
-    limit,
-    search = ""
-}: {
-    page: number;
-    limit: number;
-    search?: string;
-}) => {
+export const getMedicines = async ({ search, categoryId, sortBy, sortOrder, page, limit }: MedicineFiltersState
+) => {
     await new Promise((r) => setTimeout(r, 300)); // simulate latency
 
     // 🔎 Normalize search text
@@ -75,4 +69,12 @@ export const getMedicineById = async (id: number | string) => {
     await new Promise((r) => setTimeout(r, 500)); // simulate latency
 
     return MEDICINES.find((m) => m.id === Number(id));
+};
+export const createMedicine = async (data: Partial<MedicineResponse>) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+
+    return {
+        ...data,
+        id: MEDICINES.length + 1,
+    };
 };

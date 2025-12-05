@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import * as z from "zod";
 import { format } from "date-fns";
 import {
   Search,
@@ -41,25 +40,38 @@ import { MedicineResponse } from "@/interfaces/medicine";
 import { Category } from "@/interfaces/category";
 import MedicineDialog from "./components/MedicineDialog";
 import CategoryDialog from "./components/CategoryDialog";
+export type MedicineFiltersState = {
+  search: string;
+  categoryId: string;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+  page: number;
+  limit: number;
+};
 export default function Medicine() {
   const [activeTab, setActiveTab] = useState<"medicines" | "categories">("medicines");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all");
   // Data States
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(6);
 
-  const { data: medicines } = useMedicines(page, limit);
-  const { data: categories } = useCategories();
+  const [filters, setFilters] = useState<MedicineFiltersState>({
+    search: "",
+    categoryId: "",
+    sortBy: "createdAt",
+    sortOrder: "desc",
+    page: 1,
+    limit: 6,
+  });
+
+
+
+  const { data: medicines, isLoading: isLoadingMedicines } = useMedicines(filters);
+  const { data: categories, isLoading: isLoadingCategories } = useCategories();
+
   // Modal State
   const [isMedicineModalOpen, setIsMedicineModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [editingMedicineId, setEditingMedicineId] = useState<string | null>(null);
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [editingMedicine, setEditingMedicine] = useState<MedicineResponse | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  // Filtered Medicines based on search and category filter
-  const filteredMedicines = medicines;
-  const filteredCategories = categories;
   //helper functions
   const isExpiringSoon = (expiresAt: string) => {
     const today = new Date();
@@ -73,14 +85,24 @@ export default function Medicine() {
   };
   // Medicine Actions
   const handleOpenMedicineModal = (medicine?: MedicineResponse) => {
-
+    if (medicine) {
+      setEditingMedicine(medicine);
+    } else {
+      setEditingMedicine(null);
+    }
     setIsMedicineModalOpen(true);
   };
 
 
   const handleOpenCategoryModal = (category?: Category) => {
+    if (category) {
+      setEditingCategory(category);
+    } else {
+      setEditingCategory(null);
+    }
     setIsCategoryModalOpen(true);
   }
+
   return (
     <div className="space-y-6 p-6 bg-gray-50/50 min-h-screen">
       {/* HEADER */}
@@ -120,22 +142,39 @@ export default function Medicine() {
             <Input
               placeholder={activeTab === "medicines" ? "Tìm thuốc, hoạt chất..." : "Tìm danh mục..."}
               className="pl-9"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={filters.search}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  search: e.target.value,
+                  page: 1, // reset page khi search
+                }))
+              }
             />
           </div>
 
           {activeTab === "medicines" && (
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <span className="text-sm text-muted-foreground whitespace-nowrap">Lọc theo:</span>
-              <Select value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
+              <Select
+                // value={filters.categoryId}
+                onValueChange={(value) => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    categoryId: value === "all" ? "" : value, // Nếu chọn "Tất cả", đặt categoryId là ""
+                    page: 1, // Reset về trang đầu tiên khi filter
+                  }));
+                }}
+              >
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Tất cả danh mục" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tất cả ({medicines && medicines.items.length})</SelectItem>
-                  {categories && categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.name}>
+                  {/* Tùy chọn "Tất cả" */}
+                  <SelectItem value="all">Tất cả ({medicines?.items.length || 0})</SelectItem>
+                  {/* Danh sách các danh mục */}
+                  {categories?.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id.toString()}>
                       {cat.name}
                     </SelectItem>
                   ))}
@@ -161,14 +200,14 @@ export default function Medicine() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredMedicines?.items.length === 0 ? (
+                {medicines?.items.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                       Không tìm thấy thuốc nào.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredMedicines?.items.map((medicine) => (
+                  medicines?.items.map((medicine) => (
                     <TableRow key={medicine.id}>
                       <TableCell className="font-medium text-gray-900">{medicine.name}</TableCell>
                       <TableCell className="text-gray-500">{medicine.activeIngredient}</TableCell>
@@ -210,7 +249,7 @@ export default function Medicine() {
                           <Button
                             variant="ghost" size="icon"
                             className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                            onClick={() => onDelete(medicine.id)}
+                          // onClick={() => onDelete(medicine.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -237,7 +276,7 @@ export default function Medicine() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCategories && filteredCategories.map((category) => {
+                {categories && categories.map((category) => {
                   const count = medicines?.items.filter(m => m.category?.id === category.id).length;
                   return (
                     <TableRow key={category.id}>
@@ -267,7 +306,7 @@ export default function Medicine() {
                           <Button
                             variant="ghost" size="icon"
                             className="h-8 w-8 text-red-500 hover:bg-red-50"
-                            onClick={() => handleDeleteCategoryConfirm(category.id)}
+                          // onClick={() => handleDeleteCategoryConfirm(category.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -282,12 +321,20 @@ export default function Medicine() {
         </TabsContent>
       </Tabs>
       {/* ---- MEDICINE DIALOG (FORM) --- */}
-      <MedicineDialog isMedicineModalOpen={isMedicineModalOpen} setIsMedicineModalOpen={setIsMedicineModalOpen}
-        editingMedicineId={editingMedicineId} categories={categories} />
+      <MedicineDialog
+        isMedicineModalOpen={isMedicineModalOpen}
+        setIsMedicineModalOpen={setIsMedicineModalOpen}
+        editingMedicine={editingMedicine}
+        setEditingMedicine={setEditingMedicine}
+        categories={categories} />
 
       {/* --- CATEGORY DIALOG (FORM) --- */}
-      <CategoryDialog isCategoryModalOpen={isCategoryModalOpen} setIsCategoryModalOpen={setIsCategoryModalOpen}
-        editingCategoryId={editingCategoryId} />
+      <CategoryDialog
+        isCategoryModalOpen={isCategoryModalOpen}
+        setIsCategoryModalOpen={setIsCategoryModalOpen}
+        editingCategory={editingCategory}
+        setEditingCategory={setEditingCategory}
+      />
     </div>
 
   );

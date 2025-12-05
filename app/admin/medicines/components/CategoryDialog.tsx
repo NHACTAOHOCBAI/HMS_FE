@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-const CategoryDialog = ({ isCategoryModalOpen, setIsCategoryModalOpen, editingCategoryId }: { isCategoryModalOpen: boolean, setIsCategoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>, editingCategoryId: string | null }) => {
+import { Category } from '@/interfaces/category';
+const CategoryDialog = (
+    {
+        isCategoryModalOpen,
+        setIsCategoryModalOpen,
+        editingCategory,
+        setEditingCategory }
+        :
+        {
+            isCategoryModalOpen: boolean,
+            setIsCategoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+            editingCategory: Category | null,
+            setEditingCategory: React.Dispatch<React.SetStateAction<Category | null>>,
+        }
+) => {
 
     const categorySchema = z.object({
         name: z.string().min(2, "Tên danh mục tối thiểu 2 ký tự"),
@@ -22,19 +36,27 @@ const CategoryDialog = ({ isCategoryModalOpen, setIsCategoryModalOpen, editingCa
         },
     });
     const onCategorySubmit = (data: z.infer<typeof categorySchema>) => {
-        if (editingCategoryId) {
+        if (editingCategory) {
             // Call API to update category here
         } else {
             // Call API to create new category here 
         }
         setIsCategoryModalOpen(false);
     };
+    useEffect(() => {
+        if (editingCategory) {
+            categoryForm.setValue("name", editingCategory.name);
+            categoryForm.setValue("description", editingCategory.description || "");
+        } else {
+            categoryForm.reset();
+        }
+    }, [editingCategory, categoryForm]);
     return (
         <>
             <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{editingCategoryId ? "Sửa danh mục" : "Thêm danh mục mới"}</DialogTitle>
+                        <DialogTitle>{editingCategory ? "Sửa danh mục" : "Thêm danh mục mới"}</DialogTitle>
                     </DialogHeader>
 
                     <Form {...categoryForm}>
@@ -70,7 +92,7 @@ const CategoryDialog = ({ isCategoryModalOpen, setIsCategoryModalOpen, editingCa
                                     Hủy
                                 </Button>
                                 <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                                    {editingCategoryId ? "Cập nhật" : "Thêm mới"}
+                                    {editingCategory ? "Cập nhật" : "Thêm mới"}
                                 </Button>
                             </DialogFooter>
                         </form>

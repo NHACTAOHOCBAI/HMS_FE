@@ -6,11 +6,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 import { Category } from "@/interfaces/category";
 import type { SubmitHandler } from "react-hook-form";
+import { MedicineResponse } from "@/interfaces/medicine";
+import { useEffect } from "react";
+import { useCreateMedicine } from "@/hooks/queries/useMedicine";
 
-const MedicineDialog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMedicineId, categories }: { isMedicineModalOpen: boolean, setIsMedicineModalOpen: React.Dispatch<React.SetStateAction<boolean>>, editingMedicineId: string | null, categories: Category[] | undefined }) => {
+const MedicineDialog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMedicine, setEditingMedicine, categories }:
+    {
+        isMedicineModalOpen: boolean,
+        setIsMedicineModalOpen: React.Dispatch<React.SetStateAction<boolean>>,
+        editingMedicine: MedicineResponse | null,
+        setEditingMedicine: React.Dispatch<React.SetStateAction<MedicineResponse | null>>,
+        categories: Category[] | undefined
+    }) => {
+
+    const { mutate: createMedicine } = useCreateMedicine();
 
     // 2. Zod Schemas
     const medicineFormSchema = z.object({
@@ -23,7 +34,6 @@ const MedicineDialog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMe
         quantity: z.number().min(0, "Số lượng không hợp lệ"),
         purchasePrice: z.number().min(0, "Giá nhập không hợp lệ"),
         sellingPrice: z.number().min(0, "Giá bán không hợp lệ"),
-
         expiresAt: z.string().min(1, "Vui lòng chọn hạn sử dụng"),
         description: z.string().nullable().optional(),
     });
@@ -68,13 +78,32 @@ const MedicineDialog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMe
         setIsMedicineModalOpen(false);
     };
 
+    useEffect(() => {
+
+        if (editingMedicine) {
+            medicineForm.setValue("name", editingMedicine.name);
+            medicineForm.setValue("activeIngredient", editingMedicine.activeIngredient);
+            medicineForm.setValue("categoryId", editingMedicine.category?.id.toString() || "");
+            medicineForm.setValue("unit", editingMedicine.unit);
+            medicineForm.setValue("concentration", "");
+            medicineForm.setValue("quantity", editingMedicine.quantity);
+            medicineForm.setValue("purchasePrice", editingMedicine.purchasePrice);
+            medicineForm.setValue("sellingPrice", editingMedicine.sellingPrice);
+            medicineForm.setValue("expiresAt", editingMedicine.expiresAt.split("T")[0]);
+            medicineForm.setValue("packaging", editingMedicine.packaging);
+            medicineForm.setValue("description", editingMedicine.description);
+        }
+        else {
+            medicineForm.reset();
+        }
+    }, [editingMedicine, medicineForm]);
 
     return (<>
         {/* --- MEDICINE DIALOG (FORM) --- */}
         <Dialog open={isMedicineModalOpen} onOpenChange={setIsMedicineModalOpen}>
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle>{editingMedicineId ? "Cập nhật thông tin thuốc" : "Thêm thuốc mới"}</DialogTitle>
+                    <DialogTitle>{editingMedicine ? "Cập nhật thông tin thuốc" : "Thêm thuốc mới"}</DialogTitle>
                     <DialogDescription>
                         Điền đầy đủ thông tin thuốc vào biểu mẫu dưới đây.
                     </DialogDescription>
@@ -115,7 +144,7 @@ const MedicineDialog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMe
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Danh mục <span className="text-red-500">*</span></FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Chọn danh mục" />
@@ -205,7 +234,7 @@ const MedicineDialog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMe
                                 Hủy bỏ
                             </Button>
                             <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                                {editingMedicineId ? "Lưu thay đổi" : "Tạo mới"}
+                                {editingMedicine ? "Lưu thay đổi" : "Tạo mới"}
                             </Button>
                         </DialogFooter>
                     </form>
