@@ -228,16 +228,16 @@ const Medicines = ({
           </TableBody>
         </Table>
         {/* Pagination */}
-        <div className="flex items-center space-x-2">
+        {/* <div className="flex items-center space-x-2">
           <Button
             size="icon"
             className="border-app-primary-blue-500 border"
-            disabled={medicines?.data.page === 1}
-            // onClick={() => onPageChange( medicines?.data.page-1 - 1)}
+            disabled={filters.page === 1}
+            // onClick={() => onPageChange( filters.page-1 - 1)}
             onClick={() =>
               setFilters((prev) => ({
                 ...prev,
-                page: medicines?.data.page - 1,
+                page: filters.page - 1,
               }))
             }
           >
@@ -246,7 +246,7 @@ const Medicines = ({
 
           <div className="flex space-x-1">
             {getPaginationNumbers(
-              medicines?.data.page - 1,
+              filters.page - 1,
               medicines?.data.totalPages || 0
             ).map((p, idx) =>
               p === "..." ? (
@@ -260,11 +260,9 @@ const Medicines = ({
                 <Button
                   key={idx}
                   size="icon"
-                  variant={
-                    p === medicines?.data.page - 1 ? "default" : "outline"
-                  }
+                  variant={p === filters.page || 0 - 1 ? "default" : "outline"}
                   className={
-                    p === medicines?.data.page - 1
+                    p === filters.page || 0 - 1
                       ? "border-app-primary-blue-500 border bg-white text-app-primary-blue-700"
                       : " border"
                   }
@@ -284,17 +282,17 @@ const Medicines = ({
           <Button
             size="icon"
             className="border-app-primary-blue-500 border"
-            disabled={medicines?.data.page - 1 === medicines?.data.totalPages}
+            disabled={(filters.page ?? 0) - 1 === medicines?.data.totalPages}
             onClick={() =>
               setFilters((prev) => ({
                 ...prev,
-                page: medicines?.data.page - 1 + 1,
+                page: (filters.page ?? 0) - 1 + 1,
               }))
             }
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
-        </div>
+        </div> */}
       </div>
 
       <MedicineDialog
@@ -314,7 +312,7 @@ function getPaginationNumbers(current: number, total: number) {
   // Trang 1
   pages.push(1);
 
-  // "..." trước khi tới  medicines?.data.page-1-1
+  // "..." trước khi tới  filters.page-1-1
   if (current > 3) {
     pages.push("...");
   }
@@ -353,14 +351,14 @@ function getPaginationNumbers(current: number, total: number) {
 //     <Button
 //       size="icon"
 //       className="border-app-primary-blue-500 border"
-//       disabled={ medicines?.data.page-1 === 1}
-//       onClick={() => onPageChange( medicines?.data.page-1 - 1)}
+//       disabled={ filters.page-1 === 1}
+//       onClick={() => onPageChange( filters.page-1 - 1)}
 //     >
 //       <ChevronLeft className="h-4 w-4" />
 //     </Button>
 
 //     <div className="flex space-x-1">
-//       {getPaginationNumbers( medicines?.data.page-1, totalPages).map((p, idx) =>
+//       {getPaginationNumbers( filters.page-1, totalPages).map((p, idx) =>
 //         p === "..." ? (
 //           <span key={idx} className="flex items-center px-2 text-gray-500">
 //             ...
@@ -369,9 +367,9 @@ function getPaginationNumbers(current: number, total: number) {
 //           <Button
 //             key={idx}
 //             size="icon"
-//             variant={p ===  medicines?.data.page-1 ? "default" : "outline"}
+//             variant={p ===  filters.page-1 ? "default" : "outline"}
 //             className={
-//               p ===  medicines?.data.page-1
+//               p ===  filters.page-1
 //                 ? "border-app-primary-blue-500 border bg-white text-app-primary-blue-700"
 //                 : " border"
 //             }
@@ -386,8 +384,8 @@ function getPaginationNumbers(current: number, total: number) {
 //     <Button
 //       size="icon"
 //       className="border-app-primary-blue-500 border"
-//       disabled={ medicines?.data.page-1 === totalPages}
-//       onClick={() => onPageChange( medicines?.data.page-1 + 1)}
+//       disabled={ filters.page-1 === totalPages}
+//       onClick={() => onPageChange( filters.page-1 + 1)}
 //     >
 //       <ChevronRight className="h-4 w-4" />
 //     </Button>
