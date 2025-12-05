@@ -1,11 +1,16 @@
 import { MedicineFiltersState } from "@/app/admin/medicines/components/Medicines";
 import { createMedicine, getMedicines } from "@/services/medicine.service";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 export const useMedicines = (filters: MedicineFiltersState) => {
   return useQuery({
     queryKey: ["medicines", filters],
     queryFn: () => getMedicines(filters),
-    // keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 };
 export const useCreateMedicine = () => {

@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+// Giả định hook này trả về dữ liệu phân trang (page, limit, totalPages, content)
 import { useMedicines } from "@/hooks/queries/useMedicine";
 import {
   AlertCircle,
@@ -30,26 +31,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import CategoryDialog from "@/app/admin/medicines/components/CategoryDialog";
-import MedicineDialog from "@/app/admin/medicines/components/MedicineDialog";
-const isExpiringSoon = (expiresAt: string) => {
-  const today = new Date();
-  const expiryDate = new Date(expiresAt);
-  const daysUntilExpiry = Math.ceil(
-    (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  );
-  return daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
-};
+// import CategoryDialog from "@/app/admin/medicines/components/CategoryDialog"; // Giữ nguyên
+import MedicineDialog from "@/app/admin/medicines/components/MedicineDialog"; // Giữ nguyên
+import PaginatedTable from "@/app/admin/_components/PaginatedTable";
 
-const isExpired = (expiresAt: string) => {
-  return new Date(expiresAt) < new Date();
-};
+// --- UTILITY FUNCTIONS ---
+// --- TYPES & COMPONENT ---
+
 export type MedicineFiltersState = {
   search: string;
   categoryId: string;
   sortBy: string;
   sortOrder: "asc" | "desc";
-  page: number;
+  page: number; // One-based: Trang 1, 2, 3...
   limit: number;
 };
 interface MedicinesProps {
@@ -68,9 +62,10 @@ const Medicines = ({
     categoryId: "",
     sortBy: "createdAt",
     sortOrder: "desc",
-    page: 1,
+    page: 1, // Bắt đầu từ trang 1
     limit: 6,
   });
+
   const handleOpenMedicineModal = (medicine?: MedicineResponse) => {
     if (medicine) {
       setEditingMedicine(medicine);
@@ -79,10 +74,58 @@ const Medicines = ({
     }
     setIsMedicineModalOpen(true);
   };
+
+  // Hook dùng query param filters
   const { data: medicines, isLoading: isLoadingMedicines } =
     useMedicines(filters);
+
+  // Lấy tổng số trang để dùng cho logic disabled/hiển thị phân trang
+  const totalPages = medicines?.data?.totalPages || 0;
+  const header = [
+    "Tên thuốc",
+    "Hoạt chất",
+    "Danh mục",
+    "Tồn kho",
+    "Giá bán",
+    "Hạn dùng",
+    "Thao tác",
+  ];
+  const rows = (medicine: MedicineResponse) => (
+    <TableRow key={medicine.id}>
+      <TableCell className="font-medium text-gray-900">
+        {medicine.name}
+      </TableCell>
+
+      <TableCell>{medicine.activeIngredient}</TableCell>
+
+      <TableCell>
+        <Badge variant="outline" className="bg-gray-50">
+          {medicine.category?.name ?? "Chưa phân loại"}
+        </Badge>
+      </TableCell>
+
+      <TableCell>{medicine.quantity}</TableCell>
+
+      <TableCell>{medicine.sellingPrice.toLocaleString("vi-VN")} ₫</TableCell>
+
+      <TableCell>
+        {format(new Date(medicine.expiresAt), "dd/MM/yyyy")}
+      </TableCell>
+
+      <TableCell className="text-right">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleOpenMedicineModal(medicine)}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
   return (
     <div>
+      {/* Search and Filter Section */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-lg border shadow-sm">
         <div className="relative w-full sm:w-96">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -104,7 +147,8 @@ const Medicines = ({
             Lọc theo:
           </span>
           <Select
-            // value={filters.categoryId}
+            // Sử dụng filters.categoryId nếu muốn hiển thị giá trị đang chọn
+            value={filters.categoryId || "all"}
             onValueChange={(value) => {
               setFilters((prev) => ({
                 ...prev,
@@ -119,9 +163,10 @@ const Medicines = ({
             <SelectContent>
               {/* Tùy chọn "Tất cả" */}
               <SelectItem value="all">
-                Tất cả ({medicines?.data.content.length || 0})
+                Tất cả
+                {/* Có thể hiển thị tổng số lượng nếu API có trả về totalElements */}
               </SelectItem>
-              {/* Danh sách các danh mục */}
+              {/* Danh sách các danh mục - hiện đang bị comment, cần hook useCategories */}
               {/* {categories?.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id.toString()}>
                     {cat.name}
@@ -131,262 +176,27 @@ const Medicines = ({
           </Select>
         </div>
       </div>
-      <div className="rounded-md border bg-white shadow-sm overflow-hidden mt-2">
-        <Table>
-          <TableHeader className="bg-gray-50">
-            <TableRow>
-              <TableHead>Tên thuốc</TableHead>
-              <TableHead>Hoạt chất</TableHead>
-              <TableHead>Danh mục</TableHead>
-              <TableHead>Tồn kho</TableHead>
-              <TableHead>Giá bán</TableHead>
-              <TableHead>Hạn dùng</TableHead>
-              <TableHead className="text-right">Thao tác</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {medicines?.data.content.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={8}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  Không tìm thấy thuốc nào.
-                </TableCell>
-              </TableRow>
-            ) : (
-              medicines?.data.content.map((medicine) => (
-                <TableRow key={medicine.id}>
-                  <TableCell className="font-medium text-gray-900">
-                    {medicine.name}
-                  </TableCell>
-                  <TableCell className="text-gray-500">
-                    {medicine.activeIngredient}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-gray-50">
-                      {medicine.category?.name ?? "Chưa phân loại"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={
-                        medicine.quantity < 10
-                          ? "text-red-600 font-bold"
-                          : "text-gray-700"
-                      }
-                    >
-                      {medicine.quantity}
-                    </span>
-                  </TableCell>
 
-                  <TableCell className="font-medium">
-                    {medicine.sellingPrice.toLocaleString("vi-VN")} ₫
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-sm ${
-                          isExpired(medicine.expiresAt)
-                            ? "text-red-600 font-medium"
-                            : isExpiringSoon(medicine.expiresAt)
-                            ? "text-amber-600 font-medium"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        {format(new Date(medicine.expiresAt), "dd/MM/yyyy")}
-                      </span>
-                      {(isExpired(medicine.expiresAt) ||
-                        isExpiringSoon(medicine.expiresAt)) && (
-                        <AlertCircle className="w-4 h-4 text-red-500" />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                        onClick={() => handleOpenMedicineModal(medicine)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                        // onClick={() => onDelete(medicine.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        {/* Pagination */}
-        {/* <div className="flex items-center space-x-2">
-          <Button
-            size="icon"
-            className="border-app-primary-blue-500 border"
-            disabled={filters.page === 1}
-            // onClick={() => onPageChange( filters.page-1 - 1)}
-            onClick={() =>
-              setFilters((prev) => ({
-                ...prev,
-                page: filters.page - 1,
-              }))
-            }
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+      <PaginatedTable
+        columns={header}
+        data={medicines?.data.content || []}
+        page={filters.page}
+        totalPages={totalPages}
+        onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
+        isLoading={isLoadingMedicines}
+        emptyMessage="Không tìm thấy thuốc nào."
+        renderRow={rows}
+      />
 
-          <div className="flex space-x-1">
-            {getPaginationNumbers(
-              filters.page - 1,
-              medicines?.data.totalPages || 0
-            ).map((p, idx) =>
-              p === "..." ? (
-                <span
-                  key={idx}
-                  className="flex items-center px-2 text-gray-500"
-                >
-                  ...
-                </span>
-              ) : (
-                <Button
-                  key={idx}
-                  size="icon"
-                  variant={p === filters.page || 0 - 1 ? "default" : "outline"}
-                  className={
-                    p === filters.page || 0 - 1
-                      ? "border-app-primary-blue-500 border bg-white text-app-primary-blue-700"
-                      : " border"
-                  }
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      page: p as number,
-                    }))
-                  }
-                >
-                  {p}
-                </Button>
-              )
-            )}
-          </div>
-
-          <Button
-            size="icon"
-            className="border-app-primary-blue-500 border"
-            disabled={(filters.page ?? 0) - 1 === medicines?.data.totalPages}
-            onClick={() =>
-              setFilters((prev) => ({
-                ...prev,
-                page: (filters.page ?? 0) - 1 + 1,
-              }))
-            }
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div> */}
-      </div>
-
+      {/* Medicine Dialog/Modal */}
       <MedicineDialog
         isMedicineModalOpen={isMedicineModalOpen}
         setIsMedicineModalOpen={setIsMedicineModalOpen}
         editingMedicine={editingMedicine}
         setEditingMedicine={setEditingMedicine}
-        categories={[]}
+        categories={[]} // Cần truyền categories thực tế từ hook useCategories
       />
     </div>
   );
 };
 export default Medicines;
-function getPaginationNumbers(current: number, total: number) {
-  const pages: (number | string)[] = [];
-
-  // Trang 1
-  pages.push(1);
-
-  // "..." trước khi tới  filters.page-1-1
-  if (current > 3) {
-    pages.push("...");
-  }
-
-  // current-1
-  if (current > 2) {
-    pages.push(current - 1);
-  }
-
-  // current
-  if (current !== 1 && current !== total) {
-    pages.push(current);
-  }
-
-  // current+1
-  if (current < total - 1) {
-    pages.push(current + 1);
-  }
-
-  // "..." sau current+1
-  if (current < total - 2) {
-    pages.push("...");
-  }
-
-  // Trang cuối
-  if (total > 1) {
-    pages.push(total);
-  }
-
-  return pages;
-}
-//   {
-//     /* Pagination */
-//   }
-//   <div className="flex items-center space-x-2">
-//     <Button
-//       size="icon"
-//       className="border-app-primary-blue-500 border"
-//       disabled={ filters.page-1 === 1}
-//       onClick={() => onPageChange( filters.page-1 - 1)}
-//     >
-//       <ChevronLeft className="h-4 w-4" />
-//     </Button>
-
-//     <div className="flex space-x-1">
-//       {getPaginationNumbers( filters.page-1, totalPages).map((p, idx) =>
-//         p === "..." ? (
-//           <span key={idx} className="flex items-center px-2 text-gray-500">
-//             ...
-//           </span>
-//         ) : (
-//           <Button
-//             key={idx}
-//             size="icon"
-//             variant={p ===  filters.page-1 ? "default" : "outline"}
-//             className={
-//               p ===  filters.page-1
-//                 ? "border-app-primary-blue-500 border bg-white text-app-primary-blue-700"
-//                 : " border"
-//             }
-//             onClick={() => onPageChange(p as number)}
-//           >
-//             {p}
-//           </Button>
-//         )
-//       )}
-//     </div>
-
-//     <Button
-//       size="icon"
-//       className="border-app-primary-blue-500 border"
-//       disabled={ filters.page-1 === totalPages}
-//       onClick={() => onPageChange( filters.page-1 + 1)}
-//     >
-//       <ChevronRight className="h-4 w-4" />
-//     </Button>
-//   </div>;
