@@ -43,6 +43,7 @@ export interface MedicalExam {
   appointment: AppointmentSummary;
   patient: PatientSummary;
   doctor: DoctorSummary;
+  status?: ExamStatus;
   diagnosis?: string;
   symptoms?: string;
   treatment?: string;
@@ -61,6 +62,7 @@ export interface MedicalExamListItem {
   appointment: AppointmentSummary;
   patient: PatientSummary;
   doctor: DoctorSummary;
+  status?: ExamStatus;
   diagnosis?: string;
   examDate: string;
   hasPrescription?: boolean;
@@ -68,6 +70,7 @@ export interface MedicalExamListItem {
 
 export interface MedicalExamCreateRequest {
   appointmentId: string;
+  status?: ExamStatus;
   diagnosis?: string;
   symptoms?: string;
   treatment?: string;
@@ -81,6 +84,7 @@ export interface MedicalExamCreateRequest {
 }
 
 export interface MedicalExamUpdateRequest {
+  status?: ExamStatus;
   diagnosis?: string;
   symptoms?: string;
   treatment?: string;
@@ -98,6 +102,7 @@ export interface MedicalExamListParams {
   doctorId?: string;
   startDate?: string;
   endDate?: string;
+  status?: ExamStatus;
   page?: number;
   size?: number;
   sort?: string;
@@ -164,6 +169,8 @@ export interface PrescriptionCreateRequest {
   notes?: string;
   items: PrescriptionItemRequest[];
 }
+
+export type ExamStatus = "PENDING" | "IN_PROGRESS" | "FINALIZED" | "CANCELLED";
 
 // ============ Paginated Response ============
 

@@ -22,10 +22,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { useMedicalExamList } from "@/hooks/queries/useMedicalExam";
 import { useDebounce } from "@/hooks/useDebounce";
 import { MedicalExamListItem } from "@/interfaces/medical-exam";
+import { ExamStatus } from "@/interfaces/medical-exam";
+import { ExamStatusBadge } from "./_components/exam-status-badge";
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleString("en-US", {
@@ -37,6 +38,9 @@ const formatDate = (value: string) =>
 export default function MedicalExamListPage() {
   const [search, setSearch] = useState("");
   const [doctorFilter, setDoctorFilter] = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<ExamStatus | "ALL">("ALL");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(0);
   const [size] = useState(20);
 
@@ -46,6 +50,9 @@ export default function MedicalExamListPage() {
     page,
     size,
     doctorId: doctorFilter !== "ALL" ? doctorFilter : undefined,
+    status: statusFilter !== "ALL" ? statusFilter : undefined,
+    startDate: startDate || undefined,
+    endDate: endDate || undefined,
   });
 
   const exams = data?.content || [];
@@ -103,6 +110,44 @@ export default function MedicalExamListPage() {
                 <SelectItem value="emp002">Dr. Tran Thi Mai</SelectItem>
               </SelectContent>
             </Select>
+            <Select
+              value={statusFilter}
+              onValueChange={(v: ExamStatus | "ALL") => {
+                setStatusFilter(v);
+                setPage(0);
+              }}
+            >
+              <SelectTrigger className="h-10 w-full rounded-lg sm:w-48">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Statuses</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                <SelectItem value="FINALIZED">Finalized</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setPage(0);
+              }}
+              className="h-10 w-full sm:w-auto"
+              aria-label="Start date"
+            />
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setPage(0);
+              }}
+              className="h-10 w-full sm:w-auto"
+              aria-label="End date"
+            />
           </div>
         </CardHeader>
 
@@ -114,7 +159,8 @@ export default function MedicalExamListPage() {
                   <TableHead className="w-[20%]">Patient</TableHead>
                   <TableHead className="w-[20%]">Doctor</TableHead>
                   <TableHead className="w-[25%]">Diagnosis</TableHead>
-                  <TableHead className="w-[15%]">Exam Date</TableHead>
+                  <TableHead className="w-[12%]">Status</TableHead>
+                  <TableHead className="w-[13%]">Exam Date</TableHead>
                   <TableHead className="w-[10%] text-center">Rx</TableHead>
                   <TableHead className="w-[10%] text-right">Actions</TableHead>
                 </TableRow>
@@ -140,6 +186,9 @@ export default function MedicalExamListPage() {
                       </TableCell>
                       <TableCell className="text-muted-foreground truncate max-w-[200px]">
                         {exam.diagnosis || "-"}
+                      </TableCell>
+                      <TableCell>
+                        <ExamStatusBadge status={exam.status as ExamStatus | undefined} />
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {formatDate(exam.examDate)}

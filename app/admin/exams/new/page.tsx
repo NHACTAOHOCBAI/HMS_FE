@@ -19,10 +19,11 @@ export default function NewMedicalExamPage() {
   const router = useRouter();
   const createExamMutation = useCreateMedicalExam();
 
-  const handleSubmit = async (data: MedicalExamFormValues) => {
+  const handleSubmit = async (data: MedicalExamFormValues, status: "PENDING" | "FINALIZED") => {
     try {
       await createExamMutation.mutateAsync({
         appointmentId: data.appointmentId,
+        status,
         diagnosis: data.diagnosis,
         symptoms: data.symptoms,
         treatment: data.treatment,
@@ -68,7 +69,8 @@ export default function NewMedicalExamPage() {
         </CardHeader>
         <CardContent>
           <MedicalExamForm
-            onSubmit={handleSubmit}
+            onSubmit={() => {}}
+            onSubmitWithStatus={handleSubmit}
             isSubmitting={createExamMutation.isPending}
           />
         </CardContent>

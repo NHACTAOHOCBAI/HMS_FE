@@ -102,9 +102,7 @@ export default function DoctorAppointmentDetailPage() {
         </Button>
         {appointment.status === "COMPLETED" && (
           <Button asChild>
-            <Link href={`/admin/exams/new?appointmentId=${appointment.id}`}>
-              Create Medical Exam
-            </Link>
+            <Link href={`/doctor/appointments/${appointment.id}/exam`}>Create Medical Exam</Link>
           </Button>
         )}
       </div>

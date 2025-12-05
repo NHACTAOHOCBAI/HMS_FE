@@ -78,11 +78,12 @@ export default function EditMedicalExamPage() {
     );
   }
 
-  const handleSubmit = async (data: MedicalExamFormValues) => {
+  const handleSubmit = async (data: MedicalExamFormValues, status: "PENDING" | "FINALIZED") => {
     try {
       await updateExamMutation.mutateAsync({
         id: exam.id,
         data: {
+          status,
           diagnosis: data.diagnosis,
           symptoms: data.symptoms,
           treatment: data.treatment,
@@ -150,7 +151,8 @@ export default function EditMedicalExamPage() {
         <CardContent>
           <MedicalExamForm
             defaultValues={defaultValues}
-            onSubmit={handleSubmit}
+            onSubmit={() => {}}
+            onSubmitWithStatus={handleSubmit}
             isSubmitting={updateExamMutation.isPending}
           />
         </CardContent>

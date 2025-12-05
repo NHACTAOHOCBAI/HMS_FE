@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { useMedicalExam } from "@/hooks/queries/useMedicalExam";
+import { ExamStatusBadge } from "../_components/exam-status-badge";
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleString("en-US", {
@@ -110,6 +111,7 @@ export default function MedicalExamDetailPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {exam.status ? <ExamStatusBadge status={exam.status as any} /> : null}
           {canEdit && timeRemaining && (
             <Badge variant="outline" className="flex items-center gap-1">
               <Clock className="h-3 w-3" />

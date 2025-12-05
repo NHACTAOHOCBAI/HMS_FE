@@ -22,12 +22,14 @@ interface MedicalExamFormProps {
   defaultValues?: Partial<MedicalExamFormValues>;
   onSubmit: (data: MedicalExamFormValues) => void;
   isSubmitting?: boolean;
+  onSubmitWithStatus?: (data: MedicalExamFormValues, status: "PENDING" | "FINALIZED") => void;
 }
 
 export function MedicalExamForm({
   defaultValues,
   onSubmit,
   isSubmitting,
+  onSubmitWithStatus,
 }: MedicalExamFormProps) {
   const form = useForm<MedicalExamFormValues>({
     resolver: zodResolver(medicalExamSchema) as any,
@@ -217,9 +219,33 @@ export function MedicalExamForm({
           />
         </div>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save Medical Exam"}
-        </Button>
+        {onSubmitWithStatus ? (
+          <div className="flex flex-wrap gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={() =>
+                form.handleSubmit((values) => onSubmitWithStatus(values, "PENDING"))()
+              }
+            >
+              {isSubmitting ? "Saving..." : "Save Draft"}
+            </Button>
+            <Button
+              type="button"
+              disabled={isSubmitting}
+              onClick={() =>
+                form.handleSubmit((values) => onSubmitWithStatus(values, "FINALIZED"))()
+              }
+            >
+              {isSubmitting ? "Saving..." : "Save & Finalize"}
+            </Button>
+          </div>
+        ) : (
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Medical Exam"}
+          </Button>
+        )}
       </form>
     </Form>
   );

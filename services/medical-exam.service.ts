@@ -9,6 +9,7 @@ import {
   Prescription,
   PrescriptionListItem,
   PaginatedResponse,
+  ExamStatus,
 } from "@/interfaces/medical-exam";
 
 const BASE_URL = "/api/exams";
@@ -92,6 +93,7 @@ let mockExams: MedicalExam[] = [
       specialization: "Cardiology",
       phoneNumber: "0912345678",
     },
+    status: "FINALIZED",
     diagnosis: "Hypertension Stage 1",
     symptoms: "Headache, dizziness",
     treatment: "Lifestyle changes, medication",
@@ -150,6 +152,7 @@ let mockExams: MedicalExam[] = [
       specialization: "Pediatrics",
       phoneNumber: "0914567890",
     },
+    status: "FINALIZED",
     diagnosis: "Common Cold",
     symptoms: "Runny nose, sore throat, mild fever",
     treatment: "Rest, fluids, paracetamol as needed",
@@ -208,6 +211,7 @@ let mockExams: MedicalExam[] = [
       specialization: "Cardiology",
       phoneNumber: "0912345678",
     },
+    status: "FINALIZED",
     diagnosis: "Diabetes Type 2",
     symptoms: "Frequent urination, increased thirst, fatigue",
     treatment: "Metformin, dietary changes, regular monitoring",
@@ -257,6 +261,7 @@ let mockExams: MedicalExam[] = [
       specialization: "Emergency Medicine",
       phoneNumber: "0915678901",
     },
+    status: "FINALIZED",
     diagnosis: "Acute Bronchitis",
     symptoms: "Cough with mucus, chest discomfort, fatigue",
     treatment: "Antibiotics, cough suppressant, rest",
@@ -318,6 +323,10 @@ export const getMedicalExams = async (params?: MedicalExamListParams) => {
     filtered = filtered.filter((e) => e.doctor.id === params.doctorId);
   }
 
+  if (params?.status) {
+    filtered = filtered.filter((e) => e.status === params.status);
+  }
+
   if (params?.startDate) {
     filtered = filtered.filter(
       (e) => new Date(e.examDate) >= new Date(params.startDate!)
@@ -342,6 +351,7 @@ export const getMedicalExams = async (params?: MedicalExamListParams) => {
       appointment: exam.appointment,
       patient: exam.patient,
       doctor: exam.doctor,
+      status: exam.status,
       diagnosis: exam.diagnosis,
       symptoms: exam.symptoms,
       treatment: exam.treatment,
@@ -364,8 +374,14 @@ export const getMedicalExam = async (id: string) => {
   return mockExams.find((e) => e.id === id);
 };
 
+export const getMedicalExamByAppointment = async (appointmentId: string) => {
+  await delay(300);
+  return mockExams.find((e) => e.appointment.id === appointmentId);
+};
+
 export const createMedicalExam = async (data: MedicalExamCreateRequest) => {
   await delay(500);
+  const status: ExamStatus = data.status || "PENDING";
   const newExam: MedicalExam = {
     id: `exam${String(mockExams.length + 1).padStart(3, "0")}`,
     appointment: {
@@ -374,6 +390,7 @@ export const createMedicalExam = async (data: MedicalExamCreateRequest) => {
     },
     patient: { id: "p001", fullName: "New Patient" },
     doctor: { id: "emp001", fullName: "Dr. Current User" },
+    status,
     diagnosis: data.diagnosis,
     symptoms: data.symptoms,
     treatment: data.treatment,
@@ -413,6 +430,7 @@ export const updateMedicalExam = async (
 
   mockExams[index] = {
     ...mockExams[index],
+    status: data.status ?? mockExams[index].status,
     diagnosis: data.diagnosis ?? mockExams[index].diagnosis,
     symptoms: data.symptoms ?? mockExams[index].symptoms,
     treatment: data.treatment ?? mockExams[index].treatment,

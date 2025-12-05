@@ -6,6 +6,7 @@ import {
   getMedicalExam,
   updateMedicalExam,
   createPrescriptionMock,
+  getMedicalExamByAppointment,
 } from "@/services/medical-exam.service";
 import {
   MedicalExamCreateRequest,
@@ -59,6 +60,14 @@ export const useMedicalExam = (id: string) => {
     queryKey: medicalExamKeys.detail(id),
     queryFn: () => getMedicalExam(id),
     enabled: !!id,
+  });
+};
+
+export const useMedicalExamByAppointment = (appointmentId: string) => {
+  return useQuery({
+    queryKey: medicalExamKeys.byAppointment(appointmentId),
+    queryFn: () => getMedicalExamByAppointment(appointmentId),
+    enabled: !!appointmentId,
   });
 };
 
@@ -149,9 +158,12 @@ function getMedicalExamErrorMessage(errorCode: string): string {
     APPOINTMENT_NOT_COMPLETED:
       "Appointment must be completed before creating an exam",
     EXAM_EXISTS: "A medical exam already exists for this appointment",
+    EXAM_ALREADY_EXISTS: "A medical exam already exists for this appointment",
     EXAM_NOT_FOUND: "Medical exam not found",
     EXAM_NOT_MODIFIABLE: "Cannot modify exam after 24 hours",
+    EXAM_NOT_EDITABLE: "Cannot modify exam after 24 hours",
     "Cannot modify exam after 24 hours": "Cannot modify exam after 24 hours",
+    APPOINTMENT_OWNER_MISMATCH: "You are not allowed to create an exam for this appointment",
     FORBIDDEN: "You do not have permission to perform this action",
     UNAUTHORIZED: "Please log in to continue",
   };
