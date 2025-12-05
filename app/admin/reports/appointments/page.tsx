@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format, subDays } from "date-fns";
 import {
   Download,
@@ -36,6 +36,12 @@ import { MetricCard } from "../_components/metric-card";
 import { ChartCard } from "../_components/chart-card";
 import { useAppointmentStats } from "@/hooks/queries/useReports";
 import { useDepartments, useEmployees } from "@/hooks/queries/useHr";
+import { exportToCSV } from "@/lib/utils/export";
+import { useRouter } from "next/navigation";
+import { EmptyReportState } from "@/components/reports/EmptyReportState";
+import { CacheInfoBanner } from "@/components/reports/CacheInfoBanner";
+import { RetryButton } from "@/components/reports/RetryButton";
+import { toast } from "sonner";
 
 // Pie Chart
 function PieChart({
@@ -185,6 +191,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AppointmentStatsPage() {
+  const router = useRouter();
   const presets = useDateRangePresets();
   const [startDate, setStartDate] = useState<Date | undefined>(
     presets.last30Days.startDate
@@ -194,6 +201,18 @@ export default function AppointmentStatsPage() {
   );
   const [departmentId, setDepartmentId] = useState<string>("ALL");
   const [doctorId, setDoctorId] = useState<string>("ALL");
+  const [role, setRole] = useState<string>("ADMIN");
+
+  useEffect(() => {
+    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    setRole(r || "ADMIN");
+  }, []);
+
+  useEffect(() => {
+    if (role && role !== "ADMIN") {
+      router.replace("/doctor/reports/appointments");
+    }
+  }, [role, router]);
 
   // Fetch departments and doctors for filters
   const { data: departmentsData } = useDepartments({ size: 100 });
@@ -249,7 +268,35 @@ export default function AppointmentStatsPage() {
   }, [data]);
 
   const handleExport = () => {
-    alert("Export - Feature coming soon");
+    const rows: any[] = [];
+    data?.appointmentsByStatus?.forEach((s) =>
+      rows.push({ section: "status", status: s.status, count: s.count })
+    );
+    data?.appointmentsByType?.forEach((t) =>
+      rows.push({ section: "type", type: t.type, count: t.count })
+    );
+    data?.appointmentsByDepartment?.forEach((d) =>
+      rows.push({
+        section: "department",
+        department: d.departmentName,
+        count: d.count,
+      })
+    );
+    data?.dailyTrend?.forEach((d) =>
+      rows.push({ section: "daily", date: d.date, count: d.count })
+    );
+    exportToCSV(rows, "appointments-report.csv");
+  };
+
+  const validateRange = () => {
+    if (!startDate || !endDate) return true;
+    const diff = endDate.getTime() - startDate.getTime();
+    const max = 365 * 24 * 60 * 60 * 1000;
+    if (diff > max) {
+      toast.error("Khoảng ngày tối đa 1 năm");
+      return false;
+    }
+    return true;
   };
 
   // Reset doctor when department changes
@@ -323,6 +370,10 @@ export default function AppointmentStatsPage() {
               </Select>
             </div>
             <Button onClick={() => refetch()} disabled={isLoading}>
+              onClick={() => {
+                if (!validateRange()) return;
+                refetch();
+              }}
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate Report
             </Button>
@@ -372,9 +423,7 @@ export default function AppointmentStatsPage() {
           {statusPieData.length > 0 ? (
             <PieChart data={statusPieData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
 
@@ -386,9 +435,7 @@ export default function AppointmentStatsPage() {
           {typeBarData.length > 0 ? (
             <BarChart data={typeBarData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
       </div>
@@ -403,9 +450,7 @@ export default function AppointmentStatsPage() {
           {dailyTrendData.length > 0 ? (
             <LineChart data={dailyTrendData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
 
@@ -417,20 +462,13 @@ export default function AppointmentStatsPage() {
           {departmentBarData.length > 0 ? (
             <HorizontalBarChart data={departmentBarData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
       </div>
 
       {/* Cache Info */}
-      {data?.cached && (
-        <p className="text-center text-xs text-muted-foreground">
-          Data cached at{" "}
-          {format(new Date(data.generatedAt), "dd/MM/yyyy HH:mm")}
-        </p>
-      )}
+      {data?.cached && <CacheInfoBanner generatedAt={data.generatedAt} />}
     </div>
   );
 }

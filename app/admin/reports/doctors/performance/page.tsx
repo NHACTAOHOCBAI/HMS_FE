@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format, startOfMonth } from "date-fns";
 import {
   Download,
@@ -48,6 +48,12 @@ import { useDoctorPerformance } from "@/hooks/queries/useReports";
 import { useDepartments } from "@/hooks/queries/useHr";
 import type { DoctorPerformanceItem } from "@/interfaces/reports";
 import { cn } from "@/lib/utils";
+import { exportToCSV } from "@/lib/utils/export";
+import { useRouter } from "next/navigation";
+import { EmptyReportState } from "@/components/reports/EmptyReportState";
+import { CacheInfoBanner } from "@/components/reports/CacheInfoBanner";
+import { RetryButton } from "@/components/reports/RetryButton";
+import { toast } from "sonner";
 
 // Completion Rate Badge
 function CompletionRateBadge({ rate }: { rate: number }) {
@@ -149,6 +155,8 @@ function DoctorDetailModal({
 }
 
 export default function DoctorPerformancePage() {
+  const router = useRouter();
+  const [role, setRole] = useState<string>("ADMIN");
   const presets = useDateRangePresets();
   const [startDate, setStartDate] = useState<Date | undefined>(
     presets.thisMonth.startDate
@@ -157,6 +165,17 @@ export default function DoctorPerformancePage() {
     presets.thisMonth.endDate
   );
   const [departmentId, setDepartmentId] = useState<string>("ALL");
+
+  useEffect(() => {
+    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    setRole(r || "ADMIN");
+  }, []);
+
+  useEffect(() => {
+    if (role && role !== "ADMIN") {
+      router.replace("/doctor/reports/appointments");
+    }
+  }, [role, router]);
   const [sortBy, setSortBy] = useState<
     "completionRate" | "patientsSeen" | "totalRevenue"
   >("completionRate");
@@ -188,7 +207,28 @@ export default function DoctorPerformancePage() {
   };
 
   const handleExport = () => {
-    alert("Export - Feature coming soon");
+    const rows = doctors.map((doc) => ({
+      doctorName: doc.doctorName,
+      department: doc.departmentName,
+      specialization: doc.specialization,
+      completionRate: doc.statistics.completionRate,
+      patientsSeen: doc.statistics.patientsSeen,
+      totalRevenue: doc.statistics.totalRevenue,
+      averageTicket: doc.statistics.averageTicketSize,
+      satisfaction: doc.statistics.satisfactionScore,
+    }));
+    exportToCSV(rows, "doctor-performance.csv");
+  };
+
+  const validateRange = () => {
+    if (!startDate || !endDate) return true;
+    const diff = endDate.getTime() - startDate.getTime();
+    const max = 365 * 24 * 60 * 60 * 1000;
+    if (diff > max) {
+      toast.error("Khoảng ngày tối đa 1 năm");
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -258,7 +298,13 @@ export default function DoctorPerformancePage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => refetch()} disabled={isLoading}>
+            <Button
+              onClick={() => {
+                if (!validateRange()) return;
+                refetch();
+              }}
+              disabled={isLoading}
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate Report
             </Button>
@@ -360,11 +406,8 @@ export default function DoctorPerformancePage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="py-10 text-center text-muted-foreground"
-                  >
-                    No data available
+                  <TableCell colSpan={7}>
+                    <EmptyReportState description="No data available" />
                   </TableCell>
                 </TableRow>
               )}
@@ -381,12 +424,7 @@ export default function DoctorPerformancePage() {
       />
 
       {/* Cache Info */}
-      {data?.cached && (
-        <p className="text-center text-xs text-muted-foreground">
-          Data cached at{" "}
-          {format(new Date(data.generatedAt), "dd/MM/yyyy HH:mm")}
-        </p>
-      )}
+      {data?.cached && <CacheInfoBanner generatedAt={data.generatedAt} />}
     </div>
   );
 }

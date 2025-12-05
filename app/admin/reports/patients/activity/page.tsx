@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format, startOfMonth } from "date-fns";
 import {
   Download,
@@ -29,6 +29,12 @@ import {
 import { MetricCard } from "../../_components/metric-card";
 import { ChartCard } from "../../_components/chart-card";
 import { usePatientActivity } from "@/hooks/queries/useReports";
+import { exportToCSV } from "@/lib/utils/export";
+import { useRouter } from "next/navigation";
+import { EmptyReportState } from "@/components/reports/EmptyReportState";
+import { CacheInfoBanner } from "@/components/reports/CacheInfoBanner";
+import { RetryButton } from "@/components/reports/RetryButton";
+import { toast } from "sonner";
 
 // Pie Chart Component
 function PieChart({
@@ -211,6 +217,8 @@ const bloodTypeColors: Record<string, string> = {
 };
 
 export default function PatientActivityPage() {
+  const router = useRouter();
+  const [role, setRole] = useState<string>("ADMIN");
   const presets = useDateRangePresets();
   const [startDate, setStartDate] = useState<Date | undefined>(
     presets.thisMonth.startDate
@@ -219,6 +227,27 @@ export default function PatientActivityPage() {
     presets.thisMonth.endDate
   );
   const [status, setStatus] = useState<string>("ALL");
+  const validateRange = () => {
+    if (!startDate || !endDate) return true;
+    const diff = endDate.getTime() - startDate.getTime();
+    const max = 365 * 24 * 60 * 60 * 1000;
+    if (diff > max) {
+      toast.error("Khoảng ngày tối đa 1 năm");
+      return false;
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    setRole(r || "ADMIN");
+  }, []);
+
+  useEffect(() => {
+    if (role && role !== "ADMIN") {
+      router.replace("/doctor/reports/appointments");
+    }
+  }, [role, router]);
 
   // Fetch patient activity
   const { data, isLoading, refetch } = usePatientActivity({
@@ -265,7 +294,20 @@ export default function PatientActivityPage() {
   }, [data]);
 
   const handleExport = () => {
-    alert("Export - Feature coming soon");
+    const rows: any[] = [];
+    data?.demographics?.gender?.forEach((g) =>
+      rows.push({ section: "gender", label: g.gender, value: g.count })
+    );
+    data?.demographics?.ageGroups?.forEach((a) =>
+      rows.push({ section: "age", label: a.range, value: a.count })
+    );
+    data?.topDiagnoses?.forEach((d) =>
+      rows.push({ section: "diagnosis", label: d.diagnosis, value: d.count })
+    );
+    data?.activityTrend?.forEach((t) =>
+      rows.push({ section: "trend", date: t.date, value: t.count })
+    );
+    exportToCSV(rows, "patient-activity.csv");
   };
 
   return (
@@ -310,7 +352,13 @@ export default function PatientActivityPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => refetch()} disabled={isLoading}>
+            <Button
+              onClick={() => {
+                if (!validateRange()) return;
+                refetch();
+              }}
+              disabled={isLoading}
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate Report
             </Button>
@@ -359,9 +407,7 @@ export default function PatientActivityPage() {
           {genderPieData.length > 0 ? (
             <PieChart data={genderPieData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
 
@@ -373,9 +419,7 @@ export default function PatientActivityPage() {
           {bloodTypePieData.length > 0 ? (
             <PieChart data={bloodTypePieData} size="sm" />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
       </div>
@@ -390,9 +434,7 @@ export default function PatientActivityPage() {
           {diagnosesData.length > 0 ? (
             <HorizontalBarChart data={diagnosesData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
 
@@ -404,20 +446,13 @@ export default function PatientActivityPage() {
           {trendData.length > 0 ? (
             <LineChart data={trendData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
       </div>
 
       {/* Cache Info */}
-      {data?.cached && (
-        <p className="text-center text-xs text-muted-foreground">
-          Data cached at{" "}
-          {format(new Date(data.generatedAt), "dd/MM/yyyy HH:mm")}
-        </p>
-      )}
+      {data?.cached && <CacheInfoBanner generatedAt={data.generatedAt} />}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format, startOfMonth, subDays } from "date-fns";
 import {
@@ -123,7 +123,19 @@ function SimpleLineChart({
 
 export default function ReportsDashboardPage() {
   const router = useRouter();
+  const [role, setRole] = useState<string>("ADMIN");
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    setRole(r || "ADMIN");
+  }, []);
+
+  useEffect(() => {
+    if (role && role !== "ADMIN") {
+      router.replace("/doctor/reports/appointments");
+    }
+  }, [role, router]);
 
   // Default date range: current month
   const today = new Date();
@@ -221,16 +233,18 @@ export default function ReportsDashboardPage() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Total Revenue"
-          value={
-            revenue.data ? formatCurrency(revenue.data.totalRevenue) : "---"
-          }
-          icon={DollarSign}
-          trend={{ value: 12, label: "vs last month" }}
-          onClick={() => router.push("/admin/reports/revenue")}
-          loading={revenue.isLoading}
-        />
+        {role === "ADMIN" && (
+          <MetricCard
+            title="Total Revenue"
+            value={
+              revenue.data ? formatCurrency(revenue.data.totalRevenue) : "---"
+            }
+            icon={DollarSign}
+            trend={{ value: 12, label: "vs last month" }}
+            onClick={() => router.push("/admin/reports/revenue")}
+            loading={revenue.isLoading}
+          />
+        )}
         <MetricCard
           title="Total Appointments"
           value={appointments.data?.totalAppointments.toLocaleString() ?? "---"}
@@ -239,24 +253,28 @@ export default function ReportsDashboardPage() {
           onClick={() => router.push("/admin/reports/appointments")}
           loading={appointments.isLoading}
         />
-        <MetricCard
-          title="Active Doctors"
-          value={doctors.data?.summary?.totalDoctors.toString() ?? "---"}
-          icon={UserCheck}
-          subLabel={`Avg ${
-            doctors.data?.summary?.avgCompletionRate.toFixed(0) ?? "--"
-          }% completion`}
-          onClick={() => router.push("/admin/reports/doctors/performance")}
-          loading={doctors.isLoading}
-        />
-        <MetricCard
-          title="Total Patients"
-          value={patients.data?.totalPatients.toLocaleString() ?? "---"}
-          icon={Users}
-          trend={{ value: 8, label: "new this month" }}
-          onClick={() => router.push("/admin/reports/patients/activity")}
-          loading={patients.isLoading}
-        />
+        {role === "ADMIN" && (
+          <MetricCard
+            title="Active Doctors"
+            value={doctors.data?.summary?.totalDoctors.toString() ?? "---"}
+            icon={UserCheck}
+            subLabel={`Avg ${
+              doctors.data?.summary?.avgCompletionRate.toFixed(0) ?? "--"
+            }% completion`}
+            onClick={() => router.push("/admin/reports/doctors/performance")}
+            loading={doctors.isLoading}
+          />
+        )}
+        {role === "ADMIN" && (
+          <MetricCard
+            title="Total Patients"
+            value={patients.data?.totalPatients.toLocaleString() ?? "---"}
+            icon={Users}
+            trend={{ value: 8, label: "new this month" }}
+            onClick={() => router.push("/admin/reports/patients/activity")}
+            loading={patients.isLoading}
+          />
+        )}
       </div>
 
       {/* Charts Row */}

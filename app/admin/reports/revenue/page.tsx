@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format, startOfMonth } from "date-fns";
 import {
   Download,
@@ -36,6 +36,16 @@ import { MetricCard } from "../_components/metric-card";
 import { ChartCard } from "../_components/chart-card";
 import { useRevenueReport } from "@/hooks/queries/useReports";
 import { useDepartments } from "@/hooks/queries/useHr";
+import { exportToCSV } from "@/lib/utils/export";
+import { useRouter } from "next/navigation";
+import { EmptyReportState } from "@/components/reports/EmptyReportState";
+import { CacheInfoBanner } from "@/components/reports/CacheInfoBanner";
+import { RetryButton } from "@/components/reports/RetryButton";
+import { toast } from "sonner";
+import { EmptyReportState } from "@/components/reports/EmptyReportState";
+import { CacheInfoBanner } from "@/components/reports/CacheInfoBanner";
+import { RetryButton } from "@/components/reports/RetryButton";
+import { toast } from "sonner";
 
 // Simple Bar Chart
 function SimpleBarChart({
@@ -144,6 +154,8 @@ const paymentMethodColors: Record<string, string> = {
 };
 
 export default function RevenueReportPage() {
+  const router = useRouter();
+  const [role, setRole] = useState<string>("ADMIN");
   const presets = useDateRangePresets();
   const [startDate, setStartDate] = useState<Date | undefined>(
     presets.thisMonth.startDate
@@ -153,6 +165,17 @@ export default function RevenueReportPage() {
   );
   const [departmentId, setDepartmentId] = useState<string>("ALL");
   const [paymentMethod, setPaymentMethod] = useState<string>("ALL");
+
+  useEffect(() => {
+    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    setRole(r || "ADMIN");
+  }, []);
+
+  useEffect(() => {
+    if (role && role !== "ADMIN") {
+      router.replace("/doctor/reports/appointments");
+    }
+  }, [role, router]);
 
   // Fetch departments for filter
   const { data: departmentsData } = useDepartments({ size: 100 });
@@ -196,13 +219,32 @@ export default function RevenueReportPage() {
   }, [data]);
 
   const handleExportCSV = () => {
-    // TODO: Implement CSV export
-    alert("Export to CSV - Feature coming soon");
+    const rows = [
+      ...(data?.revenueByDepartment?.map((d) => ({
+        type: "DEPARTMENT",
+        name: d.departmentName,
+        revenue: d.revenue,
+        percentage: d.percentage,
+      })) || []),
+      ...(data?.revenueByPaymentMethod?.map((d) => ({
+        type: "PAYMENT_METHOD",
+        name: d.method,
+        amount: d.amount,
+        percentage: d.percentage,
+      })) || []),
+    ];
+    exportToCSV(rows, "revenue-report.csv");
   };
 
-  const handleExportPDF = () => {
-    // TODO: Implement PDF export
-    alert("Export to PDF - Feature coming soon");
+  const validateRange = () => {
+    if (!startDate || !endDate) return true;
+    const diff = endDate.getTime() - startDate.getTime();
+    const max = 365 * 24 * 60 * 60 * 1000;
+    if (diff > max) {
+      toast.error("Khoảng ngày tối đa 1 năm");
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -221,9 +263,6 @@ export default function RevenueReportPage() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleExportCSV}>
                 Export CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportPDF}>
-                Export PDF
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -277,7 +316,13 @@ export default function RevenueReportPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => refetch()} disabled={isLoading}>
+            <Button
+              onClick={() => {
+                if (!validateRange()) return;
+                refetch();
+              }}
+              disabled={isLoading}
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate Report
             </Button>
@@ -323,9 +368,7 @@ export default function RevenueReportPage() {
           {departmentChartData.length > 0 ? (
             <SimpleBarChart data={departmentChartData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
 
@@ -337,22 +380,13 @@ export default function RevenueReportPage() {
           {paymentMethodChartData.length > 0 ? (
             <SimplePieChart data={paymentMethodChartData} />
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-              No data available
-            </div>
+            <EmptyReportState description="No data available" />
           )}
         </ChartCard>
       </div>
 
       {/* Cache Info */}
-      {data?.cached && (
-        <p className="text-center text-xs text-muted-foreground">
-          Data cached at{" "}
-          {format(new Date(data.generatedAt), "dd/MM/yyyy HH:mm")}
-          {data.cacheExpiresAt &&
-            ` • Expires at ${format(new Date(data.cacheExpiresAt), "HH:mm")}`}
-        </p>
-      )}
+      {data?.cached && <CacheInfoBanner generatedAt={data.generatedAt} />}
     </div>
   );
 }
