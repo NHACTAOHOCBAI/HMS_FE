@@ -67,7 +67,7 @@ test.describe("Billing - Admin", () => {
         await expect(page.getByRole("dialog")).toBeVisible();
         await expect(page.getByText(/Cancellation Reason/i)).toBeVisible();
       } else {
-        test.skip("Không ở trạng thái UNPAID hoặc không có nút hủy");
+        test.skip(true, "Không ở trạng thái UNPAID hoặc không có nút hủy");
       }
     });
   });

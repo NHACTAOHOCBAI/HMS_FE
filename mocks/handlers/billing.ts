@@ -12,6 +12,7 @@ const invoices = [
     paidAmount: 0,
     balance: 500000,
     status: "UNPAID",
+    notes: "",
     items: [
       {
         id: "item-1",
@@ -45,6 +46,7 @@ const invoices = [
     paidAmount: 300000,
     balance: 700000,
     status: "PARTIALLY_PAID",
+    notes: "",
     items: [],
     payments: [
       {
@@ -76,6 +78,7 @@ const invoices = [
     paidAmount: 750000,
     balance: 0,
     status: "PAID",
+    notes: "",
     items: [],
     payments: [
       {
@@ -99,6 +102,7 @@ const invoices = [
     paidAmount: 200000,
     balance: 1000000,
     status: "OVERDUE",
+    notes: "",
     items: [],
     payments: [
       {
@@ -130,6 +134,7 @@ const invoices = [
     paidAmount: 0,
     balance: 300000,
     status: "CANCELLED",
+    notes: "",
     items: [],
     payments: [],
   },
@@ -279,7 +284,16 @@ export const billingHandlers = [
   }),
 
   http.post("**/api/billing/payments", async ({ request }) => {
-    const body = await request.json();
+    const body = (await request.json()) as any;
+    if (!body?.invoiceId || typeof body.amount !== "number") {
+      return HttpResponse.json(
+        {
+          status: "error",
+          error: { code: "VALIDATION_ERROR", message: "Invalid payload" },
+        },
+        { status: 400 }
+      );
+    }
     const invoice = invoices.find((i) => i.id === body.invoiceId);
     if (!invoice) {
       return HttpResponse.json(
@@ -305,10 +319,10 @@ export const billingHandlers = [
       );
     }
 
-    invoice.paidAmount += body.amount;
-    invoice.balance = invoice.totalAmount - invoice.paidAmount;
+    invoice.paidAmount += body.amount ?? 0;
+    invoice.balance = invoice.totalAmount - (invoice.paidAmount ?? 0);
     invoice.status =
-      invoice.paidAmount >= invoice.totalAmount
+      (invoice.paidAmount ?? 0) >= invoice.totalAmount
         ? "PAID"
         : invoice.status === "UNPAID"
         ? "PARTIALLY_PAID"
@@ -317,7 +331,7 @@ export const billingHandlers = [
     const payment = {
       id: `pay-${Date.now()}`,
       amount: body.amount,
-      method: body.method,
+      method: body.method ?? "CASH",
       status: "COMPLETED",
       paymentDate: new Date().toISOString(),
       notes: body.notes,
@@ -350,7 +364,7 @@ export const billingHandlers = [
         { status: 400 }
       );
     }
-    const body = await request.json();
+    const body = (await request.json()) as any;
     invoice.status = "CANCELLED";
     invoice.notes = `Cancelled: ${body?.reason || ""}`;
     return HttpResponse.json(invoice);
