@@ -1,8 +1,10 @@
 import { getCategories } from "@/services/category.service";
-import { useQuery } from "@tanstack/react-query";
-export const useCategory = () => {
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { TableParams } from "../useTableParams";
+export const useCategory = (params: TableParams) => {
     return useQuery({
-        queryKey: ["categories"],
-        queryFn: () => getCategories(),
+        queryKey: ["categories", params],
+        queryFn: () => getCategories(params),
+        placeholderData: keepPreviousData,
     });
 };

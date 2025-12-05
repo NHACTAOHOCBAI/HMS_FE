@@ -12,7 +12,7 @@ export interface TableParams {
 }
 
 export const useTableParams = () => {
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<TableParams>({
     page: 1,
     limit: 10,
     search: "",

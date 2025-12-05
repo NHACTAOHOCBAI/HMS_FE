@@ -1,3 +1,5 @@
+import { TableParams } from "@/hooks/useTableParams";
+
 export interface Category {
   id: string;
   name: string;
@@ -89,4 +91,24 @@ export const mockMedicineResponse: MedicineResponse = {
     totalElements: 150,
     totalPages: 8,
   },
+};
+export const getMedicines = async (params: TableParams): Promise<MedicineResponse> => {
+  const { page, limit } = params;
+  await new Promise((r) => setTimeout(r, 500)); // simulate latency
+
+  const start = (page - 1) * limit;
+  const end = start + limit;
+
+  const paginated = mockMedicines.slice(start, end);
+  console.log("Fetching medicines with params:", params);
+  return {
+    status: "success",
+    data: {
+      content: paginated,
+      page: page,
+      size: limit,
+      totalElements: mockMedicines.length,
+      totalPages: Math.ceil(mockMedicines.length / limit),
+    },
+  };
 };
