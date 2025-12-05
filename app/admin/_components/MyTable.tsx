@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
+import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -83,14 +83,16 @@ export function ReusableTable<T>({
   const renderSortIcon = (colKey: string, sortable?: boolean) => {
     if (!sortable) return null;
 
-    // Nếu chưa sort hoặc không phải cột hiện tại → icon mặc định
+    // ❌ Cột chưa được sort → icon mờ ChevronsUpDown
     if (sortBy !== colKey)
-      return <span className="ml-1 text-xs opacity-40">⬍</span>;
+      return <ChevronsUpDown className="ml-1 h-4 w-4 text-gray-400" />;
 
-    // Nếu đang sort
-    return (
-      <span className="ml-1 text-xs">{sortOrder === "asc" ? "▲" : "▼"}</span>
-    );
+    // 🔼 Sort ASC
+    if (sortOrder === "asc")
+      return <ChevronUp className="ml-1 h-4 w-4 text-gray-700" />;
+
+    // 🔽 Sort DESC
+    return <ChevronDown className="ml-1 h-4 w-4 text-gray-700" />;
   };
 
   return (
