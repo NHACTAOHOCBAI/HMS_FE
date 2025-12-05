@@ -20,11 +20,13 @@ const UserTablePage = () => {
     updateFilter,
     updatePage,
     updateLimit,
+    updateSort,
   } = useTableParams();
 
   const { data, isLoading } = usePatient({
     ...params,
     search: debouncedSearch,
+    sortOrder: params.sortOrder as "asc" | "desc" | undefined,
   });
 
   return (
@@ -72,6 +74,9 @@ const UserTablePage = () => {
         }}
         onPageChange={updatePage}
         onRowsPerPageChange={updateLimit}
+        onSort={updateSort}
+        sortBy={params.sortBy}
+        sortOrder={params.sortOrder as "asc" | "desc" | undefined}
       />
     </div>
   );

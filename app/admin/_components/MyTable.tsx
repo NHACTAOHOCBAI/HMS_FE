@@ -23,6 +23,9 @@ export type Column<T> = {
   key: keyof T | string;
   label: React.ReactNode;
   render?: (row: T) => React.ReactNode;
+
+  // 🆕 Thêm vào đây
+  sortable?: boolean;
 };
 
 type PaginationInfo = {
@@ -35,52 +38,29 @@ type PaginationInfo = {
 type Props<T> = {
   data: T[];
   columns: Column<T>[];
-
-  // Pagination từ server
   pagination: PaginationInfo;
 
-  // React Query triggers
   onPageChange: (page: number) => void;
   onRowsPerPageChange: (size: number) => void;
 
-  // Loading từ React Query
   loading?: boolean;
+
+  // 🆕 Sorting
+  onSort?: (key: string) => void;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 };
+
 function getPaginationNumbers(current: number, total: number) {
   const pages: (number | string)[] = [];
-
-  // Trang 1
   pages.push(1);
 
-  // "..." trước khi tới currentPage-1
-  if (current > 3) {
-    pages.push("...");
-  }
-
-  // current-1
-  if (current > 2) {
-    pages.push(current - 1);
-  }
-
-  // current
-  if (current !== 1 && current !== total) {
-    pages.push(current);
-  }
-
-  // current+1
-  if (current < total - 1) {
-    pages.push(current + 1);
-  }
-
-  // "..." sau current+1
-  if (current < total - 2) {
-    pages.push("...");
-  }
-
-  // Trang cuối
-  if (total > 1) {
-    pages.push(total);
-  }
+  if (current > 3) pages.push("...");
+  if (current > 2) pages.push(current - 1);
+  if (current !== 1 && current !== total) pages.push(current);
+  if (current < total - 1) pages.push(current + 1);
+  if (current < total - 2) pages.push("...");
+  if (total > 1) pages.push(total);
 
   return pages;
 }
@@ -92,8 +72,26 @@ export function ReusableTable<T>({
   onPageChange,
   onRowsPerPageChange,
   loading = false,
+
+  // 🆕 thêm 2 props
+  onSort,
+  sortBy,
+  sortOrder,
 }: Props<T>) {
   const { currentPage, totalPages, rowsPerPage } = pagination;
+
+  const renderSortIcon = (colKey: string, sortable?: boolean) => {
+    if (!sortable) return null;
+
+    // Nếu chưa sort hoặc không phải cột hiện tại → icon mặc định
+    if (sortBy !== colKey)
+      return <span className="ml-1 text-xs opacity-40">⬍</span>;
+
+    // Nếu đang sort
+    return (
+      <span className="ml-1 text-xs">{sortOrder === "asc" ? "▲" : "▼"}</span>
+    );
+  };
 
   return (
     <div className="flex flex-col justify-between min-h-[500px] gap-5">
@@ -102,13 +100,24 @@ export function ReusableTable<T>({
           <TableHeader>
             <TableRow>
               {columns.map((col, idx) => (
-                <TableHead key={idx}>{col.label}</TableHead>
+                <TableHead
+                  key={idx}
+                  className={
+                    col.sortable ? "cursor-pointer select-none" : "select-none"
+                  }
+                  onClick={() => col.sortable && onSort?.(String(col.key))}
+                >
+                  <div className="flex items-center">
+                    {col.label}
+                    {renderSortIcon(String(col.key), col.sortable)}
+                  </div>
+                </TableHead>
               ))}
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {/* Loading skeleton */}
+            {/* Loading */}
             {loading && (
               <TableRow>
                 <TableCell
@@ -132,7 +141,7 @@ export function ReusableTable<T>({
               </TableRow>
             )}
 
-            {/* Data rows */}
+            {/* Data */}
             {!loading &&
               data.map((row, i) => (
                 <TableRow key={i}>
@@ -147,9 +156,8 @@ export function ReusableTable<T>({
         </Table>
       </div>
 
-      {/* Pagination UI giữ nguyên */}
-      <div className="flex items-center justify-between ">
-        {/* Rows per page */}
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 text-sm">
           <span>Rows per page</span>
           <Select
@@ -167,7 +175,6 @@ export function ReusableTable<T>({
           </Select>
         </div>
 
-        {/* Pagination */}
         <div className="flex items-center space-x-2">
           <Button
             size="icon"
@@ -181,10 +188,7 @@ export function ReusableTable<T>({
           <div className="flex space-x-1">
             {getPaginationNumbers(currentPage, totalPages).map((p, idx) =>
               p === "..." ? (
-                <span
-                  key={idx}
-                  className="flex items-center px-2 text-gray-500"
-                >
+                <span key={idx} className="px-2 text-gray-500">
                   ...
                 </span>
               ) : (
@@ -195,7 +199,7 @@ export function ReusableTable<T>({
                   className={
                     p === currentPage
                       ? "border-app-primary-blue-500 border bg-white text-app-primary-blue-700"
-                      : " border"
+                      : "border"
                   }
                   onClick={() => onPageChange(p as number)}
                 >

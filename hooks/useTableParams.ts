@@ -14,55 +14,41 @@ export interface TableParams {
 export const useTableParams = () => {
   const [params, setParams] = useState({
     page: 1,
-    limit: 6,
+    limit: 10,
     search: "",
+    gender: "",
+    status: "",
     sortBy: "",
-    sortOrder: "asc" as "asc" | "desc",
-    filters: {} as Record<string, any>,
+    sortOrder: "asc",
   });
 
-  const debouncedSearch = useDebounce(params.search, 400);
+  const debouncedSearch = useDebounce(params.search, 500);
 
-  const updateFilter = (key: string, value: any) => {
-    setParams((prev) => ({
-      ...prev,
-      filters: { ...prev.filters, [key]: value },
-      page: 1,
+  const updateSearch = (value: string) =>
+    setParams((p) => ({ ...p, search: value, page: 1 }));
+
+  const updateFilter = (key: string, value: string) =>
+    setParams((p) => ({ ...p, [key]: value, page: 1 }));
+
+  const updatePage = (page: number) => setParams((p) => ({ ...p, page }));
+
+  const updateLimit = (limit: number) =>
+    setParams((p) => ({ ...p, limit, page: 1 }));
+
+  const updateSort = (key: string) =>
+    setParams((p) => ({
+      ...p,
+      sortBy: key,
+      sortOrder: p.sortOrder === "asc" ? "desc" : "asc",
     }));
-  };
-
-  const updateSort = (field: string) => {
-    setParams((prev) => ({
-      ...prev,
-      sortBy: field,
-      sortOrder: prev.sortOrder === "asc" ? "desc" : "asc",
-      page: 1,
-    }));
-  };
-
-  const updateSearch = (text: string) => {
-    setParams((prev) => ({
-      ...prev,
-      search: text,
-      page: 1,
-    }));
-  };
-
-  const updatePage = (page: number) => {
-    setParams((prev) => ({ ...prev, page }));
-  };
-
-  const updateLimit = (limit: number) => {
-    setParams((prev) => ({ ...prev, limit, page: 1 }));
-  };
 
   return {
     params,
     debouncedSearch,
-    updateFilter,
     updateSearch,
-    updateSort,
+    updateFilter,
     updatePage,
     updateLimit,
+    updateSort,
   };
 };

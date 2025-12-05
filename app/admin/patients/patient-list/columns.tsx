@@ -35,7 +35,7 @@ export const userColumns: Column<Patient>[] = [
     ),
   },
 
-  { key: "fullName", label: "Full Name" },
+  { key: "fullName", label: "Full Name", sortable: true },
   { key: "dateOfBirth", label: "Date of Birth" },
   { key: "gender", label: "Gender" },
 
