@@ -26,12 +26,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { UpdatePatientDialog } from "@/app/admin/patients/update-patient/UpdatePatientDialog";
-import { Patient } from "@/interfaces/patient";
 const UserTablePage = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
-  const [updatedPatient, setUpdatedPatient] = useState<Patient | null>(null);
+  const [updatedId, setUpdatedId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [openNew, setOpenNew] = useState(false);
   const {
     params,
@@ -42,12 +41,12 @@ const UserTablePage = () => {
     updateLimit,
     updateSort,
   } = useTableParams();
-  const handleOpenDelete = (id: number) => {
+  const handleOpenDelete = (id: string) => {
     setDeleteId(id);
     setOpen(true);
   };
-  const handleOpenUpdate = (patient: Patient) => {
-    setUpdatedPatient(patient);
+  const handleOpenUpdate = (id: string) => {
+    setUpdatedId(id);
     setOpenUpdate(true);
   };
   const { data, isLoading } = usePatient({
@@ -56,21 +55,16 @@ const UserTablePage = () => {
     sortOrder: params.sortOrder as "asc" | "desc" | undefined,
   });
   const { mutate: deletePatient } = useDeletePatient();
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     console.log("Deleting patient with id:", id);
-    deletePatient(
-      {
-        id: id,
+    deletePatient(id, {
+      onSuccess: () => {
+        toast.success("Patient has been created");
       },
-      {
-        onSuccess: () => {
-          toast.success("Patient has been created");
-        },
-        onError: (error) => {
-          toast.error(`Ohh!!! ${error.message}`);
-        },
-      }
-    );
+      onError: (error) => {
+        toast.error(`Ohh!!! ${error.message}`);
+      },
+    });
   };
   return (
     <>
@@ -128,7 +122,7 @@ const UserTablePage = () => {
       <UpdatePatientDialog
         open={openUpdate}
         setOpen={setOpenUpdate}
-        patient={updatedPatient}
+        patientId={updatedId}
       />
 
       <AddPatientDialog open={openNew} setOpen={setOpenNew} />

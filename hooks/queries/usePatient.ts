@@ -2,6 +2,7 @@ import { TableParams } from "@/hooks/useTableParams";
 import {
   createPatient,
   deletePatient,
+  getPatientById,
   getPatients,
   updatePatient,
 } from "@/services/patient.service";
@@ -15,6 +16,13 @@ export const usePatient = (params: TableParams) => {
   return useQuery({
     queryKey: ["patients", params],
     queryFn: () => getPatients(params),
+    placeholderData: keepPreviousData,
+  });
+};
+export const usePatientById = (id: string) => {
+  return useQuery({
+    queryKey: ["patient by id", id],
+    queryFn: () => getPatientById(id),
     placeholderData: keepPreviousData,
   });
 };

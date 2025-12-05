@@ -16,8 +16,6 @@ export const useTableParams = () => {
     page: 1,
     limit: 10,
     search: "",
-    gender: "",
-    status: "",
     sortBy: "",
     sortOrder: "asc",
   });
