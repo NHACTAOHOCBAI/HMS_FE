@@ -1,5 +1,9 @@
 import { MedicineFiltersState } from "@/app/admin/medicines/components/Medicines";
-import { createMedicine, getMedicines } from "@/services/medicine.service";
+import {
+  createMedicine,
+  deleteMedicine,
+  getMedicines,
+} from "@/services/medicine.service";
 import {
   keepPreviousData,
   useMutation,
@@ -17,6 +21,15 @@ export const useCreateMedicine = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createMedicine,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["medicines"] });
+    },
+  });
+};
+export const useDeleteMedicine = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteMedicine,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["medicines"] });
     },

@@ -76,6 +76,12 @@ export const getMedicineById = async (id: number | string) => {
 
   return MEDICINES.find((m) => m.id === Number(id));
 };
+export const deleteMedicine = async (id: number | string) => {
+  console.log("Deleting medicine with id:", id);
+  await new Promise((r) => setTimeout(r, 500)); // simulate latency
+
+  return { success: true };
+};
 export const createMedicine = async (data: Partial<MedicineResponse>) => {
   await new Promise((r) => setTimeout(r, 500)); // simulate latency
 

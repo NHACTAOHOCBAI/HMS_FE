@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 // Giả định hook này trả về dữ liệu phân trang (page, limit, totalPages, content)
-import { useMedicines } from "@/hooks/queries/useMedicine";
+import { useDeleteMedicine, useMedicines } from "@/hooks/queries/useMedicine";
 import {
   AlertCircle,
   ChevronLeft,
@@ -34,6 +34,18 @@ import { Input } from "@/components/ui/input";
 // import CategoryDialog from "@/app/admin/medicines/components/CategoryDialog"; // Giữ nguyên
 import MedicineDialog from "@/app/admin/medicines/components/MedicineDialog"; // Giữ nguyên
 import PaginatedTable from "@/app/admin/_components/PaginatedTable";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 // --- UTILITY FUNCTIONS ---
 // --- TYPES & COMPONENT ---
@@ -54,6 +66,23 @@ const Medicines = ({
   setIsMedicineModalOpen,
   isMedicineModalOpen,
 }: MedicinesProps) => {
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const { mutate: deleteMedicine, isPending: isDeleting } = useDeleteMedicine();
+
+  const handleConfirmDelete = () => {
+    if (!deleteId) return;
+    deleteMedicine(deleteId, {
+      onSuccess: () => {
+        toast.success("Xóa thuốc thành công!");
+      },
+
+      onError: () => {
+        toast.error("Xóa thuốc thất bại!");
+      },
+    });
+    setDeleteId(null); // đóng dialog sau khi xoá
+  };
+
   const [editingMedicine, setEditingMedicine] =
     useState<MedicineResponse | null>(null);
 
@@ -112,13 +141,21 @@ const Medicines = ({
         {format(new Date(medicine.expiresAt), "dd/MM/yyyy")}
       </TableCell>
 
-      <TableCell className="text-right">
+      <TableCell className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => handleOpenMedicineModal(medicine)}
         >
           <Pencil className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+          onClick={() => setDeleteId(medicine.id)}
+        >
+          <Trash2 className="h-4 w-4" />
         </Button>
       </TableCell>
     </TableRow>
@@ -196,6 +233,31 @@ const Medicines = ({
         setEditingMedicine={setEditingMedicine}
         categories={[]} // Cần truyền categories thực tế từ hook useCategories
       />
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có chắc muốn xóa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Thuốc sẽ bị xóa vĩnh viễn khỏi hệ thống. Hành động này không thể
+              hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteId(null)}>
+              Hủy
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              className="bg-red-500 hover:bg-red-600"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Đang xoá..." : "Xóa"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
