@@ -1,81 +1,92 @@
-import type { Medicine } from "@/interfaces/medicine";
+export interface Category {
+  id: string;
+  name: string;
+}
 
-const mockCategories = [
-    "antibiotic",
-    "painkiller",
-    "vitamin",
-    "supplement",
-    "fever",
+export interface Medicine {
+  id: string;
+  name: string;
+  activeIngredient: string;
+  unit: string;
+  concentration: string;
+  packaging: string;
+  quantity: number;
+  purchasePrice: number;
+  sellingPrice: number;
+  expiresAt: string;
+  manufacturer: string;
+  category: Category;
+  createdAt: string;
+}
+
+export interface MedicineResponse {
+  status: string;
+  data: {
+    content: Medicine[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+  };
+}
+
+export const mockMedicines: Medicine[] = [
+  {
+    id: "med001",
+    name: "Amoxicillin 500mg",
+    activeIngredient: "Amoxicillin",
+    unit: "capsule",
+    concentration: "500mg",
+    packaging: "Box of 20 capsules",
+    quantity: 1000,
+    purchasePrice: 5000,
+    sellingPrice: 8000,
+    expiresAt: "2026-12-31",
+    manufacturer: "GSK",
+    category: { id: "cat001", name: "Antibiotics" },
+    createdAt: "2025-12-02T10:30:00Z",
+  },
+  {
+    id: "med002",
+    name: "Paracetamol 500mg",
+    activeIngredient: "Paracetamol",
+    unit: "tablet",
+    concentration: "500mg",
+    packaging: "Box of 50 tablets",
+    quantity: 2000,
+    purchasePrice: 2000,
+    sellingPrice: 4000,
+    expiresAt: "2026-06-30",
+    manufacturer: "Tylenol",
+    category: { id: "cat002", name: "Painkillers" },
+    createdAt: "2025-12-02T10:30:00Z",
+  },
+  {
+    id: "med003",
+    name: "Cefixime 200mg",
+    activeIngredient: "Cefixime",
+    unit: "capsule",
+    concentration: "200mg",
+    packaging: "Box of 10 capsules",
+    quantity: 500,
+    purchasePrice: 6000,
+    sellingPrice: 9000,
+    expiresAt: "2026-03-31",
+    manufacturer: "Pfizer",
+    category: { id: "cat001", name: "Antibiotics" },
+    createdAt: "2025-12-02T10:30:00Z",
+  },
+  // bạn có thể thêm nhiều medicine mock khác để đủ totalElements
 ];
 
-// Random helper
-const random = (min: number, max: number) =>
-    Math.floor(Math.random() * (max - min + 1)) + min;
-
-const generateMockMedicines = (): Medicine[] => {
-    const list: Medicine[] = [];
-
-    for (let i = 1; i <= 50; i++) {
-        list.push({
-            id: i,
-            name: `Medicine ${i}`,
-            activeIngredient: `Ingredient ${i}`,
-            unit: "tablet",
-            description: i % 2 === 0 ? `Description for medicine ${i}` : null,
-            quantity: random(10, 200),
-            packaging: i % 3 === 0 ? "Box of 10 strips" : null,
-            purchasePrice: random(10000, 50000),
-            sellingPrice: random(60000, 100000),
-            expiresAt: `202${random(4, 6)}-0${random(1, 9)}-15T00:00:00Z`,
-            categoryId: mockCategories[i % mockCategories.length],
-        } as Medicine);
-    }
-
-    return list;
-};
-
-const MEDICINES = generateMockMedicines();
-
-export const getMedicines = async ({
-    page,
-    limit,
-    search = ""
-}: {
-    page: number;
-    limit: number;
-    search?: string;
-}) => {
-    await new Promise((r) => setTimeout(r, 300)); // simulate latency
-
-    // 🔎 Normalize search text
-    const keyword = search.trim().toLowerCase();
-
-    // 🔍 Filter trước → paginate sau
-    const filtered = keyword
-        ? MEDICINES.filter((m) =>
-            [m.name, m.activeIngredient, m.description]
-                .filter(Boolean)
-                .some((field) =>
-                    field!.toLowerCase().includes(keyword)
-                )
-        )
-        : MEDICINES;
-
-    // ▶ Pagination
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    const paginated = filtered.slice(start, end);
-
-    return {
-        items: paginated,
-        totalItems: filtered.length,
-        currentPage: page,
-        totalPages: Math.ceil(filtered.length / limit),
-    };
-};
-
-export const getMedicineById = async (id: number | string) => {
-    await new Promise((r) => setTimeout(r, 500)); // simulate latency
-
-    return MEDICINES.find((m) => m.id === Number(id));
+// Giả lập response mặc định
+export const mockMedicineResponse: MedicineResponse = {
+  status: "success",
+  data: {
+    content: mockMedicines,
+    page: 0,
+    size: 20,
+    totalElements: 150,
+    totalPages: 8,
+  },
 };
