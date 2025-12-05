@@ -1,8 +1,10 @@
+import { TableParams } from "@/hooks/useTableParams";
 import { getPatients } from "@/services/patient.service";
-import { useQuery } from "@tanstack/react-query";
-export const usePatient = (page: number, limit: number) => {
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+export const usePatient = (params: TableParams) => {
   return useQuery({
-    queryKey: ["mock-users", page, limit],
-    queryFn: () => getPatients({ page, limit }),
+    queryKey: ["mock-users", params],
+    queryFn: () => getPatients(params),
+    placeholderData: keepPreviousData,
   });
 };

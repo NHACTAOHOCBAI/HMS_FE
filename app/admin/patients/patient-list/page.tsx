@@ -1,6 +1,5 @@
 "use client";
 import { ReusableTable } from "@/app/admin/_components/MyTable";
-import { useState } from "react";
 import { usePatient } from "@/hooks/queries/usePatient";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,17 +11,32 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { userColumns } from "@/app/admin/patients/patient-list/columns";
+import { useTableParams } from "@/hooks/useTableParams";
 const UserTablePage = () => {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(6);
+  const {
+    params,
+    debouncedSearch,
+    updateSearch,
+    updateFilter,
+    updatePage,
+    updateLimit,
+  } = useTableParams();
 
-  const { data, isLoading } = usePatient(page, limit);
+  const { data, isLoading } = usePatient({
+    ...params,
+    search: debouncedSearch,
+  });
 
   return (
     <div>
       <div className="mb-5 flex items-center gap-5">
-        <Input className="h-[50px] rounded-[30px] w-[460px]" />
-        <Select>
+        <Input
+          placeholder="Search patient..."
+          className="h-[50px] rounded-[30px] w-[460px]"
+          onChange={(e) => updateSearch(e.target.value)}
+        />
+
+        <Select onValueChange={(v) => updateFilter("gender", v)}>
           <SelectTrigger>
             <SelectValue placeholder="Gender" />
           </SelectTrigger>
@@ -31,36 +45,33 @@ const UserTablePage = () => {
             <SelectItem value="female">Female</SelectItem>
           </SelectContent>
         </Select>
-        <Select>
+
+        <Select onValueChange={(v) => updateFilter("status", v)}>
           <SelectTrigger>
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="new">New</SelectItem>
             <SelectItem value="waiting">Waiting</SelectItem>
-            <SelectItem value="inVist">In Vist</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
             <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inActive">In Active</SelectItem>
           </SelectContent>
         </Select>
+
         <Button className="ml-auto">New Patient</Button>
       </div>
+
       <ReusableTable
-        data={data?.items ?? []}
+        data={data?.data.content ?? []}
         columns={userColumns}
         loading={isLoading}
         pagination={{
-          currentPage: data?.currentPage ?? 1,
-          totalPages: data?.totalPages ?? 1,
-          rowsPerPage: limit,
-          totalItems: data?.totalItems ?? 0,
+          currentPage: params.page,
+          totalPages: data?.data.totalPages ?? 1,
+          rowsPerPage: params.limit,
+          totalItems: data?.data.totalElements ?? 0,
         }}
-        onPageChange={(p) => setPage(p)}
-        onRowsPerPageChange={(size) => {
-          setLimit(size);
-          setPage(1); // reset page
-        }}
+        onPageChange={updatePage}
+        onRowsPerPageChange={updateLimit}
       />
     </div>
   );

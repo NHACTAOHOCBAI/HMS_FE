@@ -1,3 +1,4 @@
+import { TableParams } from "@/hooks/useTableParams";
 import { Patient, PatientStatus } from "@/interfaces/patient";
 const mockStatus: PatientStatus[] = [
   "New",
@@ -25,24 +26,23 @@ const generateMockUsers = (): Patient[] => {
 };
 
 const PATIENTS = generateMockUsers();
-export const getPatients = async ({
-  page,
-  limit,
-}: {
-  page: number;
-  limit: number;
-}) => {
+export const getPatients = async (params: TableParams) => {
+  const { page, limit } = params;
   await new Promise((r) => setTimeout(r, 500)); // simulate latency
 
   const start = (page - 1) * limit;
   const end = start + limit;
 
   const paginated = PATIENTS.slice(start, end);
-
+  console.log("Fetching patients with params:", params);
   return {
-    items: paginated,
-    totalItems: PATIENTS.length,
-    currentPage: page,
-    totalPages: Math.ceil(PATIENTS.length / limit),
+    status: "success",
+    data: {
+      content: paginated,
+      page: page,
+      size: limit,
+      totalElements: PATIENTS.length,
+      totalPages: Math.ceil(PATIENTS.length / limit),
+    },
   };
 };
