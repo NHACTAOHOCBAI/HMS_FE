@@ -1,6 +1,6 @@
 "use client";
 import { ReusableTable } from "@/app/admin/_components/MyTable";
-import { usePatient } from "@/hooks/queries/usePatient";
+import { useDeletePatient, usePatient } from "@/hooks/queries/usePatient";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -14,7 +14,20 @@ import { userColumns } from "@/app/admin/patients/patient-list/columns";
 import { useTableParams } from "@/hooks/useTableParams";
 import { useState } from "react";
 import { AddPatientDialog } from "@/app/admin/patients/add-patient/AddPatientDialog";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 const UserTablePage = () => {
+  const [open, setOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [openNew, setOpenNew] = useState(false);
   const {
     params,
@@ -25,13 +38,32 @@ const UserTablePage = () => {
     updateLimit,
     updateSort,
   } = useTableParams();
-
+  const handleOpenDelete = (id: number) => {
+    setDeleteId(id);
+    setOpen(true);
+  };
   const { data, isLoading } = usePatient({
     ...params,
     search: debouncedSearch,
     sortOrder: params.sortOrder as "asc" | "desc" | undefined,
   });
-
+  const { mutate: deletePatient } = useDeletePatient();
+  const handleDelete = (id: number) => {
+    console.log("Deleting patient with id:", id);
+    deletePatient(
+      {
+        id: id,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Patient has been created");
+        },
+        onError: (error) => {
+          toast.error(`Ohh!!! ${error.message}`);
+        },
+      }
+    );
+  };
   return (
     <>
       <div>
@@ -70,7 +102,7 @@ const UserTablePage = () => {
 
         <ReusableTable
           data={data?.data.content ?? []}
-          columns={userColumns}
+          columns={userColumns(handleOpenDelete)}
           loading={isLoading}
           pagination={{
             currentPage: params.page,
@@ -86,6 +118,29 @@ const UserTablePage = () => {
         />
       </div>
       <AddPatientDialog open={openNew} setOpen={setOpenNew} />
+      {/* delete */}
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm delete?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This patient will be permanently
+              removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                handleDelete(deleteId!);
+              }}
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

@@ -1,3 +1,5 @@
+"use client";
+
 import { Column } from "@/app/admin/_components/MyTable";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +14,7 @@ import {
 import { Patient, PatientStatus } from "@/interfaces/patient";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
+
 const statusClass: Record<PatientStatus, string> = {
   New: "bg-green-100 text-green-700 hover:bg-green-100/80",
   Waiting: "bg-indigo-100 text-indigo-700 hover:bg-indigo-100/80",
@@ -20,8 +23,12 @@ const statusClass: Record<PatientStatus, string> = {
   Active: "bg-teal-100 text-teal-700 hover:bg-teal-100/80",
   Inactive: "bg-red-100 text-red-700 hover:bg-red-100/80",
 };
-export const userColumns: Column<Patient>[] = [
-  { key: "id", label: "Id" },
+
+// 🟦 Columns
+export const userColumns = (
+  handleOpenDelete: (id: number) => void
+): Column<Patient>[] => [
+  { key: "id", label: "Id", sortable: true },
 
   {
     key: "avatar",
@@ -47,14 +54,14 @@ export const userColumns: Column<Patient>[] = [
       return <Badge className={`${className}`}>{row.status}</Badge>;
     },
   },
+
   {
     key: "action",
     label: "Actions",
-    render: (medicine) => (
+    render: (row) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -62,26 +69,20 @@ export const userColumns: Column<Patient>[] = [
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-          {/* 👁 View */}
-          <Link href={`/admin/medicines/${medicine.id}`}>
+          <Link href={`/admin/patients/${row.id}`}>
             <DropdownMenuItem>
-              <Eye className=" w-4 h-4 mr-2" />
+              <Eye className="w-4 h-4 mr-2" />
               View
             </DropdownMenuItem>
           </Link>
 
-          {/* ✏ Edit */}
-          <Link href={`/admin/medicines/${medicine.id}/update-medicine`}>
-            <DropdownMenuItem onClick={() => console.log("Edit", medicine.id)}>
+          <Link href={`/admin/patients/${row.id}/update`}>
+            <DropdownMenuItem>
               <Pencil className="w-4 h-4 mr-2" />
               Edit
             </DropdownMenuItem>
           </Link>
-          {/* 🗑 Delete */}
-          <DropdownMenuItem
-            className="text-red-600 focus:text-red-600"
-            onClick={() => console.log("Delete", medicine.id)}
-          >
+          <DropdownMenuItem onClick={() => handleOpenDelete(row.id)}>
             <Trash2 className="w-4 h-4 mr-2" />
             Delete
           </DropdownMenuItem>

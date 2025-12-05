@@ -1,5 +1,9 @@
 import { TableParams } from "@/hooks/useTableParams";
-import { createPatient, getPatients } from "@/services/patient.service";
+import {
+  createPatient,
+  deletePatient,
+  getPatients,
+} from "@/services/patient.service";
 import {
   useQuery,
   keepPreviousData,
@@ -17,6 +21,15 @@ export const useCreatePatient = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createPatient,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
+    },
+  });
+};
+export const useDeletePatient = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deletePatient,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
     },

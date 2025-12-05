@@ -71,24 +71,27 @@ export function AddPatientDialog({ open, setOpen }: Props) {
                 <FormItem>
                   <FormLabel>Full name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nguyen Dang Phuc" {...field} />
+                    <Input
+                      disabled={isPending}
+                      placeholder="Nguyen Dang Phuc"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex flex-col gap-3">
-              <Button disabled={isPending} type="submit" className="w-full">
-                Create
-              </Button>
+            <div className="flex gap-3 justify-end">
               <Button
                 disabled={isPending}
                 type="button"
                 onClick={handleCancel}
                 variant={"outline"}
-                className="w-full"
               >
                 Cancel
+              </Button>
+              <Button disabled={isPending} type="submit">
+                Create
               </Button>
             </div>
           </form>

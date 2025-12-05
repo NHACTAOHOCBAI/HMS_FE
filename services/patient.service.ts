@@ -50,3 +50,7 @@ export const createPatient = async (data: { fullName: string }) => {
   console.log("Creating patient with data:", data);
   return true;
 };
+export const deletePatient = async (data: { id: number }) => {
+  console.log("Delete patient with data:", data.id);
+  return true;
+};
