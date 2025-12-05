@@ -1,19 +1,12 @@
-import type { Medicine } from "@/interfaces/medicine";
+import type { Medicine, MedicineResponse } from "@/interfaces/medicine";
 
-const mockCategories = [
-    "antibiotic",
-    "painkiller",
-    "vitamin",
-    "supplement",
-    "fever",
-];
 
 // Random helper
 const random = (min: number, max: number) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
 
-const generateMockMedicines = (): Medicine[] => {
-    const list: Medicine[] = [];
+const generateMockMedicines = (): MedicineResponse[] => {
+    const list: MedicineResponse[] = [];
 
     for (let i = 1; i <= 50; i++) {
         list.push({
@@ -27,8 +20,12 @@ const generateMockMedicines = (): Medicine[] => {
             purchasePrice: random(10000, 50000),
             sellingPrice: random(60000, 100000),
             expiresAt: `202${random(4, 6)}-0${random(1, 9)}-15T00:00:00Z`,
-            categoryId: mockCategories[i % mockCategories.length],
-        } as Medicine);
+            category: {
+                id: random(1, 6),
+                name: `Category ${random(1, 6)}`,
+                description: `Description for category ${random(1, 6)}`
+            },
+        } as MedicineResponse);
     }
 
     return list;

@@ -122,7 +122,9 @@ export default function AdminLayout({
                                     asChild
                                     isActive={isSubActive}
                                   >
-                                    <Link href={`/${subItem.url}`}>
+                                    <Link href={`/${subItem.url}`}
+
+                                    >
                                       <span>{subItem.title}</span>
                                     </Link>
                                   </SidebarMenuSubButton>

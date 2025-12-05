@@ -1,4 +1,17 @@
-export interface Medicine {
+// export interface Medicine {
+//     id: number;
+//     name: string;
+//     activeIngredient: string;
+//     unit: string;
+//     description?: string | null;
+//     quantity: number;
+//     packaging?: string | null;
+//     purchasePrice: number;
+//     sellingPrice: number;
+//     expiresAt: string;      // ISO date string
+//     categoryId: string;
+// }
+export interface MedicineResponse {
     id: number;
     name: string;
     activeIngredient: string;
@@ -9,5 +22,9 @@ export interface Medicine {
     purchasePrice: number;
     sellingPrice: number;
     expiresAt: string;      // ISO date string
-    categoryId: string;
+    category: {
+        id: number;
+        name: string;
+        description?: string | null;
+    } | null;
 }

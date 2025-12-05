@@ -1,6 +1,6 @@
 import { getMedicineById, getMedicines } from "@/services/medicine.service";
 import { useQuery } from "@tanstack/react-query";
-export const useMedicine = (page: number, limit: number, search?: string) => {
+export const useMedicines = (page: number, limit: number, search?: string) => {
     return useQuery({
         queryKey: ["medicines", page, limit, search],
         queryFn: () => getMedicines({ page, limit, search }),
