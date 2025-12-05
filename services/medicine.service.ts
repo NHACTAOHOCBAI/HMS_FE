@@ -90,3 +90,11 @@ export const createMedicine = async (data: Partial<MedicineResponse>) => {
     id: MEDICINES.length + 1,
   };
 };
+export const updateMedicine = async (data: Partial<MedicineResponse>) => {
+  await new Promise((r) => setTimeout(r, 500)); // simulate latency
+
+  return {
+    ...data,
+    id: MEDICINES.length + 1,
+  };
+};

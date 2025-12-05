@@ -46,6 +46,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useCategories } from "@/hooks/queries/useCategory";
 
 // --- UTILITY FUNCTIONS ---
 // --- TYPES & COMPONENT ---
@@ -66,6 +67,7 @@ const Medicines = ({
   setIsMedicineModalOpen,
   isMedicineModalOpen,
 }: MedicinesProps) => {
+  const { data: categories } = useCategories({});
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { mutate: deleteMedicine, isPending: isDeleting } = useDeleteMedicine();
 
@@ -160,6 +162,7 @@ const Medicines = ({
       </TableCell>
     </TableRow>
   );
+  console.log("Rendered Medicines Component", categories?.data.content);
   return (
     <div>
       {/* Search and Filter Section */}
@@ -204,11 +207,11 @@ const Medicines = ({
                 {/* Có thể hiển thị tổng số lượng nếu API có trả về totalElements */}
               </SelectItem>
               {/* Danh sách các danh mục - hiện đang bị comment, cần hook useCategories */}
-              {/* {categories?.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id.toString()}>
-                    {cat.name}
-                  </SelectItem>
-                ))} */}
+              {categories?.data.content.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id.toString()}>
+                  {cat.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

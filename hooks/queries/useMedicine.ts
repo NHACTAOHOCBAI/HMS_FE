@@ -26,6 +26,15 @@ export const useCreateMedicine = () => {
     },
   });
 };
+export const useUpdateMedicine = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createMedicine,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["medicines"] });
+    },
+  });
+};
 export const useDeleteMedicine = () => {
   const queryClient = useQueryClient();
   return useMutation({
