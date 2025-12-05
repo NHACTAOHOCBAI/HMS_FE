@@ -8,8 +8,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { Category } from "@/interfaces/category";
+import type { SubmitHandler } from "react-hook-form";
 
-const MedicineDiaglog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMedicineId, categories }: { isMedicineModalOpen: boolean, setIsMedicineModalOpen: React.Dispatch<React.SetStateAction<boolean>>, editingMedicineId: string | null, categories: Category[] | undefined }) => {
+const MedicineDialog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingMedicineId, categories }: { isMedicineModalOpen: boolean, setIsMedicineModalOpen: React.Dispatch<React.SetStateAction<boolean>>, editingMedicineId: string | null, categories: Category[] | undefined }) => {
 
     // 2. Zod Schemas
     const medicineFormSchema = z.object({
@@ -17,11 +18,12 @@ const MedicineDiaglog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingM
         activeIngredient: z.string().min(2, "Hoạt chất bắt buộc nhập"),
         categoryId: z.string().min(1, "Phải chọn danh mục"), // string do Select trả về
         unit: z.string().min(1, "Đơn vị không được để trống"),
-        quantity: z.coerce.number().min(0, "Số lượng không hợp lệ"),
-        packaging: z.string().nullable().optional(),
         concentration: z.string().min(1, "Hàm lượng bắt buộc"),
-        purchasePrice: z.coerce.number().min(0, "Giá nhập không hợp lệ"),
-        sellingPrice: z.coerce.number().min(0, "Giá bán không hợp lệ"),
+        packaging: z.string().nullable().optional(),
+        quantity: z.number().min(0, "Số lượng không hợp lệ"),
+        purchasePrice: z.number().min(0, "Giá nhập không hợp lệ"),
+        sellingPrice: z.number().min(0, "Giá bán không hợp lệ"),
+
         expiresAt: z.string().min(1, "Vui lòng chọn hạn sử dụng"),
         description: z.string().nullable().optional(),
     });
@@ -57,8 +59,7 @@ const MedicineDiaglog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingM
             description: "",
         },
     });
-
-    const onMedicineSubmit = (values: z.infer<typeof medicineFormSchema>) => {
+    const onMedicineSubmit: SubmitHandler<z.infer<typeof medicineFormSchema>> = (values) => {
         // if (editingMedicineId) {
         //   onUpdate(editingMedicineId, values);
         // } else {
@@ -66,6 +67,8 @@ const MedicineDiaglog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingM
         // }
         setIsMedicineModalOpen(false);
     };
+
+
     return (<>
         {/* --- MEDICINE DIALOG (FORM) --- */}
         <Dialog open={isMedicineModalOpen} onOpenChange={setIsMedicineModalOpen}>
@@ -212,4 +215,4 @@ const MedicineDiaglog = ({ isMedicineModalOpen, setIsMedicineModalOpen, editingM
     </>);
 }
 
-export default MedicineDiaglog
+export default MedicineDialog

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-const CategoryDiaglog = ({ isCategoryModalOpen, setIsCategoryModalOpen, editingCategoryId }: { isCategoryModalOpen: boolean, setIsCategoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>, editingCategoryId: string | null }) => {
+const CategoryDialog = ({ isCategoryModalOpen, setIsCategoryModalOpen, editingCategoryId }: { isCategoryModalOpen: boolean, setIsCategoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>, editingCategoryId: string | null }) => {
 
     const categorySchema = z.object({
         name: z.string().min(2, "Tên danh mục tối thiểu 2 ký tự"),
@@ -80,4 +80,4 @@ const CategoryDiaglog = ({ isCategoryModalOpen, setIsCategoryModalOpen, editingC
     )
 }
 
-export default CategoryDiaglog
+export default CategoryDialog

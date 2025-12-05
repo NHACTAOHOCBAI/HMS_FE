@@ -37,10 +37,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useMedicines } from "@/hooks/queries/useMedicine";
 import { useCategories } from "@/hooks/queries/useCategory";
-import MedicineDiaglog from "./components/MedicineDiaglog";
 import { MedicineResponse } from "@/interfaces/medicine";
-import CategoryDiaglog from "./components/CategoryDiaglog";
 import { Category } from "@/interfaces/category";
+import MedicineDialog from "./components/MedicineDialog";
+import CategoryDialog from "./components/CategoryDialog";
 export default function Medicine() {
   const [activeTab, setActiveTab] = useState<"medicines" | "categories">("medicines");
   const [searchTerm, setSearchTerm] = useState("");
@@ -282,11 +282,11 @@ export default function Medicine() {
         </TabsContent>
       </Tabs>
       {/* ---- MEDICINE DIALOG (FORM) --- */}
-      <MedicineDiaglog isMedicineModalOpen={isMedicineModalOpen} setIsMedicineModalOpen={setIsMedicineModalOpen}
+      <MedicineDialog isMedicineModalOpen={isMedicineModalOpen} setIsMedicineModalOpen={setIsMedicineModalOpen}
         editingMedicineId={editingMedicineId} categories={categories} />
 
       {/* --- CATEGORY DIALOG (FORM) --- */}
-      <CategoryDiaglog isCategoryModalOpen={isCategoryModalOpen} setIsCategoryModalOpen={setIsCategoryModalOpen}
+      <CategoryDialog isCategoryModalOpen={isCategoryModalOpen} setIsCategoryModalOpen={setIsCategoryModalOpen}
         editingCategoryId={editingCategoryId} />
     </div>
 
