@@ -3,6 +3,7 @@ import {
   createPatient,
   deletePatient,
   getPatients,
+  updatePatient,
 } from "@/services/patient.service";
 import {
   useQuery,
@@ -21,6 +22,15 @@ export const useCreatePatient = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createPatient,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
+    },
+  });
+};
+export const useUpdatePatient = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updatePatient,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
     },

@@ -25,7 +25,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { UpdatePatientDialog } from "@/app/admin/patients/update-patient/UpdatePatientDialog";
+import { Patient } from "@/interfaces/patient";
 const UserTablePage = () => {
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [updatedPatient, setUpdatedPatient] = useState<Patient | null>(null);
   const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [openNew, setOpenNew] = useState(false);
@@ -41,6 +45,10 @@ const UserTablePage = () => {
   const handleOpenDelete = (id: number) => {
     setDeleteId(id);
     setOpen(true);
+  };
+  const handleOpenUpdate = (patient: Patient) => {
+    setUpdatedPatient(patient);
+    setOpenUpdate(true);
   };
   const { data, isLoading } = usePatient({
     ...params,
@@ -102,7 +110,7 @@ const UserTablePage = () => {
 
         <ReusableTable
           data={data?.data.content ?? []}
-          columns={userColumns(handleOpenDelete)}
+          columns={userColumns(handleOpenDelete, handleOpenUpdate)}
           loading={isLoading}
           pagination={{
             currentPage: params.page,
@@ -117,6 +125,12 @@ const UserTablePage = () => {
           sortOrder={params.sortOrder as "asc" | "desc" | undefined}
         />
       </div>
+      <UpdatePatientDialog
+        open={openUpdate}
+        setOpen={setOpenUpdate}
+        patient={updatedPatient}
+      />
+
       <AddPatientDialog open={openNew} setOpen={setOpenNew} />
       {/* delete */}
       <AlertDialog open={open} onOpenChange={setOpen}>

@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Patient, PatientStatus } from "@/interfaces/patient";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import Link from "next/link";
 
 const statusClass: Record<PatientStatus, string> = {
   New: "bg-green-100 text-green-700 hover:bg-green-100/80",
@@ -26,7 +25,8 @@ const statusClass: Record<PatientStatus, string> = {
 
 // 🟦 Columns
 export const userColumns = (
-  handleOpenDelete: (id: number) => void
+  handleOpenDelete: (id: number) => void,
+  handleOpenUpdate: (patient: Patient) => void
 ): Column<Patient>[] => [
   { key: "id", label: "Id", sortable: true },
 
@@ -69,19 +69,15 @@ export const userColumns = (
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-          <Link href={`/admin/patients/${row.id}`}>
-            <DropdownMenuItem>
-              <Eye className="w-4 h-4 mr-2" />
-              View
-            </DropdownMenuItem>
-          </Link>
+          <DropdownMenuItem>
+            <Eye className="w-4 h-4 mr-2" />
+            View
+          </DropdownMenuItem>
 
-          <Link href={`/admin/patients/${row.id}/update`}>
-            <DropdownMenuItem>
-              <Pencil className="w-4 h-4 mr-2" />
-              Edit
-            </DropdownMenuItem>
-          </Link>
+          <DropdownMenuItem onClick={() => handleOpenUpdate(row)}>
+            <Pencil className="w-4 h-4 mr-2" />
+            Edit
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleOpenDelete(row.id)}>
             <Trash2 className="w-4 h-4 mr-2" />
             Delete
