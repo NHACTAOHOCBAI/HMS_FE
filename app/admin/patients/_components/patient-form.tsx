@@ -103,6 +103,7 @@ export function PatientForm({
       relativePhoneNumber: initialData?.relativePhoneNumber ?? "",
       relativeRelationship:
         (initialData?.relativeRelationship as RelationshipType) ?? undefined,
+      accountId: initialData?.accountId ?? "",
     },
   });
 
@@ -154,13 +155,14 @@ export function PatientForm({
                 name="dateOfBirth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date of Birth</FormLabel>
+                    <FormLabel>Date of Birth *</FormLabel>
                     <FormControl>
                       <MyDatePicker
                         value={field.value ? new Date(field.value) : undefined}
                         onChange={(date) =>
                           field.onChange(date?.toISOString().split("T")[0])
                         }
+                        disabled={(date) => date > new Date()}
                       />
                     </FormControl>
                     <FormMessage />
@@ -416,6 +418,37 @@ export function PatientForm({
                     )}
                   />
                 </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+
+        {/* Account Linking (Optional) */}
+        <Collapsible defaultOpen={false}>
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Account Linking (Optional)</CardTitle>
+                  <ChevronDown className="h-5 w-5" />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="accountId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Account ID</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Link to existing accountId" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
             </CollapsibleContent>
           </Card>

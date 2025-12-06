@@ -2,11 +2,11 @@
 
 **Project:** Hospital Management System  
 **Service:** Patient Service (Patient Management)  
-**Version:** 1.1  
-**Last Updated:** December 5, 2025  
-**Target Users:** ADMIN (full access), DOCTOR/NURSE (read + write), EMPLOYEE (read only), PATIENT (own profile)
+**Version:** 1.2  
+**Last Updated:** December 6, 2025  
+**Target Users:** ADMIN (full access), DOCTOR/NURSE (read + write), RECEPTIONIST (registration & basic info), PATIENT (own profile)
 
-> **Note:** This spec uses EMPLOYEE role which maps to RECEPTIONIST in HR service. The auth-service defines roles as: ADMIN, PATIENT, DOCTOR, NURSE, EMPLOYEE.
+> **Note:** RECEPTIONIST role has specific permissions: register patients, update basic info, view records. Cannot access medical details or delete patients.
 
 ---
 
@@ -44,15 +44,15 @@ The Patient Service manages patient demographic information, health profiles, an
 
 ### 1.4 Screen Inventory
 
-| Route                         | Screen Name      | Component            | Access                         | Priority |
-| ----------------------------- | ---------------- | -------------------- | ------------------------------ | -------- |
-| `/admin/patients`             | Patient List     | `PatientListPage`    | ADMIN, DOCTOR, NURSE, EMPLOYEE | P0       |
-| `/admin/patients/new`         | Register Patient | `PatientFormPage`    | ADMIN, DOCTOR, NURSE           | P0       |
-| `/admin/patients/:id`         | Patient Detail   | `PatientDetailPage`  | ADMIN, DOCTOR, NURSE, EMPLOYEE | P0       |
-| `/admin/patients/:id/edit`    | Edit Patient     | `PatientFormPage`    | ADMIN, DOCTOR, NURSE           | P0       |
-| `/admin/patients/:id/history` | Patient History  | `PatientHistoryPage` | ADMIN, DOCTOR, NURSE           | P1       |
-| `/profile`                    | My Profile       | `MyProfilePage`      | PATIENT                        | P0       |
-| `/profile/edit`               | Edit My Profile  | `MyProfileEditPage`  | PATIENT                        | P1       |
+| Route                         | Screen Name      | Component            | Access                             | Priority |
+| ----------------------------- | ---------------- | -------------------- | ---------------------------------- | -------- |
+| `/admin/patients`             | Patient List     | `PatientListPage`    | ADMIN, DOCTOR, NURSE, RECEPTIONIST | P0       |
+| `/admin/patients/new`         | Register Patient | `PatientFormPage`    | ADMIN, DOCTOR, NURSE, RECEPTIONIST | P0       |
+| `/admin/patients/:id`         | Patient Detail   | `PatientDetailPage`  | ADMIN, DOCTOR, NURSE, RECEPTIONIST | P0       |
+| `/admin/patients/:id/edit`    | Edit Patient     | `PatientFormPage`    | ADMIN, DOCTOR, NURSE, RECEPTIONIST | P0       |
+| `/admin/patients/:id/history` | Patient History  | `PatientHistoryPage` | ADMIN, DOCTOR, NURSE               | P1       |
+| `/profile`                    | My Profile       | `MyProfilePage`      | PATIENT                            | P0       |
+| `/profile/edit`               | Edit My Profile  | `MyProfileEditPage`  | PATIENT                            | P1       |
 
 ### 1.5 Screen Hierarchy Diagram
 
@@ -115,7 +115,7 @@ The Patient Service manages patient demographic information, health profiles, an
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Staff (ADMIN/DOCTOR/NURSE) clicks "Register Patient"        │
+│ Staff (ADMIN/DOCTOR/NURSE/RECEPTIONIST) clicks "Register Patient"        │
 │                          ↓                                  │
 │ Navigate to /admin/patients/new                             │
 │                          ↓                                  │
@@ -381,8 +381,8 @@ interface PatientListState {
 | Element         | ADMIN | DOCTOR | NURSE | EMPLOYEE | PATIENT |
 | --------------- | ----- | ------ | ----- | -------- | ------- |
 | Page Access     | ✅    | ✅     | ✅    | ✅       | ❌      |
-| Register Button | ✅    | ✅     | ✅    | ❌       | ❌      |
-| Edit Button     | ✅    | ✅     | ✅    | ❌       | ❌      |
+| Register Button | ✅    | ✅     | ✅    | ✅       | ❌      |
+| Edit Button     | ✅    | ✅     | ✅    | ✅       | ❌      |
 | Delete Button   | ✅    | ❌     | ❌    | ❌       | ❌      |
 | View Button     | ✅    | ✅     | ✅    | ✅       | ❌      |
 
@@ -724,7 +724,7 @@ MyProfileEditPage
 | ---------------- | ------------------------------------------------------- |
 | **Endpoint**     | `GET /api/patients`                                     |
 | **Used By**      | `PatientListPage`                                       |
-| **Access**       | ADMIN, DOCTOR, NURSE (per API contract)                 |
+| **Access**       | ADMIN, DOCTOR, NURSE, RECEPTIONIST (per API contract)   |
 | **Query Params** | `page`, `size`, `sort`, `search`, `gender`, `bloodType` |
 
 **Request Example:**
@@ -794,11 +794,11 @@ const params = {
 
 #### 4.1.2 Get Patient by ID
 
-| Property     | Value                                                     |
-| ------------ | --------------------------------------------------------- |
-| **Endpoint** | `GET /api/patients/{id}`                                  |
-| **Used By**  | `PatientDetailPage`, `PatientFormPage` (edit mode)        |
-| **Access**   | ADMIN, DOCTOR, NURSE (all patients) \| PATIENT (own data) |
+| Property     | Value                                                                   |
+| ------------ | ----------------------------------------------------------------------- |
+| **Endpoint** | `GET /api/patients/{id}`                                                |
+| **Used By**  | `PatientDetailPage`, `PatientFormPage` (edit mode)                      |
+| **Access**   | ADMIN, DOCTOR, NURSE, RECEPTIONIST (all patients) \| PATIENT (own data) |
 
 **Response (200 OK):**
 
@@ -867,11 +867,11 @@ const params = {
 
 #### 4.1.4 Create Patient
 
-| Property     | Value                           |
-| ------------ | ------------------------------- |
-| **Endpoint** | `POST /api/patients`            |
-| **Used By**  | `PatientFormPage` (create mode) |
-| **Access**   | ADMIN, DOCTOR, NURSE            |
+| Property     | Value                              |
+| ------------ | ---------------------------------- |
+| **Endpoint** | `POST /api/patients`               |
+| **Used By**  | `PatientFormPage` (create mode)    |
+| **Access**   | ADMIN, DOCTOR, NURSE, RECEPTIONIST |
 
 **Request Body:**
 
@@ -947,11 +947,11 @@ const requestBody = {
 
 #### 4.1.5 Update Patient
 
-| Property     | Value                         |
-| ------------ | ----------------------------- |
-| **Endpoint** | `PUT /api/patients/{id}`      |
-| **Used By**  | `PatientFormPage` (edit mode) |
-| **Access**   | ADMIN, DOCTOR, NURSE          |
+| Property     | Value                              |
+| ------------ | ---------------------------------- |
+| **Endpoint** | `PUT /api/patients/{id}`           |
+| **Used By**  | `PatientFormPage` (edit mode)      |
+| **Access**   | ADMIN, DOCTOR, NURSE, RECEPTIONIST |
 
 > **Note:** API uses PUT method but accepts partial updates (all fields optional).
 

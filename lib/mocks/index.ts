@@ -1,7 +1,7 @@
 import { Invoice } from "@/interfaces/billing";
 import { EmployeeSchedule } from "@/interfaces/hr";
 import { Patient, PatientStatus } from "@/interfaces/patient";
-import { AppointmentResponse } from "@/services/appointment.service";
+import { Appointment } from "@/interfaces/appointment";
 
 export const mockDepartments = [
   {
@@ -106,6 +106,19 @@ export const mockEmployees: Employee[] = [
     createdAt: "2025-01-05T00:00:00Z",
     updatedAt: "2025-01-05T00:00:00Z",
   },
+  {
+    id: "emp-new-doctor-001",
+    fullName: "Dr. New Test",
+    role: "DOCTOR",
+    departmentId: "dep-1",
+    departmentName: "Cardiology",
+    specialization: "General",
+    email: "newdoctor@hms.com",
+    phoneNumber: "555-0106",
+    status: "ACTIVE",
+    createdAt: "2025-12-06T00:00:00Z",
+    updatedAt: "2025-12-06T00:00:00Z",
+  },
 ];
 
 const patientStatuses: PatientStatus[] = [
@@ -192,10 +205,11 @@ export const mockAppointments: AppointmentResponse[] = [
 ];
 
 // Shifts per department for HR schedule view
-export const mockSchedules: (EmployeeSchedule & {
+const staticSchedules: (EmployeeSchedule & {
   departmentId?: string;
   shift?: "MORNING" | "AFTERNOON" | "EVENING";
 })[] = [
+  // Dr. John Smith (emp-101) schedules
   {
     id: "sch-1",
     employeeId: "emp-101",
@@ -209,6 +223,7 @@ export const mockSchedules: (EmployeeSchedule & {
     createdAt: "2025-11-25T00:00:00Z",
     updatedAt: "2025-11-25T00:00:00Z",
   },
+  // Dr. Sarah Johnson (emp-102) schedules
   {
     id: "sch-2",
     employeeId: "emp-102",
@@ -222,6 +237,7 @@ export const mockSchedules: (EmployeeSchedule & {
     createdAt: "2025-11-25T00:00:00Z",
     updatedAt: "2025-11-25T00:00:00Z",
   },
+  // Dr. Emily Carter (emp-103) schedules
   {
     id: "sch-3",
     employeeId: "emp-103",
@@ -236,6 +252,53 @@ export const mockSchedules: (EmployeeSchedule & {
     updatedAt: "2025-11-25T00:00:00Z",
   },
 ];
+
+const generateDynamicSchedules = () => {
+  const schedules: any[] = [...staticSchedules];
+  const doctors = mockEmployees.filter(emp => emp.role === 'DOCTOR');
+  const today = new Date('2025-12-06T00:00:00Z');
+
+  for (let i = 0; i < 30; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const workDate = date.toISOString().split('T')[0];
+
+    doctors.forEach(doctor => {
+      // Morning Shift
+      schedules.push({
+        id: `sch-${doctor.id}-morning-${i}`,
+        employeeId: doctor.id,
+        employeeName: doctor.fullName,
+        departmentId: doctor.departmentId,
+        workDate: workDate,
+        startTime: "08:00",
+        endTime: "12:00",
+        shift: "MORNING",
+        status: "AVAILABLE",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      // Afternoon Shift
+      schedules.push({
+        id: `sch-${doctor.id}-afternoon-${i}`,
+        employeeId: doctor.id,
+        employeeName: doctor.fullName,
+        departmentId: doctor.departmentId,
+        workDate: workDate,
+        startTime: "13:00",
+        endTime: "17:00",
+        shift: "AFTERNOON",
+        status: "AVAILABLE",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    });
+  }
+  return schedules;
+};
+
+export const mockSchedules = generateDynamicSchedules();
+
 
 // Use consistent patient IDs (p001, p002, etc.) matching patient.service.ts
 export const mockInvoices: Invoice[] = [

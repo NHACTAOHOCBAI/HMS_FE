@@ -10,6 +10,7 @@ import { CalendarClock, FileText, Stethoscope, Wallet } from "lucide-react";
 import appointmentService from "@/services/appointment.service";
 import { getMedicalExams } from "@/services/medical-exam.service";
 import { getInvoicesByPatient } from "@/services/billing.service";
+import { RoleGuard } from "@/components/auth/RoleGuard";
 
 type TimelineEvent = {
   id: string;
@@ -116,6 +117,7 @@ export default function PatientHistoryPage() {
   };
 
   return (
+    <RoleGuard allowedRoles={["ADMIN", "DOCTOR", "NURSE"]}>
     <div className="page-shell space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -194,6 +196,7 @@ export default function PatientHistoryPage() {
         </CardContent>
       </Card>
     </div>
+    </RoleGuard>
   );
 }
 

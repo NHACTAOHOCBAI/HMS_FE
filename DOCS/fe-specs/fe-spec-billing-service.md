@@ -2,9 +2,9 @@
 
 **Project:** Hospital Management System  
 **Service:** Billing Service (Invoice & Payment Management)  
-**Version:** 1.0  
-**Last Updated:** December 4, 2025  
-**Target Users:** ADMIN (full access), PATIENT (own invoices only)
+**Version:** 1.1  
+**Last Updated:** December 6, 2025  
+**Target Users:** ADMIN (full access), RECEPTIONIST (view invoices & record payments), PATIENT (own invoices only)
 
 ---
 
@@ -13,6 +13,7 @@
 ### 1.1 Service Scope
 
 The Billing Service manages patient invoices and payment processing. It provides:
+
 - Invoice generation (auto-generated from prescription creation)
 - Invoice listing with filters (by patient, status, date range)
 - Invoice details view (line items, payment history)
@@ -22,33 +23,33 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 ### 1.2 Related Backend
 
-| Item | Value |
-|------|-------|
-| **Service** | billing-service |
-| **Port** | 8087 |
-| **Base Path** | `/api/billing` |
-| **Database** | `billing_db` |
-| **Tables** | `invoices`, `invoice_items`, `payments` |
+| Item          | Value                                   |
+| ------------- | --------------------------------------- |
+| **Service**   | billing-service                         |
+| **Port**      | 8087                                    |
+| **Base Path** | `/api/billing`                          |
+| **Database**  | `billing_db`                            |
+| **Tables**    | `invoices`, `invoice_items`, `payments` |
 
 ### 1.3 Cross-Service Dependencies
 
-| Service | Purpose | Endpoints Used |
-|---------|---------|----------------|
-| **Appointment Service** | Appointment reference | `GET /api/appointments/{id}` |
-| **Patient Service** | Patient lookup | `GET /api/patients`, `GET /api/patients/{id}` |
-| **Medical Exam Service** | Prescription reference | `GET /api/exams/{examId}/prescription` |
+| Service                  | Purpose                | Endpoints Used                                |
+| ------------------------ | ---------------------- | --------------------------------------------- |
+| **Appointment Service**  | Appointment reference  | `GET /api/appointments/{id}`                  |
+| **Patient Service**      | Patient lookup         | `GET /api/patients`, `GET /api/patients/{id}` |
+| **Medical Exam Service** | Prescription reference | `GET /api/exams/{examId}/prescription`        |
 
 ### 1.4 Screen Inventory
 
-| Route | Screen Name | Component | Access | Priority |
-|-------|-------------|-----------|--------|----------|
-| `/admin/billing` | Invoice List (Admin) | `InvoiceListPage` | ADMIN | P0 |
-| `/admin/billing/{id}` | Invoice Detail | `InvoiceDetailPage` | ADMIN | P0 |
-| `/admin/billing/{id}/payment` | Record Payment | `PaymentFormPage` | ADMIN | P0 |
-| `/admin/billing/payments` | Payment History | `PaymentListPage` | ADMIN | P1 |
-| `/patient/billing` | My Invoices | `PatientInvoiceListPage` | PATIENT | P0 |
-| `/patient/billing/{id}` | Invoice Detail (Patient) | `InvoiceDetailPage` | PATIENT | P0 |
-| `/patient/billing/{id}/pay` | Make Payment | `PatientPaymentPage` | PATIENT | P1 |
+| Route                         | Screen Name              | Component                | Access              | Priority |
+| ----------------------------- | ------------------------ | ------------------------ | ------------------- | -------- |
+| `/admin/billing`              | Invoice List (Admin)     | `InvoiceListPage`        | ADMIN, RECEPTIONIST | P0       |
+| `/admin/billing/{id}`         | Invoice Detail           | `InvoiceDetailPage`      | ADMIN, RECEPTIONIST | P0       |
+| `/admin/billing/{id}/payment` | Record Payment           | `PaymentFormPage`        | ADMIN, RECEPTIONIST | P0       |
+| `/admin/billing/payments`     | Payment History          | `PaymentListPage`        | ADMIN, RECEPTIONIST | P1       |
+| `/patient/billing`            | My Invoices              | `PatientInvoiceListPage` | PATIENT             | P0       |
+| `/patient/billing/{id}`       | Invoice Detail (Patient) | `InvoiceDetailPage`      | PATIENT             | P0       |
+| `/patient/billing/{id}/pay`   | Make Payment             | `PatientPaymentPage`     | PATIENT             | P1       |
 
 ### 1.5 Screen Hierarchy Diagram
 
@@ -67,7 +68,7 @@ The Billing Service manages patient invoices and payment processing. It provides
     └── /{id}/pay (make payment - online payment flow)
 ```
 
-### 1.6 Invoice Status Flow
+### 1.6 Invoice Status Flow /chưa thể kiểm thử alternative/
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -104,7 +105,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 ## 2. User Flows & Acceptance Criteria
 
-### 2.1 Flow: View Invoice List (Admin)
+### 2.1 Flow: View Invoice List (Admin) /chưa phân role/
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -119,7 +120,8 @@ The Billing Service manages patient invoices and payment processing. It provides
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Acceptance Criteria:**
+**Acceptance Criteria:** /dư due date/
+
 - [ ] Page loads within 2 seconds
 - [ ] Table displays: Invoice #, Patient Name, Date, Total, Paid, Balance, Status, Actions
 - [ ] Search filters by patient name (debounced 300ms)
@@ -135,7 +137,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 ---
 
-### 2.2 Flow: View Invoice Detail (Admin)
+### 2.2 Flow: View Invoice Detail (Admin) /chưa role/
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -157,7 +159,8 @@ The Billing Service manages patient invoices and payment processing. It provides
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Acceptance Criteria:**
+**Acceptance Criteria:** /not tax yet, how to create a payment, lack Link to related, not check overdue yet/
+
 - [ ] Display invoice header: Invoice #, Date, Due Date, Status
 - [ ] Display patient information section
 - [ ] Display line items table: Type, Description, Qty, Unit Price, Amount
@@ -200,7 +203,8 @@ The Billing Service manages patient invoices and payment processing. It provides
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Acceptance Criteria:**
+**Acceptance Criteria:** /lỗi Must be > 0 and <= balance due, Amount field: error edit, UUID/
+
 - [ ] Display invoice summary (Patient, Total, Paid, Balance)
 - [ ] Amount field: Pre-filled with balance due, editable
 - [ ] Amount validation: Must be > 0 and <= balance due
@@ -235,6 +239,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Invoices auto-filtered to logged-in patient
 - [ ] Unpaid/Partially Paid invoices shown first with highlight
 - [ ] Card view with: Invoice #, Date, Total, Status, Balance
@@ -266,6 +271,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Patient can only view own invoices (403 for others)
 - [ ] Display invoice details (same as admin but read-only)
 - [ ] Display payment history
@@ -299,6 +305,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Display invoice summary (Total, Balance Due)
 - [ ] Amount field: Default to full balance, allow partial payment
 - [ ] Payment method options: Credit Card, Bank Transfer (online)
@@ -325,6 +332,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Table displays: Payment ID, Invoice #, Patient, Amount, Method, Date, Status
 - [ ] Filter by payment method: All, CASH, CREDIT_CARD, BANK_TRANSFER, INSURANCE
 - [ ] Date range filter
@@ -355,6 +363,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Only UNPAID invoices can be cancelled
 - [ ] Confirmation modal with warning message
 - [ ] Reason field required, max 500 characters
@@ -370,7 +379,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 **Route:** `/admin/billing`  
 **Component:** `InvoiceListPage`  
-**Access:** ADMIN
+**Access:** ADMIN, RECEPTIONIST
 
 #### Layout Structure
 
@@ -401,54 +410,54 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 #### Summary Cards
 
-| Card | Value | Calculation |
-|------|-------|-------------|
-| Total Invoices | Count + Sum | All invoices in period |
-| Unpaid | Count + Sum | status IN (UNPAID, PARTIALLY_PAID) |
-| Overdue | Count + Sum | status = OVERDUE |
-| Collected | Sum | Total payments this month |
+| Card           | Value       | Calculation                        |
+| -------------- | ----------- | ---------------------------------- |
+| Total Invoices | Count + Sum | All invoices in period             |
+| Unpaid         | Count + Sum | status IN (UNPAID, PARTIALLY_PAID) |
+| Overdue        | Count + Sum | status = OVERDUE                   |
+| Collected      | Sum         | Total payments this month          |
 
 #### Filter Components
 
-| Filter | Type | Options | Default |
-|--------|------|---------|---------|
-| Search | Text Input | Patient name search | Empty |
-| Status | Select | All, UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED | All |
-| Start Date | Date Picker | Any date | Empty |
-| End Date | Date Picker | Any date | Empty |
+| Filter     | Type        | Options                                               | Default |
+| ---------- | ----------- | ----------------------------------------------------- | ------- |
+| Search     | Text Input  | Patient name search                                   | Empty   |
+| Status     | Select      | All, UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED | All     |
+| Start Date | Date Picker | Any date                                              | Empty   |
+| End Date   | Date Picker | Any date                                              | Empty   |
 
 #### Table Columns
 
-| Column | Field | Sortable | Width |
-|--------|-------|----------|-------|
-| Invoice # | `invoiceNumber` | Yes | 15% |
-| Patient | `patient.fullName` | Yes | 20% |
-| Date | `invoiceDate` | Yes (default desc) | 12% |
-| Due Date | `dueDate` | Yes | 12% |
-| Total | `totalAmount` | Yes | 12% |
-| Paid | `paidAmount` | No | 10% |
-| Balance | `totalAmount - paidAmount` | No | 10% |
-| Status | `status` | Yes | 9% |
+| Column    | Field                      | Sortable           | Width |
+| --------- | -------------------------- | ------------------ | ----- |
+| Invoice # | `invoiceNumber`            | Yes                | 15%   |
+| Patient   | `patient.fullName`         | Yes                | 20%   |
+| Date      | `invoiceDate`              | Yes (default desc) | 12%   |
+| Due Date  | `dueDate`                  | Yes                | 12%   |
+| Total     | `totalAmount`              | Yes                | 12%   |
+| Paid      | `paidAmount`               | No                 | 10%   |
+| Balance   | `totalAmount - paidAmount` | No                 | 10%   |
+| Status    | `status`                   | Yes                | 9%    |
 
 #### Action Buttons per Row
 
-| Status | Actions Available |
-|--------|-------------------|
-| UNPAID | View, Record Payment |
+| Status         | Actions Available    |
+| -------------- | -------------------- |
+| UNPAID         | View, Record Payment |
 | PARTIALLY_PAID | View, Record Payment |
-| PAID | View |
-| OVERDUE | View, Record Payment |
-| CANCELLED | View |
+| PAID           | View                 |
+| OVERDUE        | View, Record Payment |
+| CANCELLED      | View                 |
 
 #### Status Badge Styles
 
-| Status | Color | Icon |
-|--------|-------|------|
-| UNPAID | Red (`bg-red-100 text-red-800`) | 🔴 Circle |
-| PARTIALLY_PAID | Yellow (`bg-yellow-100 text-yellow-800`) | 🟡 Half |
-| PAID | Green (`bg-green-100 text-green-800`) | 🟢 Check |
-| OVERDUE | Orange (`bg-orange-100 text-orange-800`) | ⚠️ Warning |
-| CANCELLED | Gray (`bg-gray-100 text-gray-800`) | ✕ X |
+| Status         | Color                                    | Icon       |
+| -------------- | ---------------------------------------- | ---------- |
+| UNPAID         | Red (`bg-red-100 text-red-800`)          | 🔴 Circle  |
+| PARTIALLY_PAID | Yellow (`bg-yellow-100 text-yellow-800`) | 🟡 Half    |
+| PAID           | Green (`bg-green-100 text-green-800`)    | 🟢 Check   |
+| OVERDUE        | Orange (`bg-orange-100 text-orange-800`) | ⚠️ Warning |
+| CANCELLED      | Gray (`bg-gray-100 text-gray-800`)       | ✕ X        |
 
 ---
 
@@ -456,7 +465,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 **Route:** `/admin/billing/{id}` or `/patient/billing/{id}`  
 **Component:** `InvoiceDetailPage`  
-**Access:** ADMIN (all), PATIENT (own only)
+**Access:** ADMIN, RECEPTIONIST (all), PATIENT (own only)
 
 #### Layout Structure
 
@@ -524,42 +533,42 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 #### Invoice Items Table
 
-| Column | Field | Width |
-|--------|-------|-------|
-| Type | `type` (badge) | 15% |
-| Description | `description` | 40% |
-| Qty | `quantity` | 10% |
-| Unit Price | `unitPrice` | 15% |
-| Amount | `amount` | 20% |
+| Column      | Field          | Width |
+| ----------- | -------------- | ----- |
+| Type        | `type` (badge) | 15%   |
+| Description | `description`  | 40%   |
+| Qty         | `quantity`     | 10%   |
+| Unit Price  | `unitPrice`    | 15%   |
+| Amount      | `amount`       | 20%   |
 
 #### Item Type Badge Styles
 
-| Type | Color | Icon |
-|------|-------|------|
-| CONSULTATION | Purple (`bg-purple-100 text-purple-800`) | 🩺 |
-| MEDICINE | Blue (`bg-blue-100 text-blue-800`) | 💊 |
-| TEST | Cyan (`bg-cyan-100 text-cyan-800`) | 🧪 |
-| OTHER | Gray (`bg-gray-100 text-gray-800`) | 📋 |
+| Type         | Color                                    | Icon |
+| ------------ | ---------------------------------------- | ---- |
+| CONSULTATION | Purple (`bg-purple-100 text-purple-800`) | 🩺   |
+| MEDICINE     | Blue (`bg-blue-100 text-blue-800`)       | 💊   |
+| TEST         | Cyan (`bg-cyan-100 text-cyan-800`)       | 🧪   |
+| OTHER        | Gray (`bg-gray-100 text-gray-800`)       | 📋   |
 
 #### Payment History Table (if payments exist)
 
-| Column | Field | Width |
-|--------|-------|-------|
-| Date | `paymentDate` | 20% |
-| Amount | `amount` | 20% |
-| Method | `method` (badge) | 20% |
-| Status | `status` | 15% |
-| Notes | `notes` | 25% |
+| Column | Field            | Width |
+| ------ | ---------------- | ----- |
+| Date   | `paymentDate`    | 20%   |
+| Amount | `amount`         | 20%   |
+| Method | `method` (badge) | 20%   |
+| Status | `status`         | 15%   |
+| Notes  | `notes`          | 25%   |
 
 #### Conditional Actions by Status & Role
 
-| Status | ADMIN | PATIENT |
-|--------|-------|---------|
-| UNPAID | Record Payment, Cancel, Print | Pay Now, Print |
-| PARTIALLY_PAID | Record Payment, Print | Pay Now, Print |
-| PAID | Print, Download Receipt | Download Receipt |
-| OVERDUE | Record Payment, Print | Pay Now, Print |
-| CANCELLED | View only | Hidden from list |
+| Status         | ADMIN                         | PATIENT          |
+| -------------- | ----------------------------- | ---------------- |
+| UNPAID         | Record Payment, Cancel, Print | Pay Now, Print   |
+| PARTIALLY_PAID | Record Payment, Print         | Pay Now, Print   |
+| PAID           | Print, Download Receipt       | Download Receipt |
+| OVERDUE        | Record Payment, Print         | Pay Now, Print   |
+| CANCELLED      | View only                     | Hidden from list |
 
 ---
 
@@ -567,7 +576,7 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 **Route:** `/admin/billing/{id}/payment`  
 **Component:** `PaymentFormPage`  
-**Access:** ADMIN
+**Access:** ADMIN, RECEPTIONIST
 
 #### Layout Structure
 
@@ -610,31 +619,31 @@ The Billing Service manages patient invoices and payment processing. It provides
 
 #### Form Fields
 
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| `amount` | Number Input | Yes | > 0, <= balanceDue |
-| `method` | Radio Group | Yes | CASH, CREDIT_CARD, BANK_TRANSFER, INSURANCE |
-| `notes` | Textarea | No | Max 1000 chars |
-| `idempotencyKey` | Hidden | Yes | Auto-generated UUID |
+| Field            | Type         | Required | Validation                                  |
+| ---------------- | ------------ | -------- | ------------------------------------------- |
+| `amount`         | Number Input | Yes      | > 0, <= balanceDue                          |
+| `method`         | Radio Group  | Yes      | CASH, CREDIT_CARD, BANK_TRANSFER, INSURANCE |
+| `notes`          | Textarea     | No       | Max 1000 chars                              |
+| `idempotencyKey` | Hidden       | Yes      | Auto-generated UUID                         |
 
 #### Validation Rules
 
-| Field | Rule | Error Message |
-|-------|------|---------------|
-| amount | Required | "Please enter payment amount" |
-| amount | > 0 | "Amount must be greater than 0" |
+| Field  | Rule       | Error Message                                         |
+| ------ | ---------- | ----------------------------------------------------- |
+| amount | Required   | "Please enter payment amount"                         |
+| amount | > 0        | "Amount must be greater than 0"                       |
 | amount | <= balance | "Amount cannot exceed remaining balance (₫{balance})" |
-| method | Required | "Please select payment method" |
-| notes | Max 1000 | "Notes cannot exceed 1000 characters" |
+| method | Required   | "Please select payment method"                        |
+| notes  | Max 1000   | "Notes cannot exceed 1000 characters"                 |
 
 #### Payment Method Options
 
-| Method | Label | Icon |
-|--------|-------|------|
-| CASH | Cash | 💵 |
-| CREDIT_CARD | Credit Card | 💳 |
-| BANK_TRANSFER | Bank Transfer | 🏦 |
-| INSURANCE | Insurance | 🏥 |
+| Method        | Label         | Icon |
+| ------------- | ------------- | ---- |
+| CASH          | Cash          | 💵   |
+| CREDIT_CARD   | Credit Card   | 💳   |
+| BANK_TRANSFER | Bank Transfer | 🏦   |
+| INSURANCE     | Insurance     | 🏥   |
 
 ---
 
@@ -759,7 +768,7 @@ Step 2: Payment Method
 
 **Route:** `/admin/billing/payments`  
 **Component:** `PaymentListPage`  
-**Access:** ADMIN
+**Access:** ADMIN, RECEPTIONIST
 
 #### Layout Structure
 
@@ -790,24 +799,24 @@ Step 2: Payment Method
 
 #### Table Columns
 
-| Column | Field | Sortable | Width |
-|--------|-------|----------|-------|
-| Payment ID | `id` (truncated) | No | 12% |
-| Invoice # | `invoice.invoiceNumber` | Yes | 18% |
-| Patient | `patient.fullName` | Yes | 18% |
-| Amount | `amount` | Yes | 15% |
-| Method | `method` | Yes | 12% |
-| Status | `status` | No | 10% |
-| Date | `paymentDate` | Yes (default desc) | 15% |
+| Column     | Field                   | Sortable           | Width |
+| ---------- | ----------------------- | ------------------ | ----- |
+| Payment ID | `id` (truncated)        | No                 | 12%   |
+| Invoice #  | `invoice.invoiceNumber` | Yes                | 18%   |
+| Patient    | `patient.fullName`      | Yes                | 18%   |
+| Amount     | `amount`                | Yes                | 15%   |
+| Method     | `method`                | Yes                | 12%   |
+| Status     | `status`                | No                 | 10%   |
+| Date       | `paymentDate`           | Yes (default desc) | 15%   |
 
 #### Payment Method Badge Styles
 
-| Method | Color | Icon |
-|--------|-------|------|
-| CASH | Green (`bg-green-100 text-green-800`) | 💵 |
-| CREDIT_CARD | Blue (`bg-blue-100 text-blue-800`) | 💳 |
-| BANK_TRANSFER | Purple (`bg-purple-100 text-purple-800`) | 🏦 |
-| INSURANCE | Cyan (`bg-cyan-100 text-cyan-800`) | 🏥 |
+| Method        | Color                                    | Icon |
+| ------------- | ---------------------------------------- | ---- |
+| CASH          | Green (`bg-green-100 text-green-800`)    | 💵   |
+| CREDIT_CARD   | Blue (`bg-blue-100 text-blue-800`)       | 💳   |
+| BANK_TRANSFER | Purple (`bg-purple-100 text-purple-800`) | 🏦   |
+| INSURANCE     | Cyan (`bg-cyan-100 text-cyan-800`)       | 🏥   |
 
 ---
 
@@ -818,16 +827,25 @@ Step 2: Payment Method
 **File:** `services/billing.service.ts`
 
 ```typescript
-import api from '@/config/axios';
+import api from "@/config/axios";
 
-const BASE_URL = '/api/billing';
+const BASE_URL = "/api/billing";
 
 // ============ Type Definitions ============
 
-export type InvoiceStatus = 'UNPAID' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED';
-export type ItemType = 'CONSULTATION' | 'MEDICINE' | 'TEST' | 'OTHER';
-export type PaymentMethod = 'CASH' | 'CREDIT_CARD' | 'BANK_TRANSFER' | 'INSURANCE';
-export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+export type InvoiceStatus =
+  | "UNPAID"
+  | "PARTIALLY_PAID"
+  | "PAID"
+  | "OVERDUE"
+  | "CANCELLED";
+export type ItemType = "CONSULTATION" | "MEDICINE" | "TEST" | "OTHER";
+export type PaymentMethod =
+  | "CASH"
+  | "CREDIT_CARD"
+  | "BANK_TRANSFER"
+  | "INSURANCE";
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
 
 export interface PatientSummary {
   id: string;
@@ -960,7 +978,10 @@ const billingService = {
 
   // Generate invoice (internal - triggered by prescription creation)
   generateInvoice: (data: GenerateInvoiceRequest) =>
-    api.post<{ status: string; data: Invoice }>(`${BASE_URL}/invoices/generate`, data),
+    api.post<{ status: string; data: Invoice }>(
+      `${BASE_URL}/invoices/generate`,
+      data
+    ),
 
   // Get invoice by ID
   getInvoiceById: (id: string) =>
@@ -968,11 +989,16 @@ const billingService = {
 
   // Get invoice by appointment
   getInvoiceByAppointment: (appointmentId: string) =>
-    api.get<{ status: string; data: Invoice }>(`${BASE_URL}/invoices/by-appointment/${appointmentId}`),
+    api.get<{ status: string; data: Invoice }>(
+      `${BASE_URL}/invoices/by-appointment/${appointmentId}`
+    ),
 
   // List invoices (admin)
   getInvoiceList: (params: InvoiceListParams) =>
-    api.get<{ status: string; data: PaginatedResponse<InvoiceListItem> }>(`${BASE_URL}/invoices`, { params }),
+    api.get<{ status: string; data: PaginatedResponse<InvoiceListItem> }>(
+      `${BASE_URL}/invoices`,
+      { params }
+    ),
 
   // Get patient invoices
   getPatientInvoices: (patientId: string, params?: PatientInvoiceParams) =>
@@ -993,7 +1019,9 @@ const billingService = {
 
   // Get payments by invoice
   getPaymentsByInvoice: (invoiceId: string) =>
-    api.get<{ status: string; data: PaymentsByInvoice }>(`${BASE_URL}/payments/by-invoice/${invoiceId}`),
+    api.get<{ status: string; data: PaymentsByInvoice }>(
+      `${BASE_URL}/payments/by-invoice/${invoiceId}`
+    ),
 };
 
 export default billingService;
@@ -1004,28 +1032,33 @@ export default billingService;
 **File:** `hooks/queries/useBilling.ts`
 
 ```typescript
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import billingService, {
   InvoiceListParams,
   PatientInvoiceParams,
   CreatePaymentRequest,
   GenerateInvoiceRequest,
-} from '@/services/billing.service';
-import { toast } from 'sonner';
+} from "@/services/billing.service";
+import { toast } from "sonner";
 
 // ============ Query Keys ============
 
 export const billingKeys = {
-  all: ['billing'] as const,
-  invoices: () => [...billingKeys.all, 'invoices'] as const,
-  invoiceList: (params: InvoiceListParams) => [...billingKeys.invoices(), 'list', params] as const,
-  invoiceDetail: (id: string) => [...billingKeys.invoices(), 'detail', id] as const,
-  invoiceByAppointment: (appointmentId: string) => [...billingKeys.invoices(), 'by-appointment', appointmentId] as const,
-  patientInvoices: (patientId: string, params?: PatientInvoiceParams) => 
-    [...billingKeys.invoices(), 'by-patient', patientId, params] as const,
-  payments: () => [...billingKeys.all, 'payments'] as const,
-  paymentDetail: (id: string) => [...billingKeys.payments(), 'detail', id] as const,
-  paymentsByInvoice: (invoiceId: string) => [...billingKeys.payments(), 'by-invoice', invoiceId] as const,
+  all: ["billing"] as const,
+  invoices: () => [...billingKeys.all, "invoices"] as const,
+  invoiceList: (params: InvoiceListParams) =>
+    [...billingKeys.invoices(), "list", params] as const,
+  invoiceDetail: (id: string) =>
+    [...billingKeys.invoices(), "detail", id] as const,
+  invoiceByAppointment: (appointmentId: string) =>
+    [...billingKeys.invoices(), "by-appointment", appointmentId] as const,
+  patientInvoices: (patientId: string, params?: PatientInvoiceParams) =>
+    [...billingKeys.invoices(), "by-patient", patientId, params] as const,
+  payments: () => [...billingKeys.all, "payments"] as const,
+  paymentDetail: (id: string) =>
+    [...billingKeys.payments(), "detail", id] as const,
+  paymentsByInvoice: (invoiceId: string) =>
+    [...billingKeys.payments(), "by-invoice", invoiceId] as const,
 };
 
 // ============ Invoice Hooks ============
@@ -1060,7 +1093,10 @@ export const useInvoiceByAppointment = (appointmentId: string) => {
 };
 
 // Get patient invoices
-export const usePatientInvoices = (patientId: string, params?: PatientInvoiceParams) => {
+export const usePatientInvoices = (
+  patientId: string,
+  params?: PatientInvoiceParams
+) => {
   return useQuery({
     queryKey: billingKeys.patientInvoices(patientId, params),
     queryFn: () => billingService.getPatientInvoices(patientId, params),
@@ -1074,10 +1110,11 @@ export const useGenerateInvoice = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: GenerateInvoiceRequest) => billingService.generateInvoice(data),
+    mutationFn: (data: GenerateInvoiceRequest) =>
+      billingService.generateInvoice(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: billingKeys.invoices() });
-      toast.success('Invoice generated successfully');
+      toast.success("Invoice generated successfully");
       return response.data.data;
     },
     onError: (error: any) => {
@@ -1115,13 +1152,18 @@ export const useCreatePayment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreatePaymentRequest) => billingService.createPayment(data),
+    mutationFn: (data: CreatePaymentRequest) =>
+      billingService.createPayment(data),
     onSuccess: (response, variables) => {
       // Invalidate invoice detail to refresh payment history
-      queryClient.invalidateQueries({ queryKey: billingKeys.invoiceDetail(variables.invoiceId) });
-      queryClient.invalidateQueries({ queryKey: billingKeys.paymentsByInvoice(variables.invoiceId) });
+      queryClient.invalidateQueries({
+        queryKey: billingKeys.invoiceDetail(variables.invoiceId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: billingKeys.paymentsByInvoice(variables.invoiceId),
+      });
       queryClient.invalidateQueries({ queryKey: billingKeys.invoices() });
-      toast.success('Payment recorded successfully');
+      toast.success("Payment recorded successfully");
       return response.data.data;
     },
     onError: (error: any) => {
@@ -1137,29 +1179,32 @@ export const useCreatePayment = () => {
 function getBillingErrorMessage(errorCode: string): string {
   const errorMessages: Record<string, string> = {
     // Validation errors
-    VALIDATION_ERROR: 'Please check your input and try again',
-    
+    VALIDATION_ERROR: "Please check your input and try again",
+
     // Invoice errors
-    APPOINTMENT_NOT_FOUND: 'Appointment not found',
-    PRESCRIPTION_NOT_FOUND: 'No prescription found for this appointment',
-    INVOICE_NOT_FOUND: 'Invoice not found',
-    INVOICE_EXISTS: 'Invoice already exists for this appointment',
-    
+    APPOINTMENT_NOT_FOUND: "Appointment not found",
+    PRESCRIPTION_NOT_FOUND: "No prescription found for this appointment",
+    INVOICE_NOT_FOUND: "Invoice not found",
+    INVOICE_EXISTS: "Invoice already exists for this appointment",
+
     // Payment errors
-    DUPLICATE_PAYMENT: 'Payment already processed (duplicate request)',
-    INVOICE_ALREADY_PAID: 'Invoice is already fully paid',
-    INVOICE_CANCELLED: 'Cannot pay a cancelled invoice',
-    PAYMENT_NOT_FOUND: 'Payment not found',
-    
+    DUPLICATE_PAYMENT: "Payment already processed (duplicate request)",
+    INVOICE_ALREADY_PAID: "Invoice is already fully paid",
+    INVOICE_CANCELLED: "Cannot pay a cancelled invoice",
+    PAYMENT_NOT_FOUND: "Payment not found",
+
     // Patient errors
-    PATIENT_NOT_FOUND: 'Patient not found',
-    
+    PATIENT_NOT_FOUND: "Patient not found",
+
     // Auth errors
-    UNAUTHORIZED: 'Please log in to continue',
-    FORBIDDEN: 'You do not have permission to perform this action',
+    UNAUTHORIZED: "Please log in to continue",
+    FORBIDDEN: "You do not have permission to perform this action",
   };
 
-  return errorMessages[errorCode] || 'An unexpected error occurred. Please try again.';
+  return (
+    errorMessages[errorCode] ||
+    "An unexpected error occurred. Please try again."
+  );
 }
 ```
 
@@ -1171,6 +1216,7 @@ function getBillingErrorMessage(errorCode: string): string {
 **Access:** Internal (triggered by prescription creation)
 
 **Request:**
+
 ```json
 {
   "appointmentId": "apt001"
@@ -1178,6 +1224,7 @@ function getBillingErrorMessage(errorCode: string): string {
 ```
 
 **Success Response:** `201 Created`
+
 ```json
 {
   "status": "success",
@@ -1226,12 +1273,12 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 400 | VALIDATION_ERROR | appointmentId is required | Show field error |
-| 400 | PRESCRIPTION_NOT_FOUND | No prescription for this appointment | Show toast error |
-| 404 | APPOINTMENT_NOT_FOUND | Appointment doesn't exist | Show toast error |
-| 409 | INVOICE_EXISTS | Invoice already exists | Show toast info |
+| Status | Code                   | Message                              | UI Action        |
+| ------ | ---------------------- | ------------------------------------ | ---------------- |
+| 400    | VALIDATION_ERROR       | appointmentId is required            | Show field error |
+| 400    | PRESCRIPTION_NOT_FOUND | No prescription for this appointment | Show toast error |
+| 404    | APPOINTMENT_NOT_FOUND  | Appointment doesn't exist            | Show toast error |
+| 409    | INVOICE_EXISTS         | Invoice already exists               | Show toast info  |
 
 ---
 
@@ -1241,6 +1288,7 @@ function getBillingErrorMessage(errorCode: string): string {
 **Access:** ADMIN, PATIENT (own)
 
 **Success Response:** `200 OK`
+
 ```json
 {
   "status": "success",
@@ -1273,11 +1321,11 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to login |
-| 403 | FORBIDDEN | User not authorized to view this invoice | Show 403 page |
-| 404 | INVOICE_NOT_FOUND | Invoice doesn't exist | Show 404 page |
+| Status | Code              | Message                                  | UI Action         |
+| ------ | ----------------- | ---------------------------------------- | ----------------- |
+| 401    | UNAUTHORIZED      | Missing or invalid access token          | Redirect to login |
+| 403    | FORBIDDEN         | User not authorized to view this invoice | Show 403 page     |
+| 404    | INVOICE_NOT_FOUND | Invoice doesn't exist                    | Show 404 page     |
 
 ---
 
@@ -1287,6 +1335,7 @@ function getBillingErrorMessage(errorCode: string): string {
 **Access:** ADMIN, PATIENT (own)
 
 **Success Response:** `200 OK`
+
 ```json
 {
   "status": "success",
@@ -1309,12 +1358,12 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to login |
-| 403 | FORBIDDEN | User not authorized | Show 403 page |
-| 404 | APPOINTMENT_NOT_FOUND | Appointment doesn't exist | Show 404 page |
-| 404 | INVOICE_NOT_FOUND | No invoice for this appointment | Show message |
+| Status | Code                  | Message                         | UI Action         |
+| ------ | --------------------- | ------------------------------- | ----------------- |
+| 401    | UNAUTHORIZED          | Missing or invalid access token | Redirect to login |
+| 403    | FORBIDDEN             | User not authorized             | Show 403 page     |
+| 404    | APPOINTMENT_NOT_FOUND | Appointment doesn't exist       | Show 404 page     |
+| 404    | INVOICE_NOT_FOUND     | No invoice for this appointment | Show message      |
 
 ---
 
@@ -1325,17 +1374,18 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| patientId | string | No | - | Filter by patient |
-| status | string | No | - | UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED |
-| startDate | date | No | - | Filter from date (YYYY-MM-DD) |
-| endDate | date | No | - | Filter until date (YYYY-MM-DD) |
-| page | integer | No | 0 | Page number (0-indexed) |
-| size | integer | No | 20 | Page size (max: 100) |
-| sort | string | No | invoiceDate,desc | Sort field and direction |
+| Parameter | Type    | Required | Default          | Description                                      |
+| --------- | ------- | -------- | ---------------- | ------------------------------------------------ |
+| patientId | string  | No       | -                | Filter by patient                                |
+| status    | string  | No       | -                | UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED |
+| startDate | date    | No       | -                | Filter from date (YYYY-MM-DD)                    |
+| endDate   | date    | No       | -                | Filter until date (YYYY-MM-DD)                   |
+| page      | integer | No       | 0                | Page number (0-indexed)                          |
+| size      | integer | No       | 20               | Page size (max: 100)                             |
+| sort      | string  | No       | invoiceDate,desc | Sort field and direction                         |
 
 **Success Response:** `200 OK`
+
 ```json
 {
   "status": "success",
@@ -1366,13 +1416,14 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to login |
-| 400 | VALIDATION_ERROR | Invalid query parameters | Show toast error |
-| 403 | FORBIDDEN | Requires ADMIN role | Show 403 page |
+| Status | Code             | Message                         | UI Action         |
+| ------ | ---------------- | ------------------------------- | ----------------- |
+| 401    | UNAUTHORIZED     | Missing or invalid access token | Redirect to login |
+| 400    | VALIDATION_ERROR | Invalid query parameters        | Show toast error  |
+| 403    | FORBIDDEN        | Requires ADMIN role             | Show 403 page     |
 
 **Validation Error Details:**
+
 - `page must be >= 0`
 - `size must be between 1 and 100`
 - `startDate must be valid ISO 8601 date`
@@ -1389,13 +1440,14 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| status | string | No | - | Filter by status |
-| page | integer | No | 0 | Page number |
-| size | integer | No | 20 | Page size (max: 100) |
+| Parameter | Type    | Required | Default | Description          |
+| --------- | ------- | -------- | ------- | -------------------- |
+| status    | string  | No       | -       | Filter by status     |
+| page      | integer | No       | 0       | Page number          |
+| size      | integer | No       | 20      | Page size (max: 100) |
 
 **Success Response:** `200 OK`
+
 ```json
 {
   "status": "success",
@@ -1422,11 +1474,11 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to login |
-| 403 | FORBIDDEN | Patients can only view own invoices | Show 403 page |
-| 404 | PATIENT_NOT_FOUND | Patient doesn't exist | Show 404 page |
+| Status | Code              | Message                             | UI Action         |
+| ------ | ----------------- | ----------------------------------- | ----------------- |
+| 401    | UNAUTHORIZED      | Missing or invalid access token     | Redirect to login |
+| 403    | FORBIDDEN         | Patients can only view own invoices | Show 403 page     |
+| 404    | PATIENT_NOT_FOUND | Patient doesn't exist               | Show 404 page     |
 
 ---
 
@@ -1436,6 +1488,7 @@ function getBillingErrorMessage(errorCode: string): string {
 **Access:** ADMIN, PATIENT (own invoices)
 
 **Request:**
+
 ```json
 {
   "invoiceId": "inv001",
@@ -1447,6 +1500,7 @@ function getBillingErrorMessage(errorCode: string): string {
 ```
 
 **Success Response:** `201 Created`
+
 ```json
 {
   "status": "success",
@@ -1469,17 +1523,18 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to login |
-| 400 | VALIDATION_ERROR | Field validation failed | Show field errors |
-| 403 | FORBIDDEN | Patients can only pay own invoices | Show toast error |
-| 404 | INVOICE_NOT_FOUND | Invoice doesn't exist | Show 404 page |
-| 409 | DUPLICATE_PAYMENT | Idempotency key already exists | Return existing payment |
-| 409 | INVOICE_ALREADY_PAID | Invoice is fully paid | Show toast info |
-| 409 | INVOICE_CANCELLED | Cannot pay cancelled invoice | Show toast error |
+| Status | Code                 | Message                            | UI Action               |
+| ------ | -------------------- | ---------------------------------- | ----------------------- |
+| 401    | UNAUTHORIZED         | Missing or invalid access token    | Redirect to login       |
+| 400    | VALIDATION_ERROR     | Field validation failed            | Show field errors       |
+| 403    | FORBIDDEN            | Patients can only pay own invoices | Show toast error        |
+| 404    | INVOICE_NOT_FOUND    | Invoice doesn't exist              | Show 404 page           |
+| 409    | DUPLICATE_PAYMENT    | Idempotency key already exists     | Return existing payment |
+| 409    | INVOICE_ALREADY_PAID | Invoice is fully paid              | Show toast info         |
+| 409    | INVOICE_CANCELLED    | Cannot pay cancelled invoice       | Show toast error        |
 
 **Validation Error Details:**
+
 - `invoiceId is required`
 - `idempotencyKey is required`
 - `idempotencyKey must be valid UUID format`
@@ -1498,6 +1553,7 @@ function getBillingErrorMessage(errorCode: string): string {
 **Access:** ADMIN, PATIENT (own)
 
 **Success Response:** `200 OK`
+
 ```json
 {
   "status": "success",
@@ -1521,11 +1577,11 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to login |
-| 403 | FORBIDDEN | Patients can only view own payments | Show 403 page |
-| 404 | PAYMENT_NOT_FOUND | Payment doesn't exist | Show 404 page |
+| Status | Code              | Message                             | UI Action         |
+| ------ | ----------------- | ----------------------------------- | ----------------- |
+| 401    | UNAUTHORIZED      | Missing or invalid access token     | Redirect to login |
+| 403    | FORBIDDEN         | Patients can only view own payments | Show 403 page     |
+| 404    | PAYMENT_NOT_FOUND | Payment doesn't exist               | Show 404 page     |
 
 ---
 
@@ -1535,6 +1591,7 @@ function getBillingErrorMessage(errorCode: string): string {
 **Access:** ADMIN, PATIENT (own)
 
 **Success Response:** `200 OK`
+
 ```json
 {
   "status": "success",
@@ -1564,12 +1621,11 @@ function getBillingErrorMessage(errorCode: string): string {
 
 **Error Responses:**
 
-| Status | Code | Message | UI Action |
-|--------|------|---------|-----------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to login |
-| 403 | FORBIDDEN | Patients can only view own invoice payments | Show 403 page |
-| 404 | INVOICE_NOT_FOUND | Invoice doesn't exist | Show 404 page |
-
+| Status | Code              | Message                                     | UI Action         |
+| ------ | ----------------- | ------------------------------------------- | ----------------- |
+| 401    | UNAUTHORIZED      | Missing or invalid access token             | Redirect to login |
+| 403    | FORBIDDEN         | Patients can only view own invoice payments | Show 403 page     |
+| 404    | INVOICE_NOT_FOUND | Invoice doesn't exist                       | Show 404 page     |
 
 ---
 
@@ -1577,16 +1633,16 @@ function getBillingErrorMessage(errorCode: string): string {
 
 ### 5.1 Component Registry
 
-| Component | Purpose | Used In |
-|-----------|---------|---------|
-| `InvoiceStatusBadge` | Display invoice status with color coding | List, Detail |
-| `ItemTypeBadge` | Display item type (CONSULTATION, MEDICINE, etc.) | Invoice Detail |
-| `PaymentMethodBadge` | Display payment method with icon | Payment History |
-| `InvoiceCard` | Card layout for patient invoice list | Patient Portal |
-| `InvoiceSummaryCard` | Quick summary of invoice totals | Payment Form |
-| `PaymentHistoryTable` | Table of payments for an invoice | Invoice Detail |
-| `CurrencyDisplay` | Formatted currency display (VND) | Throughout |
-| `IdempotencyKeyProvider` | Generate/manage idempotency keys | Payment Forms |
+| Component                | Purpose                                          | Used In         |
+| ------------------------ | ------------------------------------------------ | --------------- |
+| `InvoiceStatusBadge`     | Display invoice status with color coding         | List, Detail    |
+| `ItemTypeBadge`          | Display item type (CONSULTATION, MEDICINE, etc.) | Invoice Detail  |
+| `PaymentMethodBadge`     | Display payment method with icon                 | Payment History |
+| `InvoiceCard`            | Card layout for patient invoice list             | Patient Portal  |
+| `InvoiceSummaryCard`     | Quick summary of invoice totals                  | Payment Form    |
+| `PaymentHistoryTable`    | Table of payments for an invoice                 | Invoice Detail  |
+| `CurrencyDisplay`        | Formatted currency display (VND)                 | Throughout      |
+| `IdempotencyKeyProvider` | Generate/manage idempotency keys                 | Payment Forms   |
 
 ### 5.2 InvoiceStatusBadge Component
 
@@ -1744,13 +1800,13 @@ interface Props {
 
 export function CurrencyDisplay({
   amount,
-  currency = 'VND',
-  locale = 'vi-VN',
-  className = '',
+  currency = "VND",
+  locale = "vi-VN",
+  className = "",
   showSymbol = true,
 }: Props) {
   const formatted = new Intl.NumberFormat(locale, {
-    style: showSymbol ? 'currency' : 'decimal',
+    style: showSymbol ? "currency" : "decimal",
     currency: currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
@@ -1760,10 +1816,10 @@ export function CurrencyDisplay({
 }
 
 // Utility function for formatting
-export function formatCurrency(amount: number, locale = 'vi-VN'): string {
+export function formatCurrency(amount: number, locale = "vi-VN"): string {
   return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: 'VND',
+    style: "currency",
+    currency: "VND",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -1800,16 +1856,25 @@ export function InvoiceSummaryCard({ invoice }: Props) {
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Total:</span>
-          <CurrencyDisplay amount={invoice.totalAmount} className="font-medium" />
+          <CurrencyDisplay
+            amount={invoice.totalAmount}
+            className="font-medium"
+          />
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Paid:</span>
-          <CurrencyDisplay amount={invoice.paidAmount} className="font-medium text-green-600" />
+          <CurrencyDisplay
+            amount={invoice.paidAmount}
+            className="font-medium text-green-600"
+          />
         </div>
         <Separator />
         <div className="flex justify-between">
           <span className="text-gray-800 font-semibold">Balance Due:</span>
-          <CurrencyDisplay amount={balanceDue} className="font-bold text-lg text-red-600" />
+          <CurrencyDisplay
+            amount={balanceDue}
+            className="font-bold text-lg text-red-600"
+          />
         </div>
       </CardContent>
     </Card>
@@ -1879,7 +1944,7 @@ export function PaymentHistoryTable({ payments, totalPaid, remainingBalance }: P
           ))}
         </TableBody>
       </Table>
-      
+
       <div className="flex justify-end gap-8 pt-4 border-t">
         <div>
           <span className="text-gray-600">Total Paid:</span>
@@ -1887,9 +1952,9 @@ export function PaymentHistoryTable({ payments, totalPaid, remainingBalance }: P
         </div>
         <div>
           <span className="text-gray-600">Remaining:</span>
-          <CurrencyDisplay 
-            amount={remainingBalance} 
-            className={\`ml-2 font-semibold \${remainingBalance > 0 ? 'text-red-600' : 'text-green-600'}\`} 
+          <CurrencyDisplay
+            amount={remainingBalance}
+            className={\`ml-2 font-semibold \${remainingBalance > 0 ? 'text-red-600' : 'text-green-600'}\`}
           />
         </div>
       </div>
@@ -1903,7 +1968,7 @@ export function PaymentHistoryTable({ payments, totalPaid, remainingBalance }: P
 ```typescript
 // hooks/useIdempotencyKey.ts
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 /**
  * Hook to manage idempotency keys for payment safety.
@@ -1955,7 +2020,7 @@ export function InvoiceCard({ invoice, onView, onPay }: Props) {
   const isOverdue = invoice.status === 'OVERDUE';
 
   return (
-    <Card className={cn('p-4', { 
+    <Card className={cn('p-4', {
       'border-red-200 bg-red-50/30': isOverdue,
       'border-yellow-200 bg-yellow-50/30': invoice.status === 'UNPAID',
     })}>
@@ -2010,81 +2075,82 @@ interface ApiErrorResponse {
 
 #### 6.2.1 Authentication & Authorization Errors
 
-| HTTP Status | Error Code | Description | UI Handling |
-|-------------|------------|-------------|-------------|
-| 401 | UNAUTHORIZED | Missing or invalid access token | Redirect to /login, clear auth state |
-| 403 | FORBIDDEN | User role not authorized | Show toast "You don't have permission" |
-| 403 | FORBIDDEN | Patients can only view own invoices | Show 403 page |
-| 403 | FORBIDDEN | Patients can only pay own invoices | Show toast error |
+| HTTP Status | Error Code   | Description                         | UI Handling                            |
+| ----------- | ------------ | ----------------------------------- | -------------------------------------- |
+| 401         | UNAUTHORIZED | Missing or invalid access token     | Redirect to /login, clear auth state   |
+| 403         | FORBIDDEN    | User role not authorized            | Show toast "You don't have permission" |
+| 403         | FORBIDDEN    | Patients can only view own invoices | Show 403 page                          |
+| 403         | FORBIDDEN    | Patients can only pay own invoices  | Show toast error                       |
 
 #### 6.2.2 Validation Errors (400 VALIDATION_ERROR)
 
 **Create Payment Validation:**
 
-| Field | Validation Rule | Error Message |
-|-------|-----------------|---------------|
-| invoiceId | Required | "invoiceId is required" |
-| idempotencyKey | Required | "idempotencyKey is required" |
-| idempotencyKey | Valid UUID | "idempotencyKey must be valid UUID format" |
-| amount | Required | "amount is required" |
-| amount | Positive | "amount must be positive (> 0)" |
-| amount | <= balance | "amount cannot exceed invoice remaining balance" |
-| method | Required | "method is required" |
-| method | Enum check | "method must be one of [CASH, CREDIT_CARD, BANK_TRANSFER, INSURANCE]" |
-| notes | Max length | "notes exceeds maximum length (1000 characters)" |
+| Field          | Validation Rule | Error Message                                                         |
+| -------------- | --------------- | --------------------------------------------------------------------- |
+| invoiceId      | Required        | "invoiceId is required"                                               |
+| idempotencyKey | Required        | "idempotencyKey is required"                                          |
+| idempotencyKey | Valid UUID      | "idempotencyKey must be valid UUID format"                            |
+| amount         | Required        | "amount is required"                                                  |
+| amount         | Positive        | "amount must be positive (> 0)"                                       |
+| amount         | <= balance      | "amount cannot exceed invoice remaining balance"                      |
+| method         | Required        | "method is required"                                                  |
+| method         | Enum check      | "method must be one of [CASH, CREDIT_CARD, BANK_TRANSFER, INSURANCE]" |
+| notes          | Max length      | "notes exceeds maximum length (1000 characters)"                      |
 
 **List Query Parameters Validation:**
 
-| Parameter | Validation Rule | Error Message |
-|-----------|-----------------|---------------|
-| page | Non-negative | "page must be >= 0" |
-| size | Range 1-100 | "size must be between 1 and 100" |
-| startDate | Valid date | "startDate must be valid ISO 8601 date" |
-| endDate | Valid date | "endDate must be valid ISO 8601 date" |
-| startDate/endDate | Date range | "startDate cannot be after endDate" |
-| status | Enum check | "status must be one of [UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED]" |
+| Parameter         | Validation Rule | Error Message                                                              |
+| ----------------- | --------------- | -------------------------------------------------------------------------- |
+| page              | Non-negative    | "page must be >= 0"                                                        |
+| size              | Range 1-100     | "size must be between 1 and 100"                                           |
+| startDate         | Valid date      | "startDate must be valid ISO 8601 date"                                    |
+| endDate           | Valid date      | "endDate must be valid ISO 8601 date"                                      |
+| startDate/endDate | Date range      | "startDate cannot be after endDate"                                        |
+| status            | Enum check      | "status must be one of [UNPAID, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED]" |
 
 #### 6.2.3 Business Logic Errors
 
-| HTTP Status | Error Code | Description | When Triggered | UI Handling |
-|-------------|------------|-------------|----------------|-------------|
-| 400 | PRESCRIPTION_NOT_FOUND | No prescription for appointment | Generate invoice without prescription | Show toast error |
-| 409 | INVOICE_EXISTS | Invoice already exists | Generate duplicate invoice | Show toast info, navigate to existing |
-| 409 | DUPLICATE_PAYMENT | Idempotency key already used | Retry with same key | Return existing payment (success) |
-| 409 | INVOICE_ALREADY_PAID | Invoice fully paid | Pay already paid invoice | Show toast info "Already paid" |
-| 409 | INVOICE_CANCELLED | Invoice is cancelled | Pay cancelled invoice | Show toast error |
+| HTTP Status | Error Code             | Description                     | When Triggered                        | UI Handling                           |
+| ----------- | ---------------------- | ------------------------------- | ------------------------------------- | ------------------------------------- |
+| 400         | PRESCRIPTION_NOT_FOUND | No prescription for appointment | Generate invoice without prescription | Show toast error                      |
+| 409         | INVOICE_EXISTS         | Invoice already exists          | Generate duplicate invoice            | Show toast info, navigate to existing |
+| 409         | DUPLICATE_PAYMENT      | Idempotency key already used    | Retry with same key                   | Return existing payment (success)     |
+| 409         | INVOICE_ALREADY_PAID   | Invoice fully paid              | Pay already paid invoice              | Show toast info "Already paid"        |
+| 409         | INVOICE_CANCELLED      | Invoice is cancelled            | Pay cancelled invoice                 | Show toast error                      |
 
 #### 6.2.4 Resource Not Found Errors (404)
 
-| Error Code | Description | When Triggered | UI Handling |
-|------------|-------------|----------------|-------------|
-| INVOICE_NOT_FOUND | Invoice doesn't exist | Get/Pay with invalid ID | Show 404 page |
+| Error Code            | Description               | When Triggered                            | UI Handling      |
+| --------------------- | ------------------------- | ----------------------------------------- | ---------------- |
+| INVOICE_NOT_FOUND     | Invoice doesn't exist     | Get/Pay with invalid ID                   | Show 404 page    |
 | APPOINTMENT_NOT_FOUND | Appointment doesn't exist | Generate invoice with invalid appointment | Show toast error |
-| PATIENT_NOT_FOUND | Patient doesn't exist | Get patient invoices with invalid ID | Show 404 page |
-| PAYMENT_NOT_FOUND | Payment doesn't exist | Get payment with invalid ID | Show 404 page |
+| PATIENT_NOT_FOUND     | Patient doesn't exist     | Get patient invoices with invalid ID      | Show 404 page    |
+| PAYMENT_NOT_FOUND     | Payment doesn't exist     | Get payment with invalid ID               | Show 404 page    |
 
 ### 6.3 Client-Side Validation (Zod Schema)
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 // Create Payment Schema
 export const createPaymentSchema = z.object({
-  invoiceId: z.string().min(1, 'Invoice ID is required'),
-  idempotencyKey: z.string().uuid('Invalid idempotency key format'),
-  amount: z.number().positive('Amount must be greater than 0'),
-  method: z.enum(['CASH', 'CREDIT_CARD', 'BANK_TRANSFER', 'INSURANCE'], {
-    required_error: 'Please select a payment method',
+  invoiceId: z.string().min(1, "Invoice ID is required"),
+  idempotencyKey: z.string().uuid("Invalid idempotency key format"),
+  amount: z.number().positive("Amount must be greater than 0"),
+  method: z.enum(["CASH", "CREDIT_CARD", "BANK_TRANSFER", "INSURANCE"], {
+    required_error: "Please select a payment method",
   }),
-  notes: z.string().max(1000, 'Notes cannot exceed 1000 characters').optional(),
+  notes: z.string().max(1000, "Notes cannot exceed 1000 characters").optional(),
 });
 
 // Custom validation for amount <= balance
 export const createPaymentSchemaWithBalance = (balanceDue: number) =>
   createPaymentSchema.extend({
-    amount: z.number()
-      .positive('Amount must be greater than 0')
-      .max(balanceDue, 'Amount cannot exceed remaining balance'),
+    amount: z
+      .number()
+      .positive("Amount must be greater than 0")
+      .max(balanceDue, "Amount cannot exceed remaining balance"),
   });
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
@@ -2095,33 +2161,36 @@ export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
 ```typescript
 // utils/billingErrors.ts
 
-export function handleBillingError(error: any, defaultMessage = 'An error occurred') {
+export function handleBillingError(
+  error: any,
+  defaultMessage = "An error occurred"
+) {
   const errorCode = error.response?.data?.error?.code;
   const errorMessage = error.response?.data?.error?.message;
-  
+
   const errorMessages: Record<string, string> = {
-    UNAUTHORIZED: 'Please log in to continue',
-    FORBIDDEN: 'You do not have permission to perform this action',
-    VALIDATION_ERROR: errorMessage || 'Please check your input',
-    INVOICE_NOT_FOUND: 'Invoice not found',
-    APPOINTMENT_NOT_FOUND: 'Appointment not found',
-    PRESCRIPTION_NOT_FOUND: 'No prescription found for this appointment',
-    PATIENT_NOT_FOUND: 'Patient not found',
-    PAYMENT_NOT_FOUND: 'Payment not found',
-    INVOICE_EXISTS: 'Invoice already exists for this appointment',
-    DUPLICATE_PAYMENT: 'Payment already processed',
-    INVOICE_ALREADY_PAID: 'Invoice is already fully paid',
-    INVOICE_CANCELLED: 'Cannot process payment for cancelled invoice',
+    UNAUTHORIZED: "Please log in to continue",
+    FORBIDDEN: "You do not have permission to perform this action",
+    VALIDATION_ERROR: errorMessage || "Please check your input",
+    INVOICE_NOT_FOUND: "Invoice not found",
+    APPOINTMENT_NOT_FOUND: "Appointment not found",
+    PRESCRIPTION_NOT_FOUND: "No prescription found for this appointment",
+    PATIENT_NOT_FOUND: "Patient not found",
+    PAYMENT_NOT_FOUND: "Payment not found",
+    INVOICE_EXISTS: "Invoice already exists for this appointment",
+    DUPLICATE_PAYMENT: "Payment already processed",
+    INVOICE_ALREADY_PAID: "Invoice is already fully paid",
+    INVOICE_CANCELLED: "Cannot process payment for cancelled invoice",
   };
-  
+
   const message = errorMessages[errorCode] || errorMessage || defaultMessage;
-  
-  if (['DUPLICATE_PAYMENT', 'INVOICE_ALREADY_PAID'].includes(errorCode)) {
+
+  if (["DUPLICATE_PAYMENT", "INVOICE_ALREADY_PAID"].includes(errorCode)) {
     toast.info(message);
   } else {
     toast.error(message);
   }
-  
+
   return message;
 }
 ```
@@ -2130,21 +2199,21 @@ export function handleBillingError(error: any, defaultMessage = 'An error occurr
 
 **Loading States:**
 
-| State | UI Behavior |
-|-------|-------------|
-| Initial Load | Show skeleton loader for table/cards |
-| Form Submit | Disable submit button, show spinner, text "Processing..." |
-| Payment Processing | Full-screen overlay with "Processing payment..." |
-| Refetching | Show subtle loading indicator (not full skeleton) |
+| State              | UI Behavior                                               |
+| ------------------ | --------------------------------------------------------- |
+| Initial Load       | Show skeleton loader for table/cards                      |
+| Form Submit        | Disable submit button, show spinner, text "Processing..." |
+| Payment Processing | Full-screen overlay with "Processing payment..."          |
+| Refetching         | Show subtle loading indicator (not full skeleton)         |
 
 **Empty States:**
 
-| Scenario | Message | Action |
-|----------|---------|--------|
-| No invoices (admin) | "No invoices found" | "Adjust filters" |
-| No invoices (patient) | "You don't have any invoices yet" | - |
-| No unpaid invoices (patient) | "All caught up! No outstanding bills" | - |
-| No payments on invoice | "No payments recorded yet" | "Record Payment" button |
+| Scenario                     | Message                               | Action                  |
+| ---------------------------- | ------------------------------------- | ----------------------- |
+| No invoices (admin)          | "No invoices found"                   | "Adjust filters"        |
+| No invoices (patient)        | "You don't have any invoices yet"     | -                       |
+| No unpaid invoices (patient) | "All caught up! No outstanding bills" | -                       |
+| No payments on invoice       | "No payments recorded yet"            | "Record Payment" button |
 
 ---
 
@@ -2155,10 +2224,19 @@ export function handleBillingError(error: any, defaultMessage = 'An error occurr
 
 // ============ Enums ============
 
-export type InvoiceStatus = 'UNPAID' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED';
-export type ItemType = 'CONSULTATION' | 'MEDICINE' | 'TEST' | 'OTHER';
-export type PaymentMethod = 'CASH' | 'CREDIT_CARD' | 'BANK_TRANSFER' | 'INSURANCE';
-export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED';
+export type InvoiceStatus =
+  | "UNPAID"
+  | "PARTIALLY_PAID"
+  | "PAID"
+  | "OVERDUE"
+  | "CANCELLED";
+export type ItemType = "CONSULTATION" | "MEDICINE" | "TEST" | "OTHER";
+export type PaymentMethod =
+  | "CASH"
+  | "CREDIT_CARD"
+  | "BANK_TRANSFER"
+  | "INSURANCE";
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
 
 // ============ Nested Types ============
 
@@ -2328,6 +2406,7 @@ export interface PaginatedResponse<T> {
 ### B.4 API Integration Checklist
 
 **Invoice APIs:**
+
 - [ ] POST /api/billing/invoices/generate (internal)
 - [ ] GET /api/billing/invoices/{id}
 - [ ] GET /api/billing/invoices/by-appointment/{appointmentId}
@@ -2335,6 +2414,7 @@ export interface PaginatedResponse<T> {
 - [ ] GET /api/billing/invoices/by-patient/{patientId}
 
 **Payment APIs:**
+
 - [ ] POST /api/billing/payments
 - [ ] GET /api/billing/payments/{id}
 - [ ] GET /api/billing/payments/by-invoice/{invoiceId}
@@ -2348,6 +2428,7 @@ export interface PaginatedResponse<T> {
 ### B.6 Testing Scenarios
 
 **Happy Path:**
+
 - [ ] View invoice list with filters
 - [ ] View invoice detail with line items
 - [ ] Record full payment (UNPAID -> PAID)
@@ -2358,6 +2439,7 @@ export interface PaginatedResponse<T> {
 - [ ] Print/download invoice
 
 **Error Scenarios:**
+
 - [ ] Validation errors displayed correctly
 - [ ] DUPLICATE_PAYMENT handled (idempotency)
 - [ ] INVOICE_ALREADY_PAID handled gracefully
@@ -2367,6 +2449,7 @@ export interface PaginatedResponse<T> {
 - [ ] Not found (404) handling
 
 **Edge Cases:**
+
 - [ ] Patient can only see/pay own invoices
 - [ ] Idempotency key prevents duplicate payments
 - [ ] Balance calculation accuracy
@@ -2376,7 +2459,7 @@ export interface PaginatedResponse<T> {
 
 ---
 
-*End of Billing Service FE Specification*
+_End of Billing Service FE Specification_
 Beta
 0 / 0
 used queries

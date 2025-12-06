@@ -2,9 +2,11 @@
 
 **Project:** Hospital Management System  
 **Service:** Medical Exam Service (Clinical Notes & Prescriptions)  
-**Version:** 1.0  
-**Last Updated:** December 5, 2025  
+**Version:** 1.1  
+**Last Updated:** December 6, 2025  
 **Target Users:** DOCTOR (primary author), NURSE (can draft vitals), ADMIN (oversight), PATIENT (read-only to their own results)
+
+> **Note:** RECEPTIONIST has NO access to medical exams - this is clinical data only.
 
 ---
 
@@ -24,35 +26,35 @@ The Medical Exam Service manages clinical encounter records that are created aft
 
 ### 1.2 Related Backend
 
-| Item          | Value                 |
-| ------------- | --------------------- |
-| **Service**   | medical-exam-service  |
-| **Port**      | 8086                  |
-| **Base Path** | `/api/medical-exams`  |
-| **Database**  | `medical_exam_db`     |
+| Item          | Value                                                  |
+| ------------- | ------------------------------------------------------ |
+| **Service**   | medical-exam-service                                   |
+| **Port**      | 8086                                                   |
+| **Base Path** | `/api/medical-exams`                                   |
+| **Database**  | `medical_exam_db`                                      |
 | **Tables**    | `medical_exams`, `prescriptions`, `prescription_items` |
 
 ### 1.3 Cross-Service Dependencies
 
-| Service                 | Purpose                                   | Endpoints Used                                               |
-| ----------------------- | ----------------------------------------- | ------------------------------------------------------------ |
-| **Appointment Service** | Validate appointment, link status         | `GET /api/appointments/{id}`                                 |
-| **HR Service**          | Doctor metadata                            | `GET /api/hr/employees/{id}`                                 |
-| **Patient Service**     | Patient metadata                           | `GET /api/patients/{id}`                                     |
-| **Pharmacy/Inventory** (if available) | Medicine lookup for prescriptions | `GET /api/pharmacy/medicines?search=`                        |
+| Service                               | Purpose                           | Endpoints Used                        |
+| ------------------------------------- | --------------------------------- | ------------------------------------- |
+| **Appointment Service**               | Validate appointment, link status | `GET /api/appointments/{id}`          |
+| **HR Service**                        | Doctor metadata                   | `GET /api/hr/employees/{id}`          |
+| **Patient Service**                   | Patient metadata                  | `GET /api/patients/{id}`              |
+| **Pharmacy/Inventory** (if available) | Medicine lookup for prescriptions | `GET /api/pharmacy/medicines?search=` |
 
 ### 1.4 Screen Inventory
 
-| Route                                        | Screen Name                    | Component                     | Access                 | Priority |
-| -------------------------------------------- | ------------------------------ | ----------------------------- | ---------------------- | -------- |
-| `/admin/exams`                               | Medical Exam List (Admin)      | `MedicalExamListPage`         | ADMIN, DOCTOR          | P0       |
-| `/admin/exams/new`                           | Create Medical Exam            | `MedicalExamFormPage`         | DOCTOR, NURSE*         | P0       |
-| `/admin/exams/{id}`                          | Medical Exam Detail            | `MedicalExamDetailPage`       | ADMIN, DOCTOR          | P0       |
-| `/admin/exams/{id}/edit`                     | Edit Medical Exam              | `MedicalExamFormPage`         | DOCTOR                 | P1       |
-| `/admin/exams/{id}/prescription`             | Manage Prescription            | `PrescriptionFormPage`        | DOCTOR                 | P0       |
-| `/doctor/exams`                              | My Exam Records                | `DoctorExamListPage`          | DOCTOR                 | P1       |
-| `/doctor/appointments/{id}/exam`             | Create from Appointment        | `MedicalExamFormPage`         | DOCTOR                 | P0       |
-| `/patient/appointments/{id}/exam`            | View Exam Result (Patient)     | `PatientExamDetailPage`       | PATIENT (own only)     | P1       |
+| Route                             | Screen Name                | Component               | Access             | Priority |
+| --------------------------------- | -------------------------- | ----------------------- | ------------------ | -------- |
+| `/admin/exams`                    | Medical Exam List (Admin)  | `MedicalExamListPage`   | ADMIN, DOCTOR      | P0       |
+| `/admin/exams/new`                | Create Medical Exam        | `MedicalExamFormPage`   | DOCTOR, NURSE\*    | P0       |
+| `/admin/exams/{id}`               | Medical Exam Detail        | `MedicalExamDetailPage` | ADMIN, DOCTOR      | P0       |
+| `/admin/exams/{id}/edit`          | Edit Medical Exam          | `MedicalExamFormPage`   | DOCTOR             | P1       |
+| `/admin/exams/{id}/prescription`  | Manage Prescription        | `PrescriptionFormPage`  | DOCTOR             | P0       |
+| `/doctor/exams`                   | My Exam Records            | `DoctorExamListPage`    | DOCTOR             | P1       |
+| `/doctor/appointments/{id}/exam`  | Create from Appointment    | `MedicalExamFormPage`   | DOCTOR             | P0       |
+| `/patient/appointments/{id}/exam` | View Exam Result (Patient) | `PatientExamDetailPage` | PATIENT (own only) | P1       |
 
 \*NURSE can draft vitals/symptoms but doctor must finalize.
 
@@ -342,29 +344,29 @@ MedicalExamListPage
 
 ### 4.1 Endpoints
 
-| Method | Path                                      | Purpose                       |
-| ------ | ----------------------------------------- | ----------------------------- |
-| GET    | `/api/medical-exams`                      | List exams with filters       |
-| GET    | `/api/medical-exams/{id}`                 | Get exam by ID                |
-| GET    | `/api/medical-exams/by-appointment/{id}`  | Get exam by appointment ID    |
-| POST   | `/api/medical-exams`                      | Create exam                   |
-| PATCH  | `/api/medical-exams/{id}`                 | Update exam                   |
-| POST   | `/api/medical-exams/{id}/prescription`    | Create prescription           |
-| PUT    | `/api/medical-exams/{id}/prescription`    | Update prescription           |
-| DELETE | `/api/medical-exams/{id}/prescription`    | Delete prescription (optional)|
+| Method | Path                                     | Purpose                        |
+| ------ | ---------------------------------------- | ------------------------------ |
+| GET    | `/api/medical-exams`                     | List exams with filters        |
+| GET    | `/api/medical-exams/{id}`                | Get exam by ID                 |
+| GET    | `/api/medical-exams/by-appointment/{id}` | Get exam by appointment ID     |
+| POST   | `/api/medical-exams`                     | Create exam                    |
+| PATCH  | `/api/medical-exams/{id}`                | Update exam                    |
+| POST   | `/api/medical-exams/{id}/prescription`   | Create prescription            |
+| PUT    | `/api/medical-exams/{id}/prescription`   | Update prescription            |
+| DELETE | `/api/medical-exams/{id}/prescription`   | Delete prescription (optional) |
 
 ### 4.2 List Query Params
 
-| Param       | Type   | Notes                                       |
-| ----------- | ------ | ------------------------------------------- |
-| `page`      | number | 0-based                                     |
-| `size`      | number | 1-100                                       |
-| `search`    | string | patient/doctor/diagnosis                    |
-| `status`    | string | PENDING, IN_PROGRESS, FINALIZED, CANCELLED  |
-| `startDate` | date   | ISO date (examDate >= start)                |
-| `endDate`   | date   | ISO date (examDate <= end)                  |
-| `doctorId`  | string | Restrict to doctor                          |
-| `patientId` | string | Restrict to patient                         |
+| Param       | Type   | Notes                                      |
+| ----------- | ------ | ------------------------------------------ |
+| `page`      | number | 0-based                                    |
+| `size`      | number | 1-100                                      |
+| `search`    | string | patient/doctor/diagnosis                   |
+| `status`    | string | PENDING, IN_PROGRESS, FINALIZED, CANCELLED |
+| `startDate` | date   | ISO date (examDate >= start)               |
+| `endDate`   | date   | ISO date (examDate <= end)                 |
+| `doctorId`  | string | Restrict to doctor                         |
+| `patientId` | string | Restrict to patient                        |
 
 ### 4.3 Client Hook Expectations
 
@@ -395,46 +397,46 @@ interface ApiErrorResponse {
 
 ### 5.2 Error Codes
 
-| HTTP | Code                       | Description                                    | UI Handling                                           |
-| ---- | -------------------------- | ---------------------------------------------- | ----------------------------------------------------- |
-| 401  | UNAUTHORIZED               | Missing/invalid token                          | Redirect to `/login`, clear auth                      |
-| 403  | FORBIDDEN                  | Access denied (role/ownership)                 | Toast "You don't have permission"                     |
-| 403  | APPOINTMENT_OWNER_MISMATCH | Doctor not assigned to appointment             | Toast "You are not assigned to this appointment"      |
-| 404  | APPOINTMENT_NOT_FOUND      | Appointment ID invalid                         | Toast "Appointment not found", highlight field        |
-| 404  | EXAM_NOT_FOUND             | Exam ID invalid                                | 404 page or toast                                     |
-| 404  | PRESCRIPTION_NOT_FOUND     | No prescription exists when updating/deleting  | Toast "Prescription not found"                        |
-| 409  | EXAM_ALREADY_EXISTS        | Exam already created for appointment           | Toast "Exam already exists for this appointment"      |
-| 409  | PRESCRIPTION_ALREADY_EXISTS| Prescription exists (POST)                     | Toast "Prescription already exists, please update"    |
-| 400  | VALIDATION_ERROR           | Field validation failed                        | Map details to form fields                            |
-| 400  | EXAM_NOT_EDITABLE          | Attempt to edit finalized/cancelled exam       | Toast "Exam cannot be edited after finalization"      |
+| HTTP | Code                        | Description                                   | UI Handling                                        |
+| ---- | --------------------------- | --------------------------------------------- | -------------------------------------------------- |
+| 401  | UNAUTHORIZED                | Missing/invalid token                         | Redirect to `/login`, clear auth                   |
+| 403  | FORBIDDEN                   | Access denied (role/ownership)                | Toast "You don't have permission"                  |
+| 403  | APPOINTMENT_OWNER_MISMATCH  | Doctor not assigned to appointment            | Toast "You are not assigned to this appointment"   |
+| 404  | APPOINTMENT_NOT_FOUND       | Appointment ID invalid                        | Toast "Appointment not found", highlight field     |
+| 404  | EXAM_NOT_FOUND              | Exam ID invalid                               | 404 page or toast                                  |
+| 404  | PRESCRIPTION_NOT_FOUND      | No prescription exists when updating/deleting | Toast "Prescription not found"                     |
+| 409  | EXAM_ALREADY_EXISTS         | Exam already created for appointment          | Toast "Exam already exists for this appointment"   |
+| 409  | PRESCRIPTION_ALREADY_EXISTS | Prescription exists (POST)                    | Toast "Prescription already exists, please update" |
+| 400  | VALIDATION_ERROR            | Field validation failed                       | Map details to form fields                         |
+| 400  | EXAM_NOT_EDITABLE           | Attempt to edit finalized/cancelled exam      | Toast "Exam cannot be edited after finalization"   |
 
 ### 5.3 Validation Rules
 
 **Exam**
 
-| Field                 | Rule                                            | Message                                            |
-| --------------------- | ----------------------------------------------- | -------------------------------------------------- |
-| appointmentId         | Required                                        | "appointmentId is required"                        |
-| diagnosis             | Required, max 1000 chars                        | "diagnosis is required" / "diagnosis too long"     |
-| symptoms              | Required, max 2000 chars                        | "symptoms are required"                            |
-| treatment             | Required, max 2000 chars                        | "treatment is required"                            |
-| notes                 | Max 2000 chars                                  | "notes exceeds maximum length"                     |
-| temperature           | Number 30-45                                    | "temperature must be between 30 and 45"            |
-| bloodPressureSystolic | Number 50-250                                   | "bloodPressureSystolic must be between 50 and 250" |
-| bloodPressureDiastolic| Number 30-150                                   | "bloodPressureDiastolic must be between 30 and 150"|
-| heartRate             | Number 30-250                                   | "heartRate must be between 30 and 250"             |
-| weight                | Number 1-500                                    | "weight must be between 1 and 500"                 |
-| height                | Number 1-300                                    | "height must be between 1 and 300"                 |
+| Field                  | Rule                     | Message                                             |
+| ---------------------- | ------------------------ | --------------------------------------------------- |
+| appointmentId          | Required                 | "appointmentId is required"                         |
+| diagnosis              | Required, max 1000 chars | "diagnosis is required" / "diagnosis too long"      |
+| symptoms               | Required, max 2000 chars | "symptoms are required"                             |
+| treatment              | Required, max 2000 chars | "treatment is required"                             |
+| notes                  | Max 2000 chars           | "notes exceeds maximum length"                      |
+| temperature            | Number 30-45             | "temperature must be between 30 and 45"             |
+| bloodPressureSystolic  | Number 50-250            | "bloodPressureSystolic must be between 50 and 250"  |
+| bloodPressureDiastolic | Number 30-150            | "bloodPressureDiastolic must be between 30 and 150" |
+| heartRate              | Number 30-250            | "heartRate must be between 30 and 250"              |
+| weight                 | Number 1-500             | "weight must be between 1 and 500"                  |
+| height                 | Number 1-300             | "height must be between 1 and 300"                  |
 
 **Prescription Item**
 
-| Field      | Rule                    | Message                                  |
-| ---------- | ----------------------- | ---------------------------------------- |
-| medicineId | Required                | "medicineId is required"                 |
-| quantity   | Integer >=1             | "quantity must be at least 1"            |
-| dosage     | Required, max 255 chars | "dosage is required"                     |
-| duration   | Required, max 255 chars | "duration is required"                   |
-| notes      | Max 500 chars           | "notes exceeds maximum length"           |
+| Field      | Rule                    | Message                        |
+| ---------- | ----------------------- | ------------------------------ |
+| medicineId | Required                | "medicineId is required"       |
+| quantity   | Integer >=1             | "quantity must be at least 1"  |
+| dosage     | Required, max 255 chars | "dosage is required"           |
+| duration   | Required, max 255 chars | "duration is required"         |
+| notes      | Max 500 chars           | "notes exceeds maximum length" |
 
 ### 5.4 Client-Side Schemas (Zod)
 
@@ -462,20 +464,22 @@ export const prescriptionItemSchema = z.object({
 });
 
 export const prescriptionSchema = z.object({
-  items: z.array(prescriptionItemSchema).min(1, "At least one medicine is required"),
+  items: z
+    .array(prescriptionItemSchema)
+    .min(1, "At least one medicine is required"),
   notes: z.string().max(1000).optional(),
 });
 ```
 
 ### 5.5 Loading & Empty States
 
-| Scenario        | UI Behavior                                        |
-| --------------- | -------------------------------------------------- |
-| Initial load    | Skeleton cards/table rows, disabled actions        |
-| Form submit     | Disable buttons, show spinner text (Saving...)     |
-| Detail refetch  | Subtle spinner in header                           |
-| Empty list      | Message "No exams found" + "Create Exam" CTA       |
-| No prescription | Message with "Add Prescription" button (doctor)    |
+| Scenario        | UI Behavior                                     |
+| --------------- | ----------------------------------------------- |
+| Initial load    | Skeleton cards/table rows, disabled actions     |
+| Form submit     | Disable buttons, show spinner text (Saving...)  |
+| Detail refetch  | Subtle spinner in header                        |
+| Empty list      | Message "No exams found" + "Create Exam" CTA    |
+| No prescription | Message with "Add Prescription" button (doctor) |
 
 ---
 

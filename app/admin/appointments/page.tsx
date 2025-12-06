@@ -4,10 +4,11 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   CalendarClock,
-  Loader2,
   Plus,
   Search,
   CalendarDays,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -49,8 +50,37 @@ import {
   CancelAppointmentDialog,
 } from "./_components";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
+
+type SortableField = "patient.fullName" | "doctor.fullName" | "appointmentTime" | "status";
+type SortDirection = "asc" | "desc";
+
+const SortableTableHeader = ({
+  field,
+  label,
+  className,
+  sortBy,
+  sortDir,
+  onSort,
+}: {
+  field: SortableField;
+  label: string;
+  className?: string;
+  sortBy: SortableField;
+  sortDir: SortDirection;
+  onSort: (field: SortableField) => void;
+}) => (
+  <TableHead className={cn("cursor-pointer hover:bg-muted/50", className)} onClick={() => onSort(field)}>
+    <div className="flex items-center gap-2">
+      {label}
+      {sortBy === field && (
+        sortDir === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+      )}
+    </div>
+  </TableHead>
+);
 
 const AppointmentPage = () => {
   const router = useRouter();
@@ -63,6 +93,8 @@ const AppointmentPage = () => {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [sortBy, setSortBy] = useState<SortableField>("appointmentTime");
+  const [sortDir, setSortDir] = useState<SortDirection>("desc");
 
   // Cancel dialog state
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -81,9 +113,9 @@ const AppointmentPage = () => {
       doctorId: doctorId === "ALL" ? undefined : doctorId,
       startDate: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
       endDate: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
-      sort: "appointmentTime,desc",
+      sort: `${sortBy},${sortDir}`,
     }),
-    [page, pageSize, debouncedSearch, status, doctorId, startDate, endDate]
+    [page, pageSize, debouncedSearch, status, doctorId, startDate, endDate, sortBy, sortDir]
   );
 
   const { data, isLoading, isFetching } = useAppointmentList(queryParams);
@@ -94,7 +126,7 @@ const AppointmentPage = () => {
     if (!data?.content) return [];
     const uniqueDoctors = new Map<string, { id: string; name: string }>();
     data.content.forEach((apt) => {
-      if (!uniqueDoctors.has(apt.doctor.id)) {
+      if (apt.doctor && !uniqueDoctors.has(apt.doctor.id)) {
         uniqueDoctors.set(apt.doctor.id, {
           id: apt.doctor.id,
           name: apt.doctor.fullName,
@@ -103,6 +135,16 @@ const AppointmentPage = () => {
     });
     return Array.from(uniqueDoctors.values());
   }, [data?.content]);
+
+  const handleSort = (field: SortableField) => {
+    if (sortBy === field) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortDir("asc");
+    }
+    setPage(0);
+  };
 
   const handleCancelClick = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
@@ -292,11 +334,11 @@ const AppointmentPage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[200px]">Patient</TableHead>
-                  <TableHead className="w-[180px]">Doctor</TableHead>
-                  <TableHead className="w-[150px]">Date & Time</TableHead>
+                  <SortableTableHeader field="patient.fullName" label="Patient" className="w-[200px]" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <SortableTableHeader field="doctor.fullName" label="Doctor" className="w-[180px]" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
+                  <SortableTableHeader field="appointmentTime" label="Date & Time" className="w-[150px]" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                   <TableHead className="w-[120px]">Type</TableHead>
-                  <TableHead className="w-[120px]">Status</TableHead>
+                  <SortableTableHeader field="status" label="Status" className="w-[120px]" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                   <TableHead>Reason</TableHead>
                   <TableHead className="w-[80px] text-right">Actions</TableHead>
                 </TableRow>

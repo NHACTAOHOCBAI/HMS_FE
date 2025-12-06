@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { format, startOfMonth } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Download,
   Loader2,
@@ -239,7 +240,8 @@ export default function PatientActivityPage() {
   };
 
   useEffect(() => {
-    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    const { user } = useAuth();
+    const r = user?.role || null;
     setRole(r || "ADMIN");
   }, []);
 

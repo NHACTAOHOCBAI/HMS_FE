@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { format, startOfMonth } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Download,
   Loader2,
@@ -38,10 +39,6 @@ import { useRevenueReport } from "@/hooks/queries/useReports";
 import { useDepartments } from "@/hooks/queries/useHr";
 import { exportToCSV } from "@/lib/utils/export";
 import { useRouter } from "next/navigation";
-import { EmptyReportState } from "@/components/reports/EmptyReportState";
-import { CacheInfoBanner } from "@/components/reports/CacheInfoBanner";
-import { RetryButton } from "@/components/reports/RetryButton";
-import { toast } from "sonner";
 import { EmptyReportState } from "@/components/reports/EmptyReportState";
 import { CacheInfoBanner } from "@/components/reports/CacheInfoBanner";
 import { RetryButton } from "@/components/reports/RetryButton";
@@ -167,7 +164,8 @@ export default function RevenueReportPage() {
   const [paymentMethod, setPaymentMethod] = useState<string>("ALL");
 
   useEffect(() => {
-    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    const { user } = useAuth();
+    const r = user?.role || null;
     setRole(r || "ADMIN");
   }, []);
 

@@ -4,27 +4,35 @@ import { z } from "zod";
 export const patientFormSchema = z.object({
   fullName: z
     .string()
-    .min(2, "Full name must be at least 2 characters")
-    .max(100, "Full name must be less than 100 characters"),
+    .min(1, "Full name is required")
+    .max(255, "Full name must be less than 255 characters"),
   email: z.string().email("Invalid email format").optional().or(z.literal("")),
   phoneNumber: z
     .string()
-    .min(10, "Phone number must be at least 10 digits")
-    .max(15, "Phone number must be less than 15 digits")
-    .regex(/^[0-9+\-\s]+$/, "Invalid phone number format"),
-  dateOfBirth: z.string().optional(),
+    .regex(/^0[0-9]{9}$/, "Phone number must be 10 digits starting with 0"),
+  dateOfBirth: z
+    .string()
+    .min(1, "Date of birth is required")
+    .refine(
+      (val) => {
+        if (!val) return false;
+        const d = new Date(val);
+        return d < new Date();
+      },
+      { message: "Date of birth cannot be in the future" }
+    ),
   gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
   address: z
     .string()
-    .max(255, "Address must be less than 255 characters")
+    .max(500, "Address must be less than 500 characters")
     .optional(),
   identificationNumber: z
     .string()
-    .max(20, "ID number must be less than 20 characters")
+    .max(50, "ID number must be less than 50 characters")
     .optional(),
   healthInsuranceNumber: z
     .string()
-    .max(30, "Insurance number must be less than 30 characters")
+    .max(50, "Insurance number must be less than 50 characters")
     .optional(),
   bloodType: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]).optional(),
   allergies: z.array(z.string()).optional(),
@@ -41,6 +49,7 @@ export const patientFormSchema = z.object({
   relativeRelationship: z
     .enum(["SPOUSE", "PARENT", "CHILD", "SIBLING", "FRIEND", "OTHER"])
     .optional(),
+  accountId: z.string().max(100).optional(),
 });
 
 export type PatientFormValues = z.infer<typeof patientFormSchema>;

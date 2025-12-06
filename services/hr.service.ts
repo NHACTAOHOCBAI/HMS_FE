@@ -16,7 +16,10 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // Local mutable copies for mocks
 let deptData: Department[] = [...mockDepartments];
 let employeeData: Employee[] = [...mockEmployees];
-let scheduleData: (EmployeeSchedule & { departmentId?: string; shift?: string })[] = [...mockSchedules];
+let scheduleData: (EmployeeSchedule & {
+  departmentId?: string;
+  shift?: string;
+})[] = [...mockSchedules];
 
 export const hrService = {
   // --- Departments ---
@@ -33,8 +36,10 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.get(`${BASE_URL}/departments`, { params });
-      return response.data.data;
+      const response = await axiosInstance.get(`${BASE_URL}/departments`, {
+        params,
+      });
+      return response.data;
     }
 
     await delay(500);
@@ -65,7 +70,7 @@ export const hrService = {
     await delay(300);
     if (!USE_MOCK) {
       const response = await axiosInstance.get(`${BASE_URL}/departments/${id}`);
-      return response.data.data;
+      return response.data;
     }
 
     await delay(300);
@@ -77,8 +82,11 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.post(`${BASE_URL}/departments`, data);
-      return response.data.data;
+      const response = await axiosInstance.post(
+        `${BASE_URL}/departments`,
+        data
+      );
+      return response.data;
     }
 
     await delay(500);
@@ -100,8 +108,11 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.patch(`${BASE_URL}/departments/${id}`, data);
-      return response.data.data;
+      const response = await axiosInstance.patch(
+        `${BASE_URL}/departments/${id}`,
+        data
+      );
+      return response.data;
     }
 
     await delay(500);
@@ -144,8 +155,10 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.get(`${BASE_URL}/employees`, { params });
-      return response.data.data;
+      const response = await axiosInstance.get(`${BASE_URL}/employees`, {
+        params,
+      });
+      return response.data;
     }
 
     await delay(500);
@@ -188,8 +201,10 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.get(`${BASE_URL}/doctors`, { params });
-      return response.data.data;
+      const response = await axiosInstance.get(`${BASE_URL}/doctors`, {
+        params,
+      });
+      return response.data;
     }
 
     await delay(500);
@@ -210,7 +225,7 @@ export const hrService = {
 
     if (!USE_MOCK) {
       const response = await axiosInstance.get(`${BASE_URL}/employees/${id}`);
-      return response.data.data;
+      return response.data;
     }
 
     await delay(300);
@@ -245,7 +260,10 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.patch(`${BASE_URL}/employees/${id}`, data);
+      const response = await axiosInstance.patch(
+        `${BASE_URL}/employees/${id}`,
+        data
+      );
       return response.data.data;
     }
 
@@ -290,7 +308,10 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.get(`${BASE_URL}/schedules/doctors`, { params });
+      const response = await axiosInstance.get(
+        `${BASE_URL}/schedules/doctors`,
+        { params }
+      );
       return response.data.data;
     }
 
@@ -303,7 +324,9 @@ export const hrService = {
       filtered = filtered.filter((s) => s.workDate <= params.endDate);
     }
     if (params.departmentId) {
-      filtered = filtered.filter((s) => (s as any).departmentId === params.departmentId);
+      filtered = filtered.filter(
+        (s) => (s as any).departmentId === params.departmentId
+      );
     }
     if (params.doctorId) {
       filtered = filtered.filter((s) => s.employeeId === params.doctorId);
@@ -333,7 +356,9 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.get(`${BASE_URL}/schedules/me`, { params });
+      const response = await axiosInstance.get(`${BASE_URL}/schedules/me`, {
+        params,
+      });
       return response.data.data;
     }
 
@@ -386,7 +411,10 @@ export const hrService = {
     // return response.data.data;
 
     if (!USE_MOCK) {
-      const response = await axiosInstance.patch(`${BASE_URL}/schedules/${id}`, data);
+      const response = await axiosInstance.patch(
+        `${BASE_URL}/schedules/${id}`,
+        data
+      );
       return response.data.data;
     }
 

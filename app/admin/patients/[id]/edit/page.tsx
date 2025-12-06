@@ -17,31 +17,41 @@ export default function EditPatientPage() {
   const { mutate: updatePatient, isPending } = useUpdatePatient(patientId);
 
   const handleSubmit = (data: PatientFormValues) => {
-    updatePatient(
-      {
-        fullName: data.fullName,
-        email: data.email || null,
-        phoneNumber: data.phoneNumber,
-        dateOfBirth: data.dateOfBirth || null,
-        gender: data.gender || null,
-        address: data.address || null,
-        identificationNumber: data.identificationNumber || null,
-        healthInsuranceNumber: data.healthInsuranceNumber || null,
-        bloodType: data.bloodType || null,
-        allergies:
-          data.allergies && data.allergies.length
-            ? data.allergies.join(", ")
-            : null,
-        relativeFullName: data.relativeFullName || null,
-        relativePhoneNumber: data.relativePhoneNumber || null,
-        relativeRelationship: data.relativeRelationship || null,
-      },
-      {
-        onSuccess: () => {
-          router.push(`/admin/patients/${patientId}`);
-        },
+    if (!patient) return;
+    const payload: any = {};
+    const allergyString =
+      data.allergies && data.allergies.length
+        ? data.allergies.join(", ")
+        : null;
+
+    const fields: Array<[keyof PatientFormValues | string, any, any]> = [
+      ["fullName", patient.fullName, data.fullName],
+      ["email", patient.email, data.email || null],
+      ["phoneNumber", patient.phoneNumber, data.phoneNumber],
+      ["dateOfBirth", patient.dateOfBirth, data.dateOfBirth || null],
+      ["gender", patient.gender, data.gender || null],
+      ["address", patient.address, data.address || null],
+      ["identificationNumber", patient.identificationNumber, data.identificationNumber || null],
+      ["healthInsuranceNumber", patient.healthInsuranceNumber, data.healthInsuranceNumber || null],
+      ["bloodType", patient.bloodType, data.bloodType || null],
+      ["allergies", patient.allergies, allergyString],
+      ["relativeFullName", patient.relativeFullName, data.relativeFullName || null],
+      ["relativePhoneNumber", patient.relativePhoneNumber, data.relativePhoneNumber || null],
+      ["relativeRelationship", patient.relativeRelationship, data.relativeRelationship || null],
+      ["accountId", patient.accountId, data.accountId || null],
+    ];
+
+    fields.forEach(([key, original, current]) => {
+      if (original !== current) {
+        payload[key] = current;
       }
-    );
+    });
+
+    updatePatient(payload, {
+      onSuccess: () => {
+        router.push(`/admin/patients/${patientId}`);
+      },
+    });
   };
 
   const handleCancel = () => {

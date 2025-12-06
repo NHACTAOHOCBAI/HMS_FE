@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useDepartment } from "@/hooks/queries/useHr";
-import { DepartmentStatusBadge } from "../_components/department-status-badge";
+import { DepartmentStatusBadge } from "../../_components/department-status-badge";
 
 export default function DepartmentViewPage() {
   const params = useParams();

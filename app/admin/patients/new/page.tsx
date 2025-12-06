@@ -34,10 +34,12 @@ export default function NewPatientPage() {
         relativeFullName: data.relativeFullName || undefined,
         relativePhoneNumber: data.relativePhoneNumber || undefined,
         relativeRelationship: data.relativeRelationship,
+        accountId: data.accountId || undefined,
       },
       {
-        onSuccess: () => {
-          router.push("/admin/patients");
+        onSuccess: (created) => {
+          const id = (created as any)?.id;
+          router.push(id ? `/admin/patients/${id}` : "/admin/patients");
         },
       }
     );

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Hotel } from "lucide-react";
 import { Input } from "@/components/ui/input";
-// import { authService } from "@/services/auth.service";
-import { mockAuthService as authService } from "@/services/auth.mock.service";
 import { z } from "zod";
+import { TestAccounts } from "./_components/test-accounts";
+import { USE_MOCK } from "@/lib/mocks/toggle";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const loginSchema = z.object({
   email: z.email({ message: "Invalid email address" }),
@@ -16,7 +16,7 @@ export const loginSchema = z.object({
 export type LoginCredentials = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
-  const router = useRouter();
+  const { login } = useAuth();
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: "",
     password: "",
@@ -30,16 +30,8 @@ const LoginPage = () => {
     setErrorMessage("");
     setIsLoading(true);
     try {
-      const response = await authService.login(credentials);
-
-      // Store tokens in localStorage
-      localStorage.setItem("accessToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
-      localStorage.setItem("userEmail", response.email);
-      localStorage.setItem("userRole", response.role);
-
-      // Redirect to admin dashboard
-      router.push("/admin");
+      await login(credentials.email, credentials.password);
+      // Redirect is handled by AuthContext based on role
     } catch (error) {
       setErrorMessage("Invalid email or password. Please try again.");
       console.error("Login error:", error);
@@ -192,6 +184,9 @@ const LoginPage = () => {
             </p>
           </div>
         </div>
+
+        {/* Test Accounts - Only in Mock Mode */}
+        {USE_MOCK && <TestAccounts />}
       </div>
     </div>
   );

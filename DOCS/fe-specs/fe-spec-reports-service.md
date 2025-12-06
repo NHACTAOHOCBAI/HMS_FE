@@ -2,9 +2,11 @@
 
 **Project:** Hospital Management System  
 **Service:** Reports Service (Analytics & Statistics)  
-**Version:** 1.0  
-**Last Updated:** December 4, 2025  
+**Version:** 1.1  
+**Last Updated:** December 6, 2025  
 **Target Users:** ADMIN (primary), DOCTOR (limited - own appointment stats)
+
+> **Note:** RECEPTIONIST has NO access to reports - this is management data.
 
 ---
 

@@ -2,9 +2,9 @@
 
 **Project:** Hospital Management System  
 **Service:** Appointment Service (Patient Appointment Booking & Management)  
-**Version:** 1.0  
-**Last Updated:** December 4, 2025  
-**Target Users:** ADMIN, DOCTOR, NURSE (full access), PATIENT (own appointments only)
+**Version:** 1.1  
+**Last Updated:** December 6, 2025  
+**Target Users:** ADMIN, DOCTOR, NURSE, RECEPTIONIST (full access), PATIENT (own appointments only)
 
 ---
 
@@ -41,17 +41,17 @@ The Appointment Service manages patient appointment bookings with doctors. It pr
 
 ### 1.4 Screen Inventory
 
-| Route                           | Screen Name                  | Component                | Access               | Priority |
-| ------------------------------- | ---------------------------- | ------------------------ | -------------------- | -------- |
-| `/admin/appointments`           | Appointment List (Admin)     | `AppointmentListPage`    | ADMIN, NURSE         | P0       |
-| `/admin/appointments/new`       | Create Appointment           | `AppointmentFormPage`    | ADMIN, DOCTOR, NURSE | P0       |
-| `/admin/appointments/{id}`      | Appointment Detail           | `AppointmentDetailPage`  | ADMIN, DOCTOR, NURSE | P0       |
-| `/admin/appointments/{id}/edit` | Edit Appointment             | `AppointmentFormPage`    | ADMIN, DOCTOR, NURSE | P1       |
-| `/doctor/appointments`          | Doctor Appointments          | `DoctorAppointmentPage`  | DOCTOR               | P0       |
-| `/doctor/appointments/{id}`     | Appointment Detail (Doctor)  | `AppointmentDetailPage`  | DOCTOR               | P0       |
-| `/patient/appointments`         | My Appointments              | `PatientAppointmentPage` | PATIENT              | P0       |
-| `/patient/appointments/new`     | Book Appointment             | `PatientBookingPage`     | PATIENT              | P0       |
-| `/patient/appointments/{id}`    | Appointment Detail (Patient) | `AppointmentDetailPage`  | PATIENT              | P1       |
+| Route                           | Screen Name                  | Component                | Access                             | Priority |
+| ------------------------------- | ---------------------------- | ------------------------ | ---------------------------------- | -------- |
+| `/admin/appointments`           | Appointment List (Admin)     | `AppointmentListPage`    | ADMIN, NURSE, RECEPTIONIST         | P0       |
+| `/admin/appointments/new`       | Create Appointment           | `AppointmentFormPage`    | ADMIN, DOCTOR, NURSE, RECEPTIONIST | P0       |
+| `/admin/appointments/{id}`      | Appointment Detail           | `AppointmentDetailPage`  | ADMIN, DOCTOR, NURSE, RECEPTIONIST | P0       |
+| `/admin/appointments/{id}/edit` | Edit Appointment             | `AppointmentFormPage`    | ADMIN, DOCTOR, NURSE, RECEPTIONIST | P1       |
+| `/doctor/appointments`          | Doctor Appointments          | `DoctorAppointmentPage`  | DOCTOR                             | P0       |
+| `/doctor/appointments/{id}`     | Appointment Detail (Doctor)  | `AppointmentDetailPage`  | DOCTOR                             | P0       |
+| `/patient/appointments`         | My Appointments              | `PatientAppointmentPage` | PATIENT                            | P0       |
+| `/patient/appointments/new`     | Book Appointment             | `PatientBookingPage`     | PATIENT                            | P0       |
+| `/patient/appointments/{id}`    | Appointment Detail (Patient) | `AppointmentDetailPage`  | PATIENT                            | P1       |
 
 ### 1.5 Screen Hierarchy Diagram
 
@@ -375,7 +375,7 @@ The Appointment Service manages patient appointment bookings with doctors. It pr
 
 **Route:** `/admin/appointments`  
 **Component:** `AppointmentListPage`  
-**Access:** ADMIN, DOCTOR, NURSE
+**Access:** ADMIN, DOCTOR, NURSE, RECEPTIONIST
 
 #### Layout Structure
 
@@ -442,7 +442,7 @@ The Appointment Service manages patient appointment bookings with doctors. It pr
 
 **Route:** `/admin/appointments/new` or `/admin/appointments/{id}/edit`  
 **Component:** `AppointmentFormPage`  
-**Access:** ADMIN, DOCTOR, NURSE
+**Access:** ADMIN, DOCTOR, NURSE, RECEPTIONIST
 
 #### Layout Structure
 
@@ -553,7 +553,7 @@ interface TimeSlot {
 
 **Route:** `/admin/appointments/{id}` or `/doctor/appointments/{id}` or `/patient/appointments/{id}`  
 **Component:** `AppointmentDetailPage`  
-**Access:** ADMIN, DOCTOR, NURSE (all), PATIENT (own only)
+**Access:** ADMIN, DOCTOR, NURSE, RECEPTIONIST (all), PATIENT (own only)
 
 #### Layout Structure
 
@@ -1086,7 +1086,7 @@ function getAppointmentErrorMessage(errorCode: string): string {
 #### 4.3.1 Create Appointment
 
 **Endpoint:** `POST /api/appointments`  
-**Access:** ADMIN, DOCTOR, NURSE, PATIENT (own)
+**Access:** ADMIN, DOCTOR, NURSE, RECEPTIONIST, PATIENT (own)
 
 **Request:**
 
@@ -1141,7 +1141,7 @@ function getAppointmentErrorMessage(errorCode: string): string {
 #### 4.3.2 Get Appointment by ID
 
 **Endpoint:** `GET /api/appointments/{id}`  
-**Access:** Authenticated (own) | ADMIN, DOCTOR, NURSE (all)
+**Access:** Authenticated (own) | ADMIN, DOCTOR, NURSE, RECEPTIONIST (all)
 
 **Success Response:** `200 OK`
 
@@ -1254,7 +1254,7 @@ function getAppointmentErrorMessage(errorCode: string): string {
 #### 4.3.4 Update Appointment
 
 **Endpoint:** `PATCH /api/appointments/{id}`  
-**Access:** ADMIN, DOCTOR, NURSE
+**Access:** ADMIN, DOCTOR, NURSE, RECEPTIONIST
 
 **Request:** (All fields optional)
 
@@ -1320,7 +1320,7 @@ function getAppointmentErrorMessage(errorCode: string): string {
 #### 4.3.5 Cancel Appointment
 
 **Endpoint:** `PATCH /api/appointments/{id}/cancel`  
-**Access:** ADMIN, DOCTOR, NURSE, PATIENT (own)
+**Access:** ADMIN, DOCTOR, NURSE, RECEPTIONIST, PATIENT (own)
 
 **Request:**
 

@@ -10,6 +10,8 @@ export type LoginResponse = {
   refreshToken: string;
   email: string;
   role: string;
+  employeeId?: string;
+  patientId?: string;
 };
 
 export const authService = {

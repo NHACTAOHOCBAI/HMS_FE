@@ -8,27 +8,21 @@ import {
   PaginatedResponse,
   TimeSlot,
 } from "@/interfaces/appointment";
+
+// Export for mock usage
+export type AppointmentResponse = Appointment;
 import { USE_MOCK } from "@/lib/mocks/toggle";
+import { mockSchedules } from "@/lib/mocks";
 
 const BASE_URL = "/api/appointments";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Mock data - matches new interface structure (patient IDs sync with patient.service.ts)
-const mockAppointments: Appointment[] = [
+const initialMockAppointments: Appointment[] = [
   {
     id: "apt-001",
-    patient: {
-      id: "p001",
-      fullName: "Nguyen Van An",
-      phoneNumber: "0901234567",
-    },
-    doctor: {
-      id: "emp-101",
-      fullName: "Dr. John Smith",
-      department: "Cardiology",
-      specialization: "Cardiology",
-    },
-    appointmentTime: "2025-12-05T09:00:00",
+    patient: { id: "p001", fullName: "Nguyen Van An", phoneNumber: "0901234567" },
+    doctor: { id: "emp-101", fullName: "Dr. John Smith", department: "Cardiology", specialization: "Cardiology" },
+    appointmentTime: "2025-12-08T09:00:00",
     status: "SCHEDULED",
     type: "CONSULTATION",
     reason: "Chest pain and shortness of breath",
@@ -38,127 +32,77 @@ const mockAppointments: Appointment[] = [
   },
   {
     id: "apt-002",
-    patient: {
-      id: "p002",
-      fullName: "Tran Thi Mai",
-      phoneNumber: "0912345678",
-    },
-    doctor: {
-      id: "emp-102",
-      fullName: "Dr. Sarah Johnson",
-      department: "Pediatrics",
-      specialization: "Pediatrics",
-    },
-    appointmentTime: "2025-12-05T10:30:00",
+    patient: { id: "p002", fullName: "Tran Thi Mai", phoneNumber: "0912345678" },
+    doctor: { id: "emp-102", fullName: "Dr. Sarah Johnson", department: "Pediatrics", specialization: "Pediatrics" },
+    appointmentTime: "2025-12-08T10:30:00",
     status: "SCHEDULED",
     type: "FOLLOW_UP",
     reason: "Follow-up after flu treatment",
     createdAt: "2025-12-01T14:00:00Z",
     updatedAt: "2025-12-01T14:00:00Z",
   },
-  {
-    id: "apt-003",
-    patient: {
-      id: "p003",
-      fullName: "Le Hoang Phuc",
-      phoneNumber: "0923456789",
-    },
-    doctor: {
-      id: "emp-101",
-      fullName: "Dr. John Smith",
-      department: "Cardiology",
-      specialization: "Cardiology",
-    },
-    appointmentTime: "2025-12-04T14:00:00",
-    status: "COMPLETED",
-    type: "CONSULTATION",
-    reason: "Annual heart checkup",
-    notes: "Patient completed examination successfully",
-    createdAt: "2025-11-28T09:00:00Z",
-    updatedAt: "2025-12-04T15:30:00Z",
-  },
-  {
-    id: "apt-004",
-    patient: {
-      id: "p004",
-      fullName: "Pham Minh Duc",
-      phoneNumber: "0934567890",
-    },
-    doctor: {
-      id: "emp-103",
-      fullName: "Dr. Emily Carter",
-      department: "Emergency",
-      specialization: "Emergency Medicine",
-    },
-    appointmentTime: "2025-12-03T11:00:00",
-    status: "CANCELLED",
-    type: "EMERGENCY",
-    reason: "Severe headache",
-    cancelledAt: "2025-12-03T09:00:00Z",
-    cancelReason: "Patient recovered at home",
-    createdAt: "2025-12-02T20:00:00Z",
-    updatedAt: "2025-12-03T09:00:00Z",
-  },
-  {
-    id: "apt-005",
-    patient: {
-      id: "p005",
-      fullName: "Vo Thi Hong",
-      phoneNumber: "0945678901",
-    },
-    doctor: {
-      id: "emp-102",
-      fullName: "Dr. Sarah Johnson",
-      department: "Pediatrics",
-      specialization: "Pediatrics",
-    },
-    appointmentTime: "2025-12-02T09:00:00",
-    status: "NO_SHOW",
-    type: "CONSULTATION",
-    reason: "Child vaccination",
-    createdAt: "2025-11-25T10:00:00Z",
-    updatedAt: "2025-12-02T10:00:00Z",
-  },
-  {
-    id: "apt-006",
-    patient: {
-      id: "p001",
-      fullName: "Nguyen Van An",
-      phoneNumber: "0901234567",
-    },
-    doctor: {
-      id: "emp-101",
-      fullName: "Dr. John Smith",
-      department: "Cardiology",
-      specialization: "Cardiology",
-    },
-    appointmentTime: "2025-12-06T14:00:00",
-    status: "SCHEDULED",
-    type: "FOLLOW_UP",
-    reason: "Follow-up for chest pain",
-    createdAt: "2025-12-05T08:00:00Z",
-    updatedAt: "2025-12-05T08:00:00Z",
-  },
 ];
 
-// Generate time slots for a day (30-min intervals from 08:00 to 17:00)
-const generateTimeSlots = (
+// --- localStorage persistence for mock data ---
+const getMockAppointments = (): Appointment[] => {
+  if (typeof window === "undefined") return initialMockAppointments;
+  const stored = localStorage.getItem("mock_appointments");
+  console.log("DEBUG: Reading from localStorage. Found data:", !!stored);
+  if (stored) {
+    const data = JSON.parse(stored);
+    console.log(`DEBUG: Parsed ${data.length} appointments from localStorage.`);
+    return data;
+  } else {
+    console.log("DEBUG: No data in localStorage, initializing with default mock data.");
+    localStorage.setItem("mock_appointments", JSON.stringify(initialMockAppointments));
+    return initialMockAppointments;
+  }
+};
+
+const saveMockAppointments = (appointments: Appointment[]) => {
+  if (typeof window !== "undefined") {
+    console.log(`DEBUG: Saving ${appointments.length} appointments to localStorage.`);
+    localStorage.setItem("mock_appointments", JSON.stringify(appointments));
+  }
+};
+// ---------------------------------------------
+
+
+// Generate time slots based on doctor's schedule (30-min intervals)
+const generateTimeSlotsWithSchedule = (
+  startTime: string, // "07:00"
+  endTime: string, // "12:00"
   bookedTimes: string[],
   currentTime?: string
 ): TimeSlot[] => {
   const slots: TimeSlot[] = [];
-  for (let hour = 8; hour < 17; hour++) {
-    for (const min of [0, 30]) {
-      const time = `${hour.toString().padStart(2, "0")}:${min
-        .toString()
-        .padStart(2, "0")}`;
-      slots.push({
-        time,
-        available: !bookedTimes.includes(time),
-        current: time === currentTime,
-      });
+  const [startHour, startMin] = startTime.split(":").map(Number);
+  const [endHour, endMin] = endTime.split(":").map(Number);
+
+  let currentHour = startHour;
+  let currentMin = startMin;
+
+  while (
+    currentHour < endHour ||
+    (currentHour === endHour && currentMin < endMin)
+  ) {
+    const time = `${currentHour.toString().padStart(2, "0")}:${currentMin
+      .toString()
+      .padStart(2, "0")}`;
+    slots.push({
+      time,
+      available: !bookedTimes.includes(time),
+      current: time === currentTime,
+    });
+
+    // Increment by 30 minutes
+    currentMin += 30;
+    if (currentMin >= 60) {
+      currentMin = 0;
+      currentHour += 1;
     }
   }
+
   return slots;
 };
 
@@ -169,10 +113,11 @@ export const appointmentService = {
   ): Promise<PaginatedResponse<Appointment>> => {
     if (!USE_MOCK) {
       const response = await axiosInstance.get(BASE_URL, { params });
-      return response.data.data;
+      return response.data;
     }
 
     await delay(300);
+    const mockAppointments = getMockAppointments();
     let filtered = [...mockAppointments];
 
     // Filter by search (patient name)
@@ -213,18 +158,22 @@ export const appointmentService = {
     // Sort
     const sortField = params.sort?.split(",")[0] || "appointmentTime";
     const sortDir = params.sort?.split(",")[1] || "desc";
+    
     filtered.sort((a, b) => {
-      const aVal =
-        sortField === "appointmentTime"
-          ? a.appointmentTime
-          : a.patient.fullName;
-      const bVal =
-        sortField === "appointmentTime"
-          ? b.appointmentTime
-          : b.patient.fullName;
-      return sortDir === "asc"
-        ? aVal.localeCompare(bVal)
-        : bVal.localeCompare(aVal);
+      let aVal: any, bVal: any;
+
+      if (sortField.includes('.')) {
+        const [obj, prop] = sortField.split('.');
+        aVal = (a as any)[obj][prop];
+        bVal = (b as any)[obj][prop];
+      } else {
+        aVal = (a as any)[sortField];
+        bVal = (b as any)[sortField];
+      }
+      
+      if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+      return 0;
     });
 
     // Pagination
@@ -248,10 +197,11 @@ export const appointmentService = {
   getById: async (id: string): Promise<Appointment | null> => {
     if (!USE_MOCK) {
       const response = await axiosInstance.get(`${BASE_URL}/${id}`);
-      return response.data.data;
+      return response.data;
     }
 
     await delay(200);
+    const mockAppointments = getMockAppointments();
     return mockAppointments.find((a) => a.id === id) || null;
   },
 
@@ -259,32 +209,132 @@ export const appointmentService = {
   create: async (data: AppointmentCreateRequest): Promise<Appointment> => {
     if (!USE_MOCK) {
       const response = await axiosInstance.post(BASE_URL, data);
-      return response.data.data;
+      return response.data;
     }
 
     await delay(300);
-    // Simulate validation
+    const mockAppointments = getMockAppointments();
+
+    // Validate appointment time is not in the past
     if (new Date(data.appointmentTime) < new Date()) {
       throw { response: { data: { error: { code: "PAST_APPOINTMENT" } } } };
     }
 
+    // Extract date and time from appointmentTime
+    const [appointmentDate, appointmentTime] = data.appointmentTime.split("T");
+    const timeOnly = appointmentTime.substring(0, 5); // "HH:mm"
+
+    // Check if doctor has schedule on this date
+    const doctorSchedule = mockSchedules.find(
+      (s: any) =>
+        s.employeeId === data.doctorId && s.workDate === appointmentDate
+    );
+
+    if (!doctorSchedule) {
+      throw {
+        response: { data: { error: { code: "DOCTOR_NOT_AVAILABLE" } } },
+      };
+    }
+
+    // Check if appointment time is within schedule hours
+    if (
+      timeOnly < doctorSchedule.startTime ||
+      timeOnly >= doctorSchedule.endTime
+    ) {
+      throw {
+        response: { data: { error: { code: "DOCTOR_NOT_AVAILABLE" } } },
+      };
+    }
+
+    // Check if time slot is already taken
+    const isSlotTaken = mockAppointments.some(
+      (a) =>
+        a.doctor.id === data.doctorId &&
+        a.status !== "CANCELLED" &&
+        a.appointmentTime === data.appointmentTime
+    );
+
+    if (isSlotTaken) {
+      throw {
+        response: { data: { error: { code: "TIME_SLOT_TAKEN" } } },
+      };
+    }
+
+    // Fetch actual patient and doctor data
+    const { getPatients } = await import("./patient.service");
+    const { hrService } = await import("./hr.service");
+
+    let patientName = `Patient ${data.patientId}`;
+    let patientPhone = "";
+    let doctorName = `Doctor ${data.doctorId}`;
+    let doctorDept = "General";
+    let doctorSpec = "General";
+
+    try {
+      const patientsResult = await getPatients({ page: 0, size: 100 });
+      const patient = patientsResult.content.find(
+        (p) => p.id === data.patientId
+      );
+      if (patient) {
+        patientName = patient.fullName;
+        patientPhone = patient.phoneNumber || "";
+      } else {
+        throw {
+          response: { data: { error: { code: "PATIENT_NOT_FOUND" } } },
+        };
+      }
+    } catch (e: any) {
+      if (e?.response?.data?.error?.code === "PATIENT_NOT_FOUND") throw e;
+      console.warn("Failed to fetch patient data for new appointment");
+    }
+
+    try {
+      const doctorsResult = await hrService.getEmployees({
+        page: 0,
+        size: 100,
+        role: "DOCTOR",
+      });
+      const doctor = doctorsResult.content.find(
+        (d: any) => d.id === data.doctorId
+      );
+      if (doctor) {
+        doctorName = doctor.fullName;
+        doctorDept = doctor.departmentName;
+        doctorSpec = doctor.specialization || "General";
+      } else {
+        throw {
+          response: { data: { error: { code: "EMPLOYEE_NOT_FOUND" } } },
+        };
+      }
+    } catch (e: any) {
+      if (e?.response?.data?.error?.code === "EMPLOYEE_NOT_FOUND") throw e;
+      console.warn("Failed to fetch doctor data for new appointment");
+    }
+
     const newAppointment: Appointment = {
       id: `apt-${Date.now()}`,
-      patient: { id: data.patientId, fullName: `Patient ${data.patientId}` },
+      patient: {
+        id: data.patientId,
+        fullName: patientName,
+        phoneNumber: patientPhone,
+      },
       doctor: {
         id: data.doctorId,
-        fullName: `Doctor ${data.doctorId}`,
-        department: "General",
+        fullName: doctorName,
+        department: doctorDept,
+        specialization: doctorSpec,
       },
       appointmentTime: data.appointmentTime,
       status: "SCHEDULED",
       type: data.type,
       reason: data.reason,
+      notes: data.notes,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    mockAppointments.unshift(newAppointment);
+    const updatedAppointments = [newAppointment, ...mockAppointments];
+    saveMockAppointments(updatedAppointments);
     return newAppointment;
   },
 
@@ -295,10 +345,11 @@ export const appointmentService = {
   ): Promise<Appointment> => {
     if (!USE_MOCK) {
       const response = await axiosInstance.patch(`${BASE_URL}/${id}`, data);
-      return response.data.data;
+      return response.data;
     }
 
     await delay(300);
+    const mockAppointments = getMockAppointments();
     const index = mockAppointments.findIndex((a) => a.id === id);
     if (index === -1) {
       throw {
@@ -313,29 +364,81 @@ export const appointmentService = {
       };
     }
 
+    // If changing appointment time, validate doctor availability
+    if (
+      data.appointmentTime &&
+      data.appointmentTime !== appointment.appointmentTime
+    ) {
+      const [appointmentDate, appointmentTime] =
+        data.appointmentTime.split("T");
+      const timeOnly = appointmentTime.substring(0, 5); // "HH:mm"
+
+      // Check if doctor has schedule on new date
+      const doctorSchedule = mockSchedules.find(
+        (s: any) =>
+          s.employeeId === appointment.doctor.id &&
+          s.workDate === appointmentDate
+      );
+
+      if (!doctorSchedule) {
+        throw {
+          response: { data: { error: { code: "DOCTOR_NOT_AVAILABLE" } } },
+        };
+      }
+
+      // Check if new time is within schedule hours
+      if (
+        timeOnly < doctorSchedule.startTime ||
+        timeOnly >= doctorSchedule.endTime
+      ) {
+        throw {
+          response: { data: { error: { code: "DOCTOR_NOT_AVAILABLE" } } },
+        };
+      }
+
+      // Check if new time slot is already taken (excluding current appointment)
+      const isSlotTaken = mockAppointments.some(
+        (a) =>
+          a.id !== id &&
+          a.doctor.id === appointment.doctor.id &&
+          a.status !== "CANCELLED" &&
+          a.appointmentTime === data.appointmentTime
+      );
+
+      if (isSlotTaken) {
+        throw {
+          response: { data: { error: { code: "TIME_SLOT_TAKEN" } } },
+        };
+      }
+    }
+
     mockAppointments[index] = {
       ...appointment,
       ...data,
       updatedAt: new Date().toISOString(),
     };
 
+    saveMockAppointments(mockAppointments);
     return mockAppointments[index];
   },
 
   // Cancel appointment
   cancel: async (
     id: string,
-    data: AppointmentCancelRequest
+    data: AppointmentCancelRequest,
+    currentUserId?: string, // For permission check
+    currentUserRole?: string
   ): Promise<Appointment> => {
     if (!USE_MOCK) {
       const response = await axiosInstance.patch(
         `${BASE_URL}/${id}/cancel`,
         data
       );
-      return response.data.data;
+      return response.data;
     }
 
     await delay(300);
+    const mockAppointments = getMockAppointments();
     const index = mockAppointments.findIndex((a) => a.id === id);
     if (index === -1) {
       throw {
@@ -344,6 +447,17 @@ export const appointmentService = {
     }
 
     const appointment = mockAppointments[index];
+
+    // Permission check: PATIENT can only cancel own appointments
+    if (
+      currentUserRole === "PATIENT" &&
+      appointment.patient.id !== currentUserId
+    ) {
+      throw {
+        response: { data: { error: { code: "FORBIDDEN" } } },
+      };
+    }
+
     if (appointment.status === "CANCELLED") {
       throw { response: { data: { error: { code: "ALREADY_CANCELLED" } } } };
     }
@@ -361,17 +475,23 @@ export const appointmentService = {
       updatedAt: new Date().toISOString(),
     };
 
+    saveMockAppointments(mockAppointments);
     return mockAppointments[index];
   },
 
   // Complete appointment (doctor only)
-  complete: async (id: string): Promise<Appointment> => {
+  complete: async (
+    id: string,
+    currentUserId?: string, // For permission check - should be doctor's employee ID
+    currentUserRole?: string
+  ): Promise<Appointment> => {
     if (!USE_MOCK) {
       const response = await axiosInstance.patch(`${BASE_URL}/${id}/complete`);
-      return response.data.data;
+      return response.data;
     }
 
     await delay(300);
+    const mockAppointments = getMockAppointments();
     const index = mockAppointments.findIndex((a) => a.id === id);
     if (index === -1) {
       throw {
@@ -380,6 +500,17 @@ export const appointmentService = {
     }
 
     const appointment = mockAppointments[index];
+
+    // Permission check: Only assigned doctor can complete
+    if (
+      currentUserRole === "DOCTOR" &&
+      appointment.doctor.id !== currentUserId
+    ) {
+      throw {
+        response: { data: { error: { code: "FORBIDDEN" } } },
+      };
+    }
+
     if (appointment.status === "COMPLETED") {
       throw { response: { data: { error: { code: "ALREADY_COMPLETED" } } } };
     }
@@ -388,13 +519,19 @@ export const appointmentService = {
         response: { data: { error: { code: "APPOINTMENT_CANCELLED" } } },
       };
     }
+    if (appointment.status === "NO_SHOW") {
+      throw {
+        response: { data: { error: { code: "APPOINTMENT_NO_SHOW" } } },
+      };
+    }
 
     mockAppointments[index] = {
       ...appointment,
       status: "COMPLETED",
       updatedAt: new Date().toISOString(),
     };
-
+    
+    saveMockAppointments(mockAppointments);
     return mockAppointments[index];
   },
 
@@ -408,10 +545,22 @@ export const appointmentService = {
       const response = await axiosInstance.get(`${BASE_URL}/slots`, {
         params: { doctorId, date },
       });
-      return response.data.data;
+      return response.data;
     }
 
     await delay(200);
+    const mockAppointments = getMockAppointments();
+
+    // Check doctor's schedule for this date
+    const doctorSchedule = mockSchedules.find(
+      (s: any) => s.employeeId === doctorId && s.workDate === date
+    );
+
+    // If no schedule, return empty array
+    if (!doctorSchedule) {
+      return [];
+    }
+
     // Get booked times for this doctor on this date
     const bookedTimes = mockAppointments
       .filter((a) => {
@@ -440,7 +589,13 @@ export const appointmentService = {
       }
     }
 
-    return generateTimeSlots(bookedTimes, currentTime);
+    // Generate slots only within doctor's schedule hours
+    return generateTimeSlotsWithSchedule(
+      doctorSchedule.startTime,
+      doctorSchedule.endTime,
+      bookedTimes,
+      currentTime
+    );
   },
 };
 

@@ -2,9 +2,9 @@
 
 **Project:** Hospital Management System  
 **Service:** HR Service (Employee & Department Management)  
-**Version:** 1.0  
-**Last Updated:** December 3, 2025  
-**Target Users:** ADMIN (primary), DOCTOR (view schedules), All authenticated users (view)
+**Version:** 1.1  
+**Last Updated:** December 6, 2025  
+**Target Users:** ADMIN (full access), DOCTOR/NURSE/RECEPTIONIST (view for booking), All authenticated users (limited view)
 
 ---
 
@@ -13,6 +13,7 @@
 ### 1.1 Service Scope
 
 The HR Service manages hospital staff (doctors, nurses, receptionists, admin) and their work schedules. It provides:
+
 - Department management (create, edit, list, deactivate)
 - Employee management (create, edit, list, soft delete)
 - Work schedule management (create, edit, view availability)
@@ -20,29 +21,29 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 
 ### 1.2 Related Backend
 
-| Item | Value |
-|------|-------|
-| **Service** | hr-service |
-| **Port** | 8084 |
-| **Base Path** | `/api/hr` |
-| **Database** | `hr_db` |
-| **Tables** | `departments`, `employees`, `employee_schedules` |
+| Item          | Value                                            |
+| ------------- | ------------------------------------------------ |
+| **Service**   | hr-service                                       |
+| **Port**      | 8084                                             |
+| **Base Path** | `/api/hr`                                        |
+| **Database**  | `hr_db`                                          |
+| **Tables**    | `departments`, `employees`, `employee_schedules` |
 
 ### 1.3 Screen Inventory
 
-| Route | Screen Name | Component | Access | Priority |
-|-------|-------------|-----------|--------|----------|
-| `/admin/hr/departments` | Department List | `DepartmentListPage` | ADMIN | P0 |
-| `/admin/hr/departments/new` | Create Department | `DepartmentFormPage` | ADMIN | P0 |
-| `/admin/hr/departments/:id` | Department Detail | `DepartmentDetailPage` | Authenticated | P1 |
-| `/admin/hr/departments/:id/edit` | Edit Department | `DepartmentFormPage` | ADMIN | P0 |
-| `/admin/hr/employees` | Employee List | `EmployeeListPage` | ADMIN | P0 |
-| `/admin/hr/employees/new` | Create Employee | `EmployeeFormPage` | ADMIN | P0 |
-| `/admin/hr/employees/:id` | Employee Detail | `EmployeeDetailPage` | Authenticated | P1 |
-| `/admin/hr/employees/:id/edit` | Edit Employee | `EmployeeFormPage` | ADMIN | P0 |
-| `/admin/hr/schedules` | Schedule Calendar | `ScheduleCalendarPage` | ADMIN | P0 |
-| `/admin/hr/schedules/new` | Create Schedule | `ScheduleFormModal` | ADMIN | P0 |
-| `/doctor/schedules` | My Schedules | `MySchedulesPage` | DOCTOR, NURSE | P1 |
+| Route                            | Screen Name       | Component              | Access        | Priority |
+| -------------------------------- | ----------------- | ---------------------- | ------------- | -------- |
+| `/admin/hr/departments`          | Department List   | `DepartmentListPage`   | ADMIN         | P0       |
+| `/admin/hr/departments/new`      | Create Department | `DepartmentFormPage`   | ADMIN         | P0       |
+| `/admin/hr/departments/:id`      | Department Detail | `DepartmentDetailPage` | Authenticated | P1       |
+| `/admin/hr/departments/:id/edit` | Edit Department   | `DepartmentFormPage`   | ADMIN         | P0       |
+| `/admin/hr/employees`            | Employee List     | `EmployeeListPage`     | ADMIN         | P0       |
+| `/admin/hr/employees/new`        | Create Employee   | `EmployeeFormPage`     | ADMIN         | P0       |
+| `/admin/hr/employees/:id`        | Employee Detail   | `EmployeeDetailPage`   | Authenticated | P1       |
+| `/admin/hr/employees/:id/edit`   | Edit Employee     | `EmployeeFormPage`     | ADMIN         | P0       |
+| `/admin/hr/schedules`            | Schedule Calendar | `ScheduleCalendarPage` | ADMIN         | P0       |
+| `/admin/hr/schedules/new`        | Create Schedule   | `ScheduleFormModal`    | ADMIN         | P0       |
+| `/doctor/schedules`              | My Schedules      | `MySchedulesPage`      | DOCTOR, NURSE | P1       |
 
 ### 1.4 Screen Hierarchy Diagram
 
@@ -89,6 +90,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Page loads within 2 seconds
 - [ ] Table displays: Name, Location, Status, Head Doctor, Actions
 - [ ] Search filters by department name (debounced 300ms)
@@ -126,6 +128,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Form validates on blur and on submit
 - [ ] Name field is required (red asterisk indicator)
 - [ ] Success: Show toast "Department created successfully", redirect to list
@@ -158,6 +161,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Form pre-fills with existing data
 - [ ] Head Doctor dropdown shows only ACTIVE doctors
 - [ ] Unchanged fields are not sent in PATCH request
@@ -190,6 +194,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Confirmation dialog before delete
 - [ ] Success: Toast "Department deleted", remove row from table
 - [ ] Error 409: Toast explaining why deletion failed
@@ -217,6 +222,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Table columns: Name, Role, Department, Email, Phone, Status, Actions
 - [ ] Role filter: All, Doctor, Nurse, Receptionist, Admin
 - [ ] Department filter: Dropdown of all departments
@@ -228,6 +234,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 ---
 
 #### 2
+
 .2.2 Create Employee
 
 ```
@@ -257,6 +264,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Form has 3 collapsible sections
 - [ ] Role change dynamically shows/hides Department and License fields
 - [ ] Department dropdown only shows ACTIVE departments
@@ -274,6 +282,7 @@ The HR Service manages hospital staff (doctors, nurses, receptionists, admin) an
 Same flow as Create, with additional considerations:
 
 **Acceptance Criteria:**
+
 - [ ] Cannot change Role if employee has future appointments (show warning)
 - [ ] Cannot change Department if employee has future appointments in current dept
 - [ ] Show "Last updated by [user] at [date]" at bottom
@@ -302,6 +311,7 @@ Same flow as Create, with additional considerations:
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Soft delete only (preserves audit trail)
 - [ ] Error 409: Show appointment count and suggest cancelling them first
 - [ ] Deleted employees hidden from list (backend filters deleted_at IS NULL)
@@ -335,6 +345,7 @@ Same flow as Create, with additional considerations:
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Default view: Current week
 - [ ] Week/Month toggle
 - [ ] Filter by department (shows all employees in dept)
@@ -372,6 +383,7 @@ Same flow as Create, with additional considerations:
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Work Date cannot be in the past
 - [ ] Start Time must be before End Time
 - [ ] Time picker in 30-minute increments
@@ -404,6 +416,7 @@ Same flow as Create, with additional considerations:
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Read-only view (no edit/delete buttons)
 - [ ] Shows next 2 weeks by default
 - [ ] Date range picker to view historical schedules
@@ -421,15 +434,15 @@ Same flow as Create, with additional considerations:
 
 #### 3.1.1 Fields & Data Table Columns
 
-| Column | Field | Type | Sortable | Filterable |
-|--------|-------|------|----------|------------|
-| Name | `name` | string | ✅ | ✅ (search) |
-| Description | `description` | string | ❌ | ❌ |
-| Location | `location` | string | ❌ | ❌ |
-| Phone | `phoneExtension` | string | ❌ | ❌ |
-| Status | `status` | badge | ✅ | ✅ (select) |
-| Head Doctor | `headDoctor.fullName` | string | ❌ | ❌ |
-| Actions | - | buttons | ❌ | ❌ |
+| Column      | Field                 | Type    | Sortable | Filterable  |
+| ----------- | --------------------- | ------- | -------- | ----------- |
+| Name        | `name`                | string  | ✅       | ✅ (search) |
+| Description | `description`         | string  | ❌       | ❌          |
+| Location    | `location`            | string  | ❌       | ❌          |
+| Phone       | `phoneExtension`      | string  | ❌       | ❌          |
+| Status      | `status`              | badge   | ✅       | ✅ (select) |
+| Head Doctor | `headDoctor.fullName` | string  | ❌       | ❌          |
+| Actions     | -                     | buttons | ❌       | ❌          |
 
 #### 3.1.2 Component Hierarchy
 
@@ -461,14 +474,14 @@ DepartmentListPage
 interface DepartmentListState {
   // Filter state
   searchQuery: string;
-  statusFilter: 'ALL' | 'ACTIVE' | 'INACTIVE';
-  
+  statusFilter: "ALL" | "ACTIVE" | "INACTIVE";
+
   // Pagination state
   page: number;
   pageSize: number;
   sortField: string;
-  sortDirection: 'asc' | 'desc';
-  
+  sortDirection: "asc" | "desc";
+
   // UI state
   deleteDialogOpen: boolean;
   departmentToDelete: Department | null;
@@ -477,12 +490,12 @@ interface DepartmentListState {
 
 #### 3.1.4 Role-Based Visibility
 
-| Element | ADMIN | DOCTOR | NURSE | PATIENT |
-|---------|-------|--------|-------|---------|
-| Page Access | ✅ | ✅ (read-only) | ✅ (read-only) | ❌ |
-| Add Button | ✅ | ❌ | ❌ | ❌ |
-| Edit Button | ✅ | ❌ | ❌ | ❌ |
-| Delete Button | ✅ | ❌ | ❌ | ❌ |
+| Element       | ADMIN | DOCTOR         | NURSE          | PATIENT |
+| ------------- | ----- | -------------- | -------------- | ------- |
+| Page Access   | ✅    | ✅ (read-only) | ✅ (read-only) | ❌      |
+| Add Button    | ✅    | ❌             | ❌             | ❌      |
+| Edit Button   | ✅    | ❌             | ❌             | ❌      |
+| Delete Button | ✅    | ❌             | ❌             | ❌      |
 
 ---
 
@@ -493,14 +506,14 @@ interface DepartmentListState {
 
 #### 3.2.1 Fields Specification
 
-| Field | Label | Type | Required | Validation | Error Message |
-|-------|-------|------|----------|------------|---------------|
-| `name` | Department Name | text | ✅ | max 255 chars, unique | "Department name is required" / "Name must be less than 255 characters" / "Department name already exists" |
-| `description` | Description | textarea | ❌ | max 1000 chars | "Description must be less than 1000 characters" |
-| `location` | Location | text | ❌ | max 255 chars | "Location must be less than 255 characters" |
-| `phoneExtension` | Phone Extension | text | ❌ | numeric, max 20 chars | "Phone extension must be numeric" |
-| `status` | Status | select | ✅ | enum | "Status is required" |
-| `headDoctorId` | Head Doctor | select | ❌ | valid doctor ID | "Selected doctor not found" |
+| Field            | Label           | Type     | Required | Validation            | Error Message                                                                                              |
+| ---------------- | --------------- | -------- | -------- | --------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `name`           | Department Name | text     | ✅       | max 255 chars, unique | "Department name is required" / "Name must be less than 255 characters" / "Department name already exists" |
+| `description`    | Description     | textarea | ❌       | max 1000 chars        | "Description must be less than 1000 characters"                                                            |
+| `location`       | Location        | text     | ❌       | max 255 chars         | "Location must be less than 255 characters"                                                                |
+| `phoneExtension` | Phone Extension | text     | ❌       | numeric, max 20 chars | "Phone extension must be numeric"                                                                          |
+| `status`         | Status          | select   | ✅       | enum                  | "Status is required"                                                                                       |
+| `headDoctorId`   | Head Doctor     | select   | ❌       | valid doctor ID       | "Selected doctor not found"                                                                                |
 
 #### 3.2.2 Component Hierarchy
 
@@ -526,11 +539,11 @@ DepartmentFormPage
 
 #### 3.2.3 Field Conditional Logic
 
-| Condition | Field Affected | Behavior |
-|-----------|----------------|----------|
-| Edit mode | `name` | Pre-filled, still editable |
-| Status = INACTIVE | - | Show warning: "Inactive departments won't accept new appointments" |
-| headDoctorId selected | - | Show doctor's department info |
+| Condition             | Field Affected | Behavior                                                           |
+| --------------------- | -------------- | ------------------------------------------------------------------ |
+| Edit mode             | `name`         | Pre-filled, still editable                                         |
+| Status = INACTIVE     | -              | Show warning: "Inactive departments won't accept new appointments" |
+| headDoctorId selected | -              | Show doctor's department info                                      |
 
 #### 3.2.4 Form State
 
@@ -542,20 +555,20 @@ interface DepartmentFormState {
     description: string;
     location: string;
     phoneExtension: string;
-    status: 'ACTIVE' | 'INACTIVE';
+    status: "ACTIVE" | "INACTIVE";
     headDoctorId: string | null;
   };
-  
+
   // Validation errors (field-level)
   errors: Record<string, string>;
-  
+
   // Form state
   isDirty: boolean;
   isSubmitting: boolean;
-  
+
   // For edit mode
   isLoading: boolean;
-  originalValues: DepartmentFormState['values'] | null;
+  originalValues: DepartmentFormState["values"] | null;
 }
 ```
 
@@ -568,35 +581,37 @@ interface DepartmentFormState {
 
 #### 3.3.1 Fields & Data Table Columns
 
-| Column | Field | Type | Sortable | Filterable |
-|--------|-------|------|----------|------------|
-| Name | `fullName` | string | ✅ | ✅ (search) |
-| Role | `role` | badge | ✅ | ✅ (select) |
-| Department | `department.name` | string | ✅ | ✅ (select) |
-| Specialization | `specialization` | string | ❌ | ❌ |
-| Email | `email` | string | ❌ | ✅ (search) |
-| Phone | `phoneNumber` | string | ❌ | ❌ |
-| Status | `status` | badge | ✅ | ✅ (select) |
-| Actions | - | buttons | ❌ | ❌ |
+| Column         | Field             | Type    | Sortable | Filterable  |
+| -------------- | ----------------- | ------- | -------- | ----------- |
+| Name           | `fullName`        | string  | ✅       | ✅ (search) |
+| Role           | `role`            | badge   | ✅       | ✅ (select) |
+| Department     | `department.name` | string  | ✅       | ✅ (select) |
+| Specialization | `specialization`  | string  | ❌       | ❌          |
+| Email          | `email`           | string  | ❌       | ✅ (search) |
+| Phone          | `phoneNumber`     | string  | ❌       | ❌          |
+| Status         | `status`          | badge   | ✅       | ✅ (select) |
+| Actions        | -                 | buttons | ❌       | ❌          |
 
 #### 3.3.2 Badge Color Mapping
 
 **Role Badges:**
+
 ```typescript
 const roleBadgeColors = {
-  DOCTOR: 'blue',
-  NURSE: 'green',
-  RECEPTIONIST: 'purple',
-  ADMIN: 'red'
+  DOCTOR: "blue",
+  NURSE: "green",
+  RECEPTIONIST: "purple",
+  ADMIN: "red",
 };
 ```
 
 **Status Badges:**
+
 ```typescript
 const statusBadgeColors = {
-  ACTIVE: 'green',
-  ON_LEAVE: 'yellow',
-  RESIGNED: 'gray'
+  ACTIVE: "green",
+  ON_LEAVE: "yellow",
+  RESIGNED: "gray",
 };
 ```
 
@@ -629,40 +644,40 @@ EmployeeListPage
 
 **Section 1: Basic Information**
 
-| Field | Label | Type | Required | Validation | Error Message |
-|-------|-------|------|----------|------------|---------------|
-| `fullName` | Full Name | text | ✅ | max 255 chars | "Full name is required" |
-| `email` | Email | email | ✅ | valid email format | "Please enter a valid email address" |
-| `phoneNumber` | Phone Number | tel | ❌ | 10-15 digits | "Phone number must be 10-15 digits" |
-| `address` | Address | textarea | ❌ | max 500 chars | - |
+| Field         | Label        | Type     | Required | Validation         | Error Message                        |
+| ------------- | ------------ | -------- | -------- | ------------------ | ------------------------------------ |
+| `fullName`    | Full Name    | text     | ✅       | max 255 chars      | "Full name is required"              |
+| `email`       | Email        | email    | ✅       | valid email format | "Please enter a valid email address" |
+| `phoneNumber` | Phone Number | tel      | ❌       | 10-15 digits       | "Phone number must be 10-15 digits"  |
+| `address`     | Address      | textarea | ❌       | max 500 chars      | -                                    |
 
 **Section 2: Employment Details**
 
-| Field | Label | Type | Required | Validation | Error Message |
-|-------|-------|------|----------|------------|---------------|
-| `role` | Role | select | ✅ | enum | "Role is required" |
-| `departmentId` | Department | select | Conditional* | valid dept ID | "Department is required for Doctor/Nurse" |
-| `specialization` | Specialization | text | ❌ | max 100 chars | - |
-| `licenseNumber` | License Number | text | Conditional* | format: XX-12345, unique | "License number is required for Doctor/Nurse" / "License number already in use" |
-| `status` | Status | select | ✅ | enum | "Status is required" |
-| `hiredAt` | Hire Date | date | ❌ | valid date, not future | "Hire date cannot be in the future" |
+| Field            | Label          | Type   | Required      | Validation               | Error Message                                                                   |
+| ---------------- | -------------- | ------ | ------------- | ------------------------ | ------------------------------------------------------------------------------- |
+| `role`           | Role           | select | ✅            | enum                     | "Role is required"                                                              |
+| `departmentId`   | Department     | select | Conditional\* | valid dept ID            | "Department is required for Doctor/Nurse"                                       |
+| `specialization` | Specialization | text   | ❌            | max 100 chars            | -                                                                               |
+| `licenseNumber`  | License Number | text   | Conditional\* | format: XX-12345, unique | "License number is required for Doctor/Nurse" / "License number already in use" |
+| `status`         | Status         | select | ✅            | enum                     | "Status is required"                                                            |
+| `hiredAt`        | Hire Date      | date   | ❌            | valid date, not future   | "Hire date cannot be in the future"                                             |
 
-*Conditional: Required when Role = DOCTOR or NURSE
+\*Conditional: Required when Role = DOCTOR or NURSE
 
 **Section 3: Account Linking (Optional)**
 
-| Field | Label | Type | Required | Validation | Error Message |
-|-------|-------|------|----------|------------|---------------|
-| `accountId` | Link to Account | searchable-select | ❌ | valid account ID | "Account not found" |
+| Field       | Label           | Type              | Required | Validation       | Error Message       |
+| ----------- | --------------- | ----------------- | -------- | ---------------- | ------------------- |
+| `accountId` | Link to Account | searchable-select | ❌       | valid account ID | "Account not found" |
 
 #### 3.4.2 Field Conditional Logic
 
-| Condition | Fields Affected | Behavior |
-|-----------|----------------|----------|
-| Role = DOCTOR or NURSE | `departmentId`, `licenseNumber` | Show as required (add red asterisk) |
-| Role = RECEPTIONIST or ADMIN | `departmentId`, `licenseNumber` | Show but optional |
-| Role = DOCTOR | `specialization` | Show prominently |
-| Edit mode + has future appointments | `role`, `departmentId` | Show warning before change |
+| Condition                           | Fields Affected                 | Behavior                            |
+| ----------------------------------- | ------------------------------- | ----------------------------------- |
+| Role = DOCTOR or NURSE              | `departmentId`, `licenseNumber` | Show as required (add red asterisk) |
+| Role = RECEPTIONIST or ADMIN        | `departmentId`, `licenseNumber` | Show but optional                   |
+| Role = DOCTOR                       | `specialization`                | Show prominently                    |
+| Edit mode + has future appointments | `role`, `departmentId`          | Show warning before change          |
 
 #### 3.4.3 Component Hierarchy
 
@@ -732,8 +747,8 @@ interface ScheduleCardProps {
     employeeName: string;
     workDate: string;
     startTime: string; // "08:00"
-    endTime: string;   // "17:00"
-    status: 'AVAILABLE' | 'BOOKED' | 'CANCELLED';
+    endTime: string; // "17:00"
+    status: "AVAILABLE" | "BOOKED" | "CANCELLED";
     notes?: string;
   };
   onClick: () => void;
@@ -745,14 +760,14 @@ interface ScheduleCardProps {
 
 #### 3.5.3 Schedule Form Modal Fields
 
-| Field | Label | Type | Required | Validation |
-|-------|-------|------|----------|------------|
-| `employeeId` | Employee | searchable-select | ✅ | valid employee |
-| `workDate` | Work Date | date | ✅ | not in past |
-| `startTime` | Start Time | time-select | ✅ | - |
-| `endTime` | End Time | time-select | ✅ | > startTime |
-| `status` | Status | select | ✅ | AVAILABLE or CANCELLED |
-| `notes` | Notes | textarea | ❌ | max 1000 chars |
+| Field        | Label      | Type              | Required | Validation             |
+| ------------ | ---------- | ----------------- | -------- | ---------------------- |
+| `employeeId` | Employee   | searchable-select | ✅       | valid employee         |
+| `workDate`   | Work Date  | date              | ✅       | not in past            |
+| `startTime`  | Start Time | time-select       | ✅       | -                      |
+| `endTime`    | End Time   | time-select       | ✅       | > startTime            |
+| `status`     | Status     | select            | ✅       | AVAILABLE or CANCELLED |
+| `notes`      | Notes      | textarea          | ❌       | max 1000 chars         |
 
 **Time Options:** 30-minute increments from 00:00 to 23:30
 
@@ -789,25 +804,27 @@ MySchedulesPage
 
 #### 4.1.1 List Departments
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `GET /api/hr/departments` |
-| **Used By** | `DepartmentListPage`, `EmployeeFormPage` (dropdown) |
-| **Query Params** | `page`, `size`, `sort`, `status`, `search` |
+| Property         | Value                                               |
+| ---------------- | --------------------------------------------------- |
+| **Endpoint**     | `GET /api/hr/departments`                           |
+| **Used By**      | `DepartmentListPage`, `EmployeeFormPage` (dropdown) |
+| **Query Params** | `page`, `size`, `sort`, `status`, `search`          |
 
 **Request → UI Mapping:**
+
 ```typescript
 // Query params from UI state
 const params = {
   page: pagination.page,
   size: pagination.pageSize,
   sort: `${sort.field},${sort.direction}`,
-  status: filters.status !== 'ALL' ? filters.status : undefined,
-  search: filters.search ? `name=like='*${filters.search}*'` : undefined
+  status: filters.status !== "ALL" ? filters.status : undefined,
+  search: filters.search ? `name=like='*${filters.search}*'` : undefined,
 };
 ```
 
 **Response Handling:**
+
 ```typescript
 // Success (200)
 {
@@ -831,12 +848,13 @@ const params = {
 
 #### 4.1.2 Create Department
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `POST /api/hr/departments` |
-| **Used By** | `DepartmentFormPage` (create mode) |
+| Property     | Value                              |
+| ------------ | ---------------------------------- |
+| **Endpoint** | `POST /api/hr/departments`         |
+| **Used By**  | `DepartmentFormPage` (create mode) |
 
 **UI → Request Mapping:**
+
 ```typescript
 // Form values to request body
 const requestBody = {
@@ -844,11 +862,12 @@ const requestBody = {
   description: form.description?.trim() || undefined,
   location: form.location?.trim() || undefined,
   phoneExtension: form.phoneExtension?.trim() || undefined,
-  status: form.status
+  status: form.status,
 };
 ```
 
 **Response Handling:**
+
 ```typescript
 // Success (201)
 // → Toast "Department created successfully"
@@ -869,12 +888,13 @@ const requestBody = {
 
 #### 4.1.3 Get Department
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `GET /api/hr/departments/{id}` |
-| **Used By** | `DepartmentFormPage` (edit mode), `DepartmentDetailPage` |
+| Property     | Value                                                    |
+| ------------ | -------------------------------------------------------- |
+| **Endpoint** | `GET /api/hr/departments/{id}`                           |
+| **Used By**  | `DepartmentFormPage` (edit mode), `DepartmentDetailPage` |
 
 **Response Handling:**
+
 ```typescript
 // Success (200)
 // → Pre-fill form with data
@@ -885,12 +905,13 @@ const requestBody = {
 
 #### 4.1.4 Update Department
 
-| Property | Value |
-|----------|-------|
+| Property     | Value                            |
+| ------------ | -------------------------------- |
 | **Endpoint** | `PATCH /api/hr/departments/{id}` |
-| **Used By** | `DepartmentFormPage` (edit mode) |
+| **Used By**  | `DepartmentFormPage` (edit mode) |
 
 **UI → Request Mapping:**
+
 ```typescript
 // Only send changed fields
 const changedFields = getChangedFields(originalValues, currentValues);
@@ -899,12 +920,13 @@ const requestBody = changedFields;
 
 #### 4.1.5 Delete Department
 
-| Property | Value |
-|----------|-------|
+| Property     | Value                             |
+| ------------ | --------------------------------- |
 | **Endpoint** | `DELETE /api/hr/departments/{id}` |
-| **Used By** | `DepartmentListPage` |
+| **Used By**  | `DepartmentListPage`              |
 
 **Response Handling:**
+
 ```typescript
 // Success (204)
 // → Toast "Department deleted"
@@ -920,44 +942,48 @@ const requestBody = changedFields;
 
 #### 4.2.1 List Employees
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `GET /api/hr/employees` |
-| **Used By** | `EmployeeListPage`, `ScheduleFormModal` (dropdown) |
+| Property         | Value                                                              |
+| ---------------- | ------------------------------------------------------------------ |
+| **Endpoint**     | `GET /api/hr/employees`                                            |
+| **Used By**      | `EmployeeListPage`, `ScheduleFormModal` (dropdown)                 |
 | **Query Params** | `page`, `size`, `sort`, `departmentId`, `role`, `status`, `search` |
 
 **RSQL Search Examples:**
+
 ```typescript
 // Build RSQL from filters
 let rsql = [];
 if (filters.search) {
-  rsql.push(`fullName=like='*${filters.search}*',email=like='*${filters.search}*'`);
+  rsql.push(
+    `fullName=like='*${filters.search}*',email=like='*${filters.search}*'`
+  );
 }
-if (filters.role !== 'ALL') {
+if (filters.role !== "ALL") {
   rsql.push(`role==${filters.role}`);
 }
-if (filters.status !== 'ALL') {
+if (filters.status !== "ALL") {
   rsql.push(`status==${filters.status}`);
 }
-const search = rsql.join(';'); // AND condition
+const search = rsql.join(";"); // AND condition
 ```
 
 #### 4.2.2 List Doctors (for Appointment Booking)
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `GET /api/hr/doctors` |
-| **Used By** | `DepartmentFormPage` (head doctor dropdown), Appointment Service |
-| **Query Params** | `departmentId`, `specialization`, `status`, `page`, `size` |
+| Property         | Value                                                            |
+| ---------------- | ---------------------------------------------------------------- |
+| **Endpoint**     | `GET /api/hr/doctors`                                            |
+| **Used By**      | `DepartmentFormPage` (head doctor dropdown), Appointment Service |
+| **Query Params** | `departmentId`, `specialization`, `status`, `page`, `size`       |
 
 #### 4.2.3 Create Employee
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `POST /api/hr/employees` |
-| **Used By** | `EmployeeFormPage` (create mode) |
+| Property     | Value                            |
+| ------------ | -------------------------------- |
+| **Endpoint** | `POST /api/hr/employees`         |
+| **Used By**  | `EmployeeFormPage` (create mode) |
 
 **UI → Request Mapping:**
+
 ```typescript
 const requestBody = {
   accountId: form.accountId || undefined,
@@ -970,11 +996,12 @@ const requestBody = {
   phoneNumber: form.phoneNumber?.trim() || undefined,
   address: form.address?.trim() || undefined,
   status: form.status,
-  hiredAt: form.hiredAt ? formatDate(form.hiredAt) : undefined
+  hiredAt: form.hiredAt ? formatDate(form.hiredAt) : undefined,
 };
 ```
 
 **Response Handling:**
+
 ```typescript
 // Success (201)
 // → Toast "Employee created successfully"
@@ -992,12 +1019,13 @@ const requestBody = {
 
 #### 4.2.4 Get Employee
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `GET /api/hr/employees/{id}` |
-| **Used By** | `EmployeeFormPage` (edit mode), `EmployeeDetailPage` |
+| Property     | Value                                                |
+| ------------ | ---------------------------------------------------- |
+| **Endpoint** | `GET /api/hr/employees/{id}`                         |
+| **Used By**  | `EmployeeFormPage` (edit mode), `EmployeeDetailPage` |
 
 **Response Handling:**
+
 ```typescript
 // Success (200)
 // → Pre-fill form with data
@@ -1008,12 +1036,13 @@ const requestBody = {
 
 #### 4.2.5 Update Employee
 
-| Property | Value |
-|----------|-------|
+| Property     | Value                          |
+| ------------ | ------------------------------ |
 | **Endpoint** | `PATCH /api/hr/employees/{id}` |
-| **Used By** | `EmployeeFormPage` (edit mode) |
+| **Used By**  | `EmployeeFormPage` (edit mode) |
 
 **UI → Request Mapping:**
+
 ```typescript
 // Only send changed fields
 const changedFields = getChangedFields(originalValues, currentValues);
@@ -1021,6 +1050,7 @@ const requestBody = changedFields;
 ```
 
 **Response Handling:**
+
 ```typescript
 // Success (200)
 // → Toast "Employee updated successfully"
@@ -1035,12 +1065,13 @@ const requestBody = changedFields;
 
 #### 4.2.6 Delete Employee (Soft Delete)
 
-| Property | Value |
-|----------|-------|
+| Property     | Value                           |
+| ------------ | ------------------------------- |
 | **Endpoint** | `DELETE /api/hr/employees/{id}` |
-| **Used By** | `EmployeeListPage` |
+| **Used By**  | `EmployeeListPage`              |
 
 **Response Handling:**
+
 ```typescript
 // Success (200) - Note: Returns 200 with deletedAt info, not 204
 {
@@ -1067,51 +1098,54 @@ const requestBody = changedFields;
 
 #### 4.3.1 List Doctor Schedules
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `GET /api/hr/schedules/doctors` |
-| **Used By** | `ScheduleCalendarPage` |
+| Property         | Value                                                                        |
+| ---------------- | ---------------------------------------------------------------------------- |
+| **Endpoint**     | `GET /api/hr/schedules/doctors`                                              |
+| **Used By**      | `ScheduleCalendarPage`                                                       |
 | **Query Params** | `departmentId`, `doctorId`, `startDate`, `endDate`, `status`, `page`, `size` |
 
 **Request Example:**
+
 ```typescript
 const params = {
   startDate: formatDate(weekStart), // "2025-12-02"
-  endDate: formatDate(weekEnd),     // "2025-12-08"
+  endDate: formatDate(weekEnd), // "2025-12-08"
   departmentId: filters.department || undefined,
   doctorId: filters.employee || undefined,
-  status: 'AVAILABLE'
+  status: "AVAILABLE",
 };
 ```
 
 #### 4.3.2 Get My Schedules
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `GET /api/hr/schedules/me` |
-| **Used By** | `MySchedulesPage` |
+| Property         | Value                            |
+| ---------------- | -------------------------------- |
+| **Endpoint**     | `GET /api/hr/schedules/me`       |
+| **Used By**      | `MySchedulesPage`                |
 | **Query Params** | `startDate`, `endDate`, `status` |
 
 #### 4.3.3 Create Schedule
 
-| Property | Value |
-|----------|-------|
+| Property     | Value                    |
+| ------------ | ------------------------ |
 | **Endpoint** | `POST /api/hr/schedules` |
-| **Used By** | `ScheduleFormModal` |
+| **Used By**  | `ScheduleFormModal`      |
 
 **UI → Request Mapping:**
+
 ```typescript
 const requestBody = {
   employeeId: form.employeeId,
   workDate: formatDate(form.workDate), // "2025-12-05"
-  startTime: form.startTime,            // "08:00"
-  endTime: form.endTime,                // "17:00"
+  startTime: form.startTime, // "08:00"
+  endTime: form.endTime, // "17:00"
   status: form.status,
-  notes: form.notes?.trim() || undefined
+  notes: form.notes?.trim() || undefined,
 };
 ```
 
 **Response Handling:**
+
 ```typescript
 // Success (201)
 // → Close modal
@@ -1124,12 +1158,13 @@ const requestBody = {
 
 #### 4.3.4 Update Schedule
 
-| Property | Value |
-|----------|-------|
-| **Endpoint** | `PATCH /api/hr/schedules/{id}` |
-| **Used By** | `ScheduleFormModal` (edit mode) |
+| Property     | Value                           |
+| ------------ | ------------------------------- |
+| **Endpoint** | `PATCH /api/hr/schedules/{id}`  |
+| **Used By**  | `ScheduleFormModal` (edit mode) |
 
 **Response Handling:**
+
 ```typescript
 // Error (409) - Has appointments
 // → Show warning: "Cannot modify schedule with booked appointments"
@@ -1137,10 +1172,10 @@ const requestBody = {
 
 #### 4.3.5 Delete Schedule
 
-| Property | Value |
-|----------|-------|
+| Property     | Value                           |
+| ------------ | ------------------------------- |
 | **Endpoint** | `DELETE /api/hr/schedules/{id}` |
-| **Used By** | `ScheduleDetailPopover` |
+| **Used By**  | `ScheduleDetailPopover`         |
 
 ---
 
@@ -1220,19 +1255,19 @@ const requestBody = {
 
 ### 5.1 Reusable Components
 
-| Component | Used In | Props |
-|-----------|---------|-------|
-| `DataTable` | All list pages | columns, data, pagination, sorting, onRowClick |
-| `SearchInput` | All list pages | value, onChange, placeholder, debounceMs |
-| `StatusBadge` | List pages, detail pages | status, colorMap |
-| `FormField` | All form pages | label, name, error, required, children |
-| `ConfirmDialog` | Delete actions | title, message, onConfirm, onCancel |
-| `PageHeader` | All pages | title, backLink?, actions? |
-| `EmptyState` | List pages | message, actionLabel?, onAction? |
-| `LoadingSkeleton` | All pages | variant (table, form, card) |
-| `SearchableSelect` | Form pages | options, value, onChange, placeholder, isLoading |
-| `DatePicker` | Form pages | value, onChange, minDate?, maxDate? |
-| `TimePicker` | Schedule form | value, onChange, step (30 min) |
+| Component          | Used In                  | Props                                            |
+| ------------------ | ------------------------ | ------------------------------------------------ |
+| `DataTable`        | All list pages           | columns, data, pagination, sorting, onRowClick   |
+| `SearchInput`      | All list pages           | value, onChange, placeholder, debounceMs         |
+| `StatusBadge`      | List pages, detail pages | status, colorMap                                 |
+| `FormField`        | All form pages           | label, name, error, required, children           |
+| `ConfirmDialog`    | Delete actions           | title, message, onConfirm, onCancel              |
+| `PageHeader`       | All pages                | title, backLink?, actions?                       |
+| `EmptyState`       | List pages               | message, actionLabel?, onAction?                 |
+| `LoadingSkeleton`  | All pages                | variant (table, form, card)                      |
+| `SearchableSelect` | Form pages               | options, value, onChange, placeholder, isLoading |
+| `DatePicker`       | Form pages               | value, onChange, minDate?, maxDate?              |
+| `TimePicker`       | Schedule form            | value, onChange, step (30 min)                   |
 
 ### 5.2 Global State (React Query Cache Keys)
 
@@ -1240,20 +1275,24 @@ const requestBody = {
 // Cache key patterns
 const queryKeys = {
   // Departments
-  departments: ['departments'] as const,
-  departmentList: (filters: DepartmentFilters) => ['departments', 'list', filters],
-  departmentDetail: (id: string) => ['departments', 'detail', id],
-  
+  departments: ["departments"] as const,
+  departmentList: (filters: DepartmentFilters) => [
+    "departments",
+    "list",
+    filters,
+  ],
+  departmentDetail: (id: string) => ["departments", "detail", id],
+
   // Employees
-  employees: ['employees'] as const,
-  employeeList: (filters: EmployeeFilters) => ['employees', 'list', filters],
-  employeeDetail: (id: string) => ['employees', 'detail', id],
-  doctors: (departmentId?: string) => ['employees', 'doctors', departmentId],
-  
+  employees: ["employees"] as const,
+  employeeList: (filters: EmployeeFilters) => ["employees", "list", filters],
+  employeeDetail: (id: string) => ["employees", "detail", id],
+  doctors: (departmentId?: string) => ["employees", "doctors", departmentId],
+
   // Schedules
-  schedules: ['schedules'] as const,
-  scheduleList: (params: ScheduleParams) => ['schedules', 'list', params],
-  mySchedules: (params: MyScheduleParams) => ['schedules', 'me', params],
+  schedules: ["schedules"] as const,
+  scheduleList: (params: ScheduleParams) => ["schedules", "list", params],
+  mySchedules: (params: MyScheduleParams) => ["schedules", "me", params],
 };
 
 // Invalidation patterns
@@ -1262,7 +1301,7 @@ queryClient.invalidateQueries({ queryKey: queryKeys.departments });
 
 // After create/update/delete employee:
 queryClient.invalidateQueries({ queryKey: queryKeys.employees });
-queryClient.invalidateQueries({ queryKey: ['employees', 'doctors'] });
+queryClient.invalidateQueries({ queryKey: ["employees", "doctors"] });
 
 // After create/update/delete schedule:
 queryClient.invalidateQueries({ queryKey: queryKeys.schedules });
@@ -1270,15 +1309,15 @@ queryClient.invalidateQueries({ queryKey: queryKeys.schedules });
 
 ### 5.3 Cross-Service Dependencies
 
-| HR Service Needs | From Service | Endpoint |
-|------------------|--------------|----------|
+| HR Service Needs           | From Service | Endpoint                             |
+| -------------------------- | ------------ | ------------------------------------ |
 | Account list (for linking) | Auth Service | `GET /api/auth/accounts` (if exists) |
 
-| Other Services Need | From HR Service | Endpoint |
-|---------------------|-----------------|----------|
-| Doctor list | Appointment Service | `GET /api/hr/doctors` |
-| Doctor availability | Appointment Service | `GET /api/hr/schedules/doctors` |
-| Employee details | Medical Exam, Billing | `GET /api/hr/employees/{id}` |
+| Other Services Need | From HR Service       | Endpoint                        |
+| ------------------- | --------------------- | ------------------------------- |
+| Doctor list         | Appointment Service   | `GET /api/hr/doctors`           |
+| Doctor availability | Appointment Service   | `GET /api/hr/schedules/doctors` |
+| Employee details    | Medical Exam, Billing | `GET /api/hr/employees/{id}`    |
 
 ---
 
@@ -1287,13 +1326,15 @@ queryClient.invalidateQueries({ queryKey: queryKeys.schedules });
 ### 6.1 API Error Response Format
 
 The backend returns errors in this format:
+
 ```typescript
 interface ApiErrorResponse {
-  status: 'error';
+  status: "error";
   error: {
-    code: string;        // e.g., "VALIDATION_ERROR", "DEPARTMENT_NOT_FOUND"
-    message: string;     // Human-readable message
-    details?: Array<{    // For validation errors
+    code: string; // e.g., "VALIDATION_ERROR", "DEPARTMENT_NOT_FOUND"
+    message: string; // Human-readable message
+    details?: Array<{
+      // For validation errors
       field: string;
       message: string;
     }>;
@@ -1306,129 +1347,100 @@ interface ApiErrorResponse {
 
 #### 6.2.1 Department Error Codes
 
-| HTTP | Code | When | UI Response |
-|------|------|------|-------------|
-| 400 | `VALIDATION_ERROR` | Invalid input | Show field-level errors |
-| 401 | `UNAUTHORIZED` | Missing/invalid token | Redirect to `/login`, clear auth state |
-| 403 | `FORBIDDEN` | Not ADMIN role | Toast "You don't have permission for this action" |
-| 404 | `DEPARTMENT_NOT_FOUND` | ID doesn't exist | Show 404 page or Toast "Department not found" |
-| 404 | `EMPLOYEE_NOT_FOUND` | Head doctor ID invalid | Set field error on headDoctorId: "Selected doctor not found" |
-| 409 | `DEPARTMENT_NAME_EXISTS` | Duplicate name | Set field error on name: "Department name already exists" |
-| 409 | `DEPARTMENT_HAS_EMPLOYEES` | Delete with employees | Toast "Cannot delete department with assigned employees. Set to Inactive instead." |
+| HTTP | Code                       | When                   | UI Response                                                                        |
+| ---- | -------------------------- | ---------------------- | ---------------------------------------------------------------------------------- |
+| 400  | `VALIDATION_ERROR`         | Invalid input          | Show field-level errors                                                            |
+| 401  | `UNAUTHORIZED`             | Missing/invalid token  | Redirect to `/login`, clear auth state                                             |
+| 403  | `FORBIDDEN`                | Not ADMIN role         | Toast "You don't have permission for this action"                                  |
+| 404  | `DEPARTMENT_NOT_FOUND`     | ID doesn't exist       | Show 404 page or Toast "Department not found"                                      |
+| 404  | `EMPLOYEE_NOT_FOUND`       | Head doctor ID invalid | Set field error on headDoctorId: "Selected doctor not found"                       |
+| 409  | `DEPARTMENT_NAME_EXISTS`   | Duplicate name         | Set field error on name: "Department name already exists"                          |
+| 409  | `DEPARTMENT_HAS_EMPLOYEES` | Delete with employees  | Toast "Cannot delete department with assigned employees. Set to Inactive instead." |
 
 #### 6.2.2 Employee Error Codes
 
-| HTTP | Code | When | UI Response |
-|------|------|------|-------------|
-| 400 | `VALIDATION_ERROR` | Invalid input | Show field-level errors |
-| 401 | `UNAUTHORIZED` | Missing/invalid token | Redirect to `/login` |
-| 403 | `FORBIDDEN` | Not ADMIN role | Toast "You don't have permission for this action" |
-| 404 | `EMPLOYEE_NOT_FOUND` | ID doesn't exist | Show 404 page or Toast "Employee not found" |
-| 404 | `ACCOUNT_NOT_FOUND` | Account ID invalid | Set field error on accountId: "Account not found" |
-| 404 | `DEPARTMENT_NOT_FOUND` | Department ID invalid | Set field error on departmentId: "Department not found" |
-| 409 | `LICENSE_NUMBER_EXISTS` | Duplicate license | Set field error on licenseNumber: "License number already in use" |
-| 409 | `HAS_FUTURE_APPOINTMENTS` | Delete with appointments | Toast "Cannot delete employee with X scheduled future appointments" |
+| HTTP | Code                      | When                     | UI Response                                                         |
+| ---- | ------------------------- | ------------------------ | ------------------------------------------------------------------- |
+| 400  | `VALIDATION_ERROR`        | Invalid input            | Show field-level errors                                             |
+| 401  | `UNAUTHORIZED`            | Missing/invalid token    | Redirect to `/login`                                                |
+| 403  | `FORBIDDEN`               | Not ADMIN role           | Toast "You don't have permission for this action"                   |
+| 404  | `EMPLOYEE_NOT_FOUND`      | ID doesn't exist         | Show 404 page or Toast "Employee not found"                         |
+| 404  | `ACCOUNT_NOT_FOUND`       | Account ID invalid       | Set field error on accountId: "Account not found"                   |
+| 404  | `DEPARTMENT_NOT_FOUND`    | Department ID invalid    | Set field error on departmentId: "Department not found"             |
+| 409  | `LICENSE_NUMBER_EXISTS`   | Duplicate license        | Set field error on licenseNumber: "License number already in use"   |
+| 409  | `HAS_FUTURE_APPOINTMENTS` | Delete with appointments | Toast "Cannot delete employee with X scheduled future appointments" |
 
 #### 6.2.3 Schedule Error Codes
 
-| HTTP | Code | When | UI Response |
-|------|------|------|-------------|
-| 400 | `VALIDATION_ERROR` | Invalid input | Show field/modal errors |
-| 401 | `UNAUTHORIZED` | Missing/invalid token | Redirect to `/login` |
-| 403 | `FORBIDDEN` | Not ADMIN role | Toast "You don't have permission for this action" |
-| 404 | `SCHEDULE_NOT_FOUND` | ID doesn't exist | Toast "Schedule not found", close modal |
-| 404 | `EMPLOYEE_NOT_FOUND` | Employee ID invalid | Set field error on employeeId: "Employee not found" |
-| 404 | `DEPARTMENT_NOT_FOUND` | Filter dept invalid | Toast "Department not found" |
-| 409 | `SCHEDULE_EXISTS` | Duplicate date | Set field error: "Employee already has a schedule for this date" |
-| 409 | `HAS_APPOINTMENTS` | Modify/delete with bookings | Toast "Cannot modify schedule with booked appointments" |
+| HTTP | Code                   | When                        | UI Response                                                      |
+| ---- | ---------------------- | --------------------------- | ---------------------------------------------------------------- |
+| 400  | `VALIDATION_ERROR`     | Invalid input               | Show field/modal errors                                          |
+| 401  | `UNAUTHORIZED`         | Missing/invalid token       | Redirect to `/login`                                             |
+| 403  | `FORBIDDEN`            | Not ADMIN role              | Toast "You don't have permission for this action"                |
+| 404  | `SCHEDULE_NOT_FOUND`   | ID doesn't exist            | Toast "Schedule not found", close modal                          |
+| 404  | `EMPLOYEE_NOT_FOUND`   | Employee ID invalid         | Set field error on employeeId: "Employee not found"              |
+| 404  | `DEPARTMENT_NOT_FOUND` | Filter dept invalid         | Toast "Department not found"                                     |
+| 409  | `SCHEDULE_EXISTS`      | Duplicate date              | Set field error: "Employee already has a schedule for this date" |
+| 409  | `HAS_APPOINTMENTS`     | Modify/delete with bookings | Toast "Cannot modify schedule with booked appointments"          |
 
 ### 6.3 Validation Error Details (from API Contract)
 
 #### Department Validation Errors
+
 ```typescript
 const departmentValidationErrors = {
-  'name': [
-    'name is required',
-    'name exceeds maximum length (255 characters)'
-  ],
-  'status': [
-    'status must be one of [ACTIVE, INACTIVE]'
-  ]
+  name: ["name is required", "name exceeds maximum length (255 characters)"],
+  status: ["status must be one of [ACTIVE, INACTIVE]"],
 };
 ```
 
 #### Employee Validation Errors
+
 ```typescript
 const employeeValidationErrors = {
-  'fullName': [
-    'fullName is required',
-    'fullName exceeds maximum length (255 characters)'
+  fullName: [
+    "fullName is required",
+    "fullName exceeds maximum length (255 characters)",
   ],
-  'role': [
-    'role is required',
-    'role must be one of [DOCTOR, NURSE, RECEPTIONIST, ADMIN]'
+  role: [
+    "role is required",
+    "role must be one of [DOCTOR, NURSE, RECEPTIONIST, ADMIN]",
   ],
-  'departmentId': [
-    'departmentId is required for DOCTOR and NURSE roles'
-  ],
-  'licenseNumber': [
-    'licenseNumber is required for DOCTOR and NURSE roles'
-  ],
-  'email': [
-    'email must be valid format'
-  ],
-  'phoneNumber': [
-    'phoneNumber must be valid Vietnamese format'
-  ],
-  'hiredAt': [
-    'hiredAt must be valid ISO 8601 date'
-  ],
-  'status': [
-    'status must be one of [ACTIVE, ON_LEAVE, RESIGNED]'
-  ]
+  departmentId: ["departmentId is required for DOCTOR and NURSE roles"],
+  licenseNumber: ["licenseNumber is required for DOCTOR and NURSE roles"],
+  email: ["email must be valid format"],
+  phoneNumber: ["phoneNumber must be valid Vietnamese format"],
+  hiredAt: ["hiredAt must be valid ISO 8601 date"],
+  status: ["status must be one of [ACTIVE, ON_LEAVE, RESIGNED]"],
 };
 ```
 
 #### Schedule Validation Errors
+
 ```typescript
 const scheduleValidationErrors = {
-  'employeeId': [
-    'employeeId is required'
+  employeeId: ["employeeId is required"],
+  workDate: [
+    "workDate is required",
+    "workDate must be valid ISO 8601 date (YYYY-MM-DD)",
+    "workDate cannot be in the past",
   ],
-  'workDate': [
-    'workDate is required',
-    'workDate must be valid ISO 8601 date (YYYY-MM-DD)',
-    'workDate cannot be in the past'
+  startTime: [
+    "startTime is required (format: HH:mm)",
+    "startTime must be valid format (HH:mm)",
+    "startTime must be before endTime",
   ],
-  'startTime': [
-    'startTime is required (format: HH:mm)',
-    'startTime must be valid format (HH:mm)',
-    'startTime must be before endTime'
+  endTime: [
+    "endTime is required (format: HH:mm)",
+    "endTime must be valid format (HH:mm)",
   ],
-  'endTime': [
-    'endTime is required (format: HH:mm)',
-    'endTime must be valid format (HH:mm)'
-  ],
-  'status': [
-    'status must be one of [AVAILABLE, BOOKED, CANCELLED]'
-  ],
-  'notes': [
-    'notes exceeds maximum length (1000 characters)'
-  ],
+  status: ["status must be one of [AVAILABLE, BOOKED, CANCELLED]"],
+  notes: ["notes exceeds maximum length (1000 characters)"],
   // For GET schedules
-  'startDate': [
-    'startDate is required',
-    'startDate cannot be after endDate'
-  ],
-  'endDate': [
-    'endDate is required'
-  ],
-  'page': [
-    'page must be >= 0'
-  ],
-  'size': [
-    'size must be between 1 and 100'
-  ]
+  startDate: ["startDate is required", "startDate cannot be after endDate"],
+  endDate: ["endDate is required"],
+  page: ["page must be >= 0"],
+  size: ["size must be between 1 and 100"],
 };
 ```
 
@@ -1436,27 +1448,30 @@ const scheduleValidationErrors = {
 
 ```typescript
 // Centralized error handler for HR Service
-function handleApiError(error: ApiErrorResponse, options?: {
-  setFieldErrors?: (errors: Record<string, string>) => void;
-  onNotFound?: () => void;
-}) {
+function handleApiError(
+  error: ApiErrorResponse,
+  options?: {
+    setFieldErrors?: (errors: Record<string, string>) => void;
+    onNotFound?: () => void;
+  }
+) {
   const { code, message, details } = error.error;
-  
+
   switch (code) {
     // Authentication errors
-    case 'UNAUTHORIZED':
+    case "UNAUTHORIZED":
       clearAuthState();
-      router.push('/login');
-      toast.error('Your session has expired. Please log in again.');
+      router.push("/login");
+      toast.error("Your session has expired. Please log in again.");
       break;
-      
+
     // Authorization errors
-    case 'FORBIDDEN':
+    case "FORBIDDEN":
       toast.error("You don't have permission for this action");
       break;
-      
+
     // Validation errors - show field-level
-    case 'VALIDATION_ERROR':
+    case "VALIDATION_ERROR":
       if (details && options?.setFieldErrors) {
         const fieldErrors = details.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -1464,92 +1479,100 @@ function handleApiError(error: ApiErrorResponse, options?: {
         }, {} as Record<string, string>);
         options.setFieldErrors(fieldErrors);
       } else {
-        toast.error(message || 'Validation failed');
+        toast.error(message || "Validation failed");
       }
       break;
-      
+
     // Not found errors
-    case 'DEPARTMENT_NOT_FOUND':
-    case 'EMPLOYEE_NOT_FOUND':
-    case 'SCHEDULE_NOT_FOUND':
-    case 'ACCOUNT_NOT_FOUND':
+    case "DEPARTMENT_NOT_FOUND":
+    case "EMPLOYEE_NOT_FOUND":
+    case "SCHEDULE_NOT_FOUND":
+    case "ACCOUNT_NOT_FOUND":
       if (options?.onNotFound) {
         options.onNotFound();
       } else {
         toast.error(getNotFoundMessage(code));
       }
       break;
-      
+
     // Conflict errors - specific messages
-    case 'DEPARTMENT_NAME_EXISTS':
-      options?.setFieldErrors?.({ name: 'Department name already exists' });
+    case "DEPARTMENT_NAME_EXISTS":
+      options?.setFieldErrors?.({ name: "Department name already exists" });
       break;
-      
-    case 'LICENSE_NUMBER_EXISTS':
-      options?.setFieldErrors?.({ licenseNumber: 'License number already in use' });
+
+    case "LICENSE_NUMBER_EXISTS":
+      options?.setFieldErrors?.({
+        licenseNumber: "License number already in use",
+      });
       break;
-      
-    case 'SCHEDULE_EXISTS':
-      options?.setFieldErrors?.({ workDate: 'Employee already has a schedule for this date' });
+
+    case "SCHEDULE_EXISTS":
+      options?.setFieldErrors?.({
+        workDate: "Employee already has a schedule for this date",
+      });
       break;
-      
-    case 'DEPARTMENT_HAS_EMPLOYEES':
-      toast.warning('Cannot delete department with assigned employees. Consider setting status to Inactive instead.');
+
+    case "DEPARTMENT_HAS_EMPLOYEES":
+      toast.warning(
+        "Cannot delete department with assigned employees. Consider setting status to Inactive instead."
+      );
       break;
-      
-    case 'HAS_FUTURE_APPOINTMENTS':
-      toast.warning('Cannot delete: Employee has scheduled future appointments. Cancel them first.');
+
+    case "HAS_FUTURE_APPOINTMENTS":
+      toast.warning(
+        "Cannot delete: Employee has scheduled future appointments. Cancel them first."
+      );
       break;
-      
-    case 'HAS_APPOINTMENTS':
-      toast.warning('Cannot modify schedule with booked appointments');
+
+    case "HAS_APPOINTMENTS":
+      toast.warning("Cannot modify schedule with booked appointments");
       break;
-      
+
     // Generic server error
     default:
-      toast.error(message || 'Something went wrong. Please try again later.');
-      console.error('Unhandled API error:', error);
+      toast.error(message || "Something went wrong. Please try again later.");
+      console.error("Unhandled API error:", error);
   }
 }
 
 function getNotFoundMessage(code: string): string {
   const messages: Record<string, string> = {
-    'DEPARTMENT_NOT_FOUND': 'Department not found',
-    'EMPLOYEE_NOT_FOUND': 'Employee not found',
-    'SCHEDULE_NOT_FOUND': 'Schedule not found',
-    'ACCOUNT_NOT_FOUND': 'Account not found'
+    DEPARTMENT_NOT_FOUND: "Department not found",
+    EMPLOYEE_NOT_FOUND: "Employee not found",
+    SCHEDULE_NOT_FOUND: "Schedule not found",
+    ACCOUNT_NOT_FOUND: "Account not found",
   };
-  return messages[code] || 'Resource not found';
+  return messages[code] || "Resource not found";
 }
 ```
 
 ### 6.5 HTTP Status Code Quick Reference
 
-| HTTP Code | Meaning | Default UI Action |
-|-----------|---------|-------------------|
-| 200 | Success | Process response, show success toast |
-| 201 | Created | Process response, show success toast, redirect |
-| 204 | No Content | Show success toast (for delete) |
-| 400 | Bad Request | Show validation errors from `details` |
-| 401 | Unauthorized | Redirect to login, clear auth |
-| 403 | Forbidden | Toast permission denied |
-| 404 | Not Found | Show 404 page OR toast based on context |
-| 409 | Conflict | Toast with specific conflict message |
-| 500 | Server Error | Toast "Something went wrong" + log error |
+| HTTP Code | Meaning      | Default UI Action                              |
+| --------- | ------------ | ---------------------------------------------- |
+| 200       | Success      | Process response, show success toast           |
+| 201       | Created      | Process response, show success toast, redirect |
+| 204       | No Content   | Show success toast (for delete)                |
+| 400       | Bad Request  | Show validation errors from `details`          |
+| 401       | Unauthorized | Redirect to login, clear auth                  |
+| 403       | Forbidden    | Toast permission denied                        |
+| 404       | Not Found    | Show 404 page OR toast based on context        |
+| 409       | Conflict     | Toast with specific conflict message           |
+| 500       | Server Error | Toast "Something went wrong" + log error       |
 
 ### 6.6 Edge Cases
 
-| Scenario | Handling |
-|----------|----------|
-| Form submitted while loading | Disable submit button, show spinner |
-| Navigate away with unsaved changes | Show "Unsaved changes" dialog |
-| Delete while viewing detail | Redirect to list with toast |
-| Session expires mid-form | Save form to localStorage, redirect to login, restore after |
-| API timeout (30s) | Toast "Request timed out. Please try again." + Retry button |
-| Network offline | Toast "You're offline. Check your connection." |
-| Empty search results | Show "No results found" with suggestion to clear filters |
-| Calendar with no schedules | Show empty state per day/week |
-| Concurrent edit conflict | Toast "Data was modified by another user. Refresh to see changes." |
+| Scenario                           | Handling                                                           |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| Form submitted while loading       | Disable submit button, show spinner                                |
+| Navigate away with unsaved changes | Show "Unsaved changes" dialog                                      |
+| Delete while viewing detail        | Redirect to list with toast                                        |
+| Session expires mid-form           | Save form to localStorage, redirect to login, restore after        |
+| API timeout (30s)                  | Toast "Request timed out. Please try again." + Retry button        |
+| Network offline                    | Toast "You're offline. Check your connection."                     |
+| Empty search results               | Show "No results found" with suggestion to clear filters           |
+| Calendar with no schedules         | Show empty state per day/week                                      |
+| Concurrent edit conflict           | Toast "Data was modified by another user. Refresh to see changes." |
 
 ### 6.7 Toast Messages (Aligned with Error Codes)
 
@@ -1557,40 +1580,42 @@ function getNotFoundMessage(code: string): string {
 const toastMessages = {
   // Success messages
   success: {
-    departmentCreated: 'Department created successfully',
-    departmentUpdated: 'Department updated successfully',
-    departmentDeleted: 'Department deleted successfully',
-    employeeCreated: 'Employee created successfully',
-    employeeUpdated: 'Employee updated successfully',
-    employeeDeleted: 'Employee deleted successfully',
-    scheduleCreated: 'Schedule created successfully',
-    scheduleUpdated: 'Schedule updated successfully',
-    scheduleDeleted: 'Schedule deleted successfully',
+    departmentCreated: "Department created successfully",
+    departmentUpdated: "Department updated successfully",
+    departmentDeleted: "Department deleted successfully",
+    employeeCreated: "Employee created successfully",
+    employeeUpdated: "Employee updated successfully",
+    employeeDeleted: "Employee deleted successfully",
+    scheduleCreated: "Schedule created successfully",
+    scheduleUpdated: "Schedule updated successfully",
+    scheduleDeleted: "Schedule deleted successfully",
   },
-  
+
   // Error messages (mapped from error codes)
   error: {
-    UNAUTHORIZED: 'Your session has expired. Please log in again.',
+    UNAUTHORIZED: "Your session has expired. Please log in again.",
     FORBIDDEN: "You don't have permission for this action.",
-    DEPARTMENT_NOT_FOUND: 'Department not found',
-    EMPLOYEE_NOT_FOUND: 'Employee not found',
-    SCHEDULE_NOT_FOUND: 'Schedule not found',
-    ACCOUNT_NOT_FOUND: 'Account not found',
-    VALIDATION_ERROR: 'Please check the form for errors',
-    NETWORK_ERROR: 'Network error. Please check your connection.',
-    SERVER_ERROR: 'Something went wrong. Please try again later.',
-    TIMEOUT: 'Request timed out. Please try again.',
+    DEPARTMENT_NOT_FOUND: "Department not found",
+    EMPLOYEE_NOT_FOUND: "Employee not found",
+    SCHEDULE_NOT_FOUND: "Schedule not found",
+    ACCOUNT_NOT_FOUND: "Account not found",
+    VALIDATION_ERROR: "Please check the form for errors",
+    NETWORK_ERROR: "Network error. Please check your connection.",
+    SERVER_ERROR: "Something went wrong. Please try again later.",
+    TIMEOUT: "Request timed out. Please try again.",
   },
-  
+
   // Warning messages (conflict errors)
   warning: {
-    DEPARTMENT_NAME_EXISTS: 'A department with this name already exists',
-    LICENSE_NUMBER_EXISTS: 'This license number is already in use',
-    DEPARTMENT_HAS_EMPLOYEES: 'Cannot delete department with assigned employees. Set to Inactive instead.',
-    HAS_FUTURE_APPOINTMENTS: 'Cannot delete: Employee has scheduled future appointments.',
-    SCHEDULE_EXISTS: 'Employee already has a schedule for this date',
-    HAS_APPOINTMENTS: 'Cannot modify schedule with booked appointments',
-  }
+    DEPARTMENT_NAME_EXISTS: "A department with this name already exists",
+    LICENSE_NUMBER_EXISTS: "This license number is already in use",
+    DEPARTMENT_HAS_EMPLOYEES:
+      "Cannot delete department with assigned employees. Set to Inactive instead.",
+    HAS_FUTURE_APPOINTMENTS:
+      "Cannot delete: Employee has scheduled future appointments.",
+    SCHEDULE_EXISTS: "Employee already has a schedule for this date",
+    HAS_APPOINTMENTS: "Cannot modify schedule with booked appointments",
+  },
 };
 ```
 
@@ -1606,7 +1631,7 @@ interface Department {
   description?: string;
   location?: string;
   phoneExtension?: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status: "ACTIVE" | "INACTIVE";
   headDoctorId?: string;
   headDoctor?: {
     id: string;
@@ -1621,7 +1646,7 @@ interface DepartmentRequest {
   description?: string;
   location?: string;
   phoneExtension?: string;
-  status: 'ACTIVE' | 'INACTIVE';
+  status: "ACTIVE" | "INACTIVE";
   headDoctorId?: string;
 }
 
@@ -1630,7 +1655,7 @@ interface Employee {
   id: string;
   accountId?: string;
   fullName: string;
-  role: 'DOCTOR' | 'NURSE' | 'RECEPTIONIST' | 'ADMIN';
+  role: "DOCTOR" | "NURSE" | "RECEPTIONIST" | "ADMIN";
   department?: {
     id: string;
     name: string;
@@ -1641,7 +1666,7 @@ interface Employee {
   email: string;
   phoneNumber?: string;
   address?: string;
-  status: 'ACTIVE' | 'ON_LEAVE' | 'RESIGNED';
+  status: "ACTIVE" | "ON_LEAVE" | "RESIGNED";
   hiredAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -1650,14 +1675,14 @@ interface Employee {
 interface EmployeeRequest {
   accountId?: string;
   fullName: string;
-  role: 'DOCTOR' | 'NURSE' | 'RECEPTIONIST' | 'ADMIN';
+  role: "DOCTOR" | "NURSE" | "RECEPTIONIST" | "ADMIN";
   departmentId?: string;
   specialization?: string;
   licenseNumber?: string;
   email: string;
   phoneNumber?: string;
   address?: string;
-  status: 'ACTIVE' | 'ON_LEAVE' | 'RESIGNED';
+  status: "ACTIVE" | "ON_LEAVE" | "RESIGNED";
   hiredAt?: string;
 }
 
@@ -1676,8 +1701,8 @@ interface EmployeeSchedule {
   };
   workDate: string; // "2025-12-05"
   startTime: string; // "08:00"
-  endTime: string;   // "17:00"
-  status: 'AVAILABLE' | 'BOOKED' | 'CANCELLED';
+  endTime: string; // "17:00"
+  status: "AVAILABLE" | "BOOKED" | "CANCELLED";
   notes?: string;
   createdAt: string;
   updatedAt?: string;
@@ -1688,13 +1713,13 @@ interface ScheduleRequest {
   workDate: string;
   startTime: string;
   endTime: string;
-  status: 'AVAILABLE' | 'BOOKED' | 'CANCELLED';
+  status: "AVAILABLE" | "BOOKED" | "CANCELLED";
   notes?: string;
 }
 
 // API Response wrappers
 interface ApiResponse<T> {
-  status: 'success' | 'error';
+  status: "success" | "error";
   data?: T;
   code?: string;
   message?: string;
@@ -1715,6 +1740,7 @@ interface PaginatedResponse<T> {
 ## Appendix B: Checklist for FE Implementation
 
 ### Department Management
+
 - [ ] Department list page with search, filter, pagination
 - [ ] Create department form with validation
 - [ ] Edit department form (pre-fill data)
@@ -1723,6 +1749,7 @@ interface PaginatedResponse<T> {
 - [ ] Status badge colors
 
 ### Employee Management
+
 - [ ] Employee list page with multi-filter
 - [ ] Create employee form with conditional fields
 - [ ] Edit employee form with warnings
@@ -1732,6 +1759,7 @@ interface PaginatedResponse<T> {
 - [ ] License number validation
 
 ### Schedule Management
+
 - [ ] Calendar view (week/month)
 - [ ] Schedule cards with status colors
 - [ ] Create schedule modal
@@ -1742,6 +1770,7 @@ interface PaginatedResponse<T> {
 - [ ] Date navigation
 
 ### General
+
 - [ ] Loading states (skeletons)
 - [ ] Error handling (toasts, field errors)
 - [ ] Empty states
@@ -1749,7 +1778,7 @@ interface PaginatedResponse<T> {
 - [ ] Role-based visibility
 - [ ] Mock data for development
 - [ ] React Query cache invalidation
-Beta
-0 / 0
-used queries
-1
+      Beta
+      0 / 0
+      used queries
+      1

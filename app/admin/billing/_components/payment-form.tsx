@@ -39,11 +39,17 @@ export function PaymentForm({
   isSubmitting,
   maxAmount,
 }: PaymentFormProps) {
-  const [idempotencyKey] = useState(() =>
-    typeof crypto !== "undefined" && crypto.randomUUID
-      ? crypto.randomUUID()
-      : ""
-  );
+  const [idempotencyKey] = useState(() => {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    // Fallback simple UUID v4-ish
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  });
 
   const schema = useMemo(
     () => paymentSchemaWithBalance(maxAmount ?? defaultAmount),
@@ -112,10 +118,9 @@ export function PaymentForm({
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="CASH">Cash</SelectItem>
-                  <SelectItem value="CARD">Card</SelectItem>
+                  <SelectItem value="CREDIT_CARD">Credit Card</SelectItem>
                   <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
                   <SelectItem value="INSURANCE">Insurance</SelectItem>
-                  <SelectItem value="OTHER">Other</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

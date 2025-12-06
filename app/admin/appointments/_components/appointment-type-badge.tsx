@@ -15,12 +15,12 @@ const typeConfig: Record<
   },
   FOLLOW_UP: {
     label: "Follow-up",
-    className: "bg-amber-100 text-amber-800",
+    className: "bg-cyan-100 text-cyan-800",
     icon: <RefreshCcw className="h-3 w-3" />,
   },
   EMERGENCY: {
     label: "Emergency",
-    className: "bg-rose-100 text-rose-800",
+    className: "bg-orange-100 text-orange-800",
     icon: <Siren className="h-3 w-3" />,
   },
 };

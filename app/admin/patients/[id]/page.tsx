@@ -52,12 +52,15 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PatientDetailPage() {
   const params = useParams();
   const router = useRouter();
   const patientId = params.id as string;
   const [activeTab, setActiveTab] = useState("info");
+  const { user } = useAuth();
+  const canDelete = user?.role === "ADMIN";
 
   const { data: patient, isLoading, error } = usePatient(patientId);
   const { mutate: deletePatient, isPending: isDeleting } = useDeletePatient();
@@ -210,6 +213,11 @@ export default function PatientDetailPage() {
       diagnosis: exam.diagnosis,
       doctor: exam.doctor,
     }));
+  const allergyList =
+    patient.allergies
+      ?.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean) || [];
 
   return (
     <div className="space-y-6">
@@ -228,45 +236,61 @@ export default function PatientDetailPage() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" asChild>
+            <Link href={`/admin/appointments/new?patientId=${patientId}`}>
+              <Calendar className="h-4 w-4 mr-2" />
+              Đặt lịch
+            </Link>
+          </Button>
+          {user?.role !== 'RECEPTIONIST' && (
+            <Button variant="outline" asChild>
+              <Link href={`/admin/patients/${patientId}/history`}>
+                <FileText className="h-4 w-4 mr-2" />
+                Lịch sử
+              </Link>
+            </Button>
+          )}
+          <Button variant="outline" asChild>
             <Link href={`/admin/patients/${patientId}/edit`}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </Link>
           </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Xóa
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Xóa bệnh nhân</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Bạn có chắc chắn muốn xóa <strong>{patient.fullName}</strong>?
-                  Hành động này không thể hoàn tác.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Hủy</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-destructive hover:bg-destructive/90"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Đang xóa...
-                    </>
-                  ) : (
-                    "Xóa"
-                  )}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {canDelete && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Xóa
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Xóa bệnh nhân</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Bạn có chắc chắn muốn xóa <strong>{patient.fullName}</strong>?
+                    Hành động này không thể hoàn tác.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Hủy</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive hover:bg-destructive/90"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Đang xóa...
+                      </>
+                    ) : (
+                      "Xóa"
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
 
@@ -299,7 +323,7 @@ export default function PatientDetailPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="info" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Thông tin</span>
@@ -313,27 +337,31 @@ export default function PatientDetailPage() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="exams" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            <span className="hidden sm:inline">Lịch sử khám</span>
-            {exams.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
-                {exams.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger
-            value="prescriptions"
-            className="flex items-center gap-2"
-          >
-            <Pill className="h-4 w-4" />
-            <span className="hidden sm:inline">Đơn thuốc</span>
-            {prescriptions.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
-                {prescriptions.length}
-              </Badge>
-            )}
-          </TabsTrigger>
+          {user?.role !== 'RECEPTIONIST' && (
+            <>
+              <TabsTrigger value="exams" className="flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                <span className="hidden sm:inline">Lịch sử khám</span>
+                {exams.length > 0 && (
+                  <Badge variant="secondary" className="ml-1">
+                    {exams.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger
+                value="prescriptions"
+                className="flex items-center gap-2"
+              >
+                <Pill className="h-4 w-4" />
+                <span className="hidden sm:inline">Đơn thuốc</span>
+                {prescriptions.length > 0 && (
+                  <Badge variant="secondary" className="ml-1">
+                    {prescriptions.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </>
+          )}
           <TabsTrigger value="invoices" className="flex items-center gap-2">
             <Receipt className="h-4 w-4" />
             <span className="hidden sm:inline">Hóa đơn</span>
@@ -343,6 +371,12 @@ export default function PatientDetailPage() {
               </Badge>
             )}
           </TabsTrigger>
+          {user?.role !== 'RECEPTIONIST' && (
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Lịch sử</span>
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* Tab: Thông tin cá nhân */}
@@ -413,7 +447,7 @@ export default function PatientDetailPage() {
                     <AlertTriangle className="h-3 w-3" />
                     Dị ứng
                   </p>
-                  <AllergyTags allergies={patient.allergies} />
+                  <AllergyTags allergies={allergyList} />
                 </div>
               </CardContent>
             </Card>
@@ -730,6 +764,26 @@ export default function PatientDetailPage() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tab: Lịch sử tổng hợp */}
+        <TabsContent value="history" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Lịch sử bệnh nhân
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Xem dòng thời gian cuộc hẹn, khám và hóa đơn của bệnh nhân.
+              </p>
+              <Button asChild>
+                <Link href={`/admin/patients/${patientId}/history`}>Xem lịch sử</Link>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

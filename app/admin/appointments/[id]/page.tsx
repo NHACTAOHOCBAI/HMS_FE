@@ -43,18 +43,20 @@ import {
   AppointmentTypeBadge,
   CancelAppointmentDialog,
 } from "../_components";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AppointmentDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
 
+  const { user } = useAuth();
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
 
   const { data: appointment, isLoading, error } = useAppointment(id);
-  const cancelMutation = useCancelAppointment();
-  const completeMutation = useCompleteAppointment();
+  const cancelMutation = useCancelAppointment(user?.employeeId, user?.role);
+  const completeMutation = useCompleteAppointment(user?.employeeId, user?.role);
 
   if (isLoading) {
     return (
@@ -93,9 +95,10 @@ export default function AppointmentDetailPage() {
     );
   }
 
-  const canEdit = appointment.status === "SCHEDULED";
-  const canCancel = appointment.status === "SCHEDULED";
-  const canComplete = appointment.status === "SCHEDULED";
+  const isScheduled = appointment.status === "SCHEDULED";
+  const canEdit = isScheduled && ["ADMIN", "NURSE", "RECEPTIONIST", "DOCTOR"].includes(user?.role || "");
+  const canCancel = isScheduled && ["ADMIN", "NURSE", "RECEPTIONIST", "DOCTOR", "PATIENT"].includes(user?.role || "");
+  const canComplete = isScheduled && user?.role === "DOCTOR";
 
   const formatDateTime = (dateTime: string) => {
     const date = new Date(dateTime);

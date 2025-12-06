@@ -22,13 +22,13 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   function onFulfilled(response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    return response.data;
+    // Return full response to allow accessing response.data.data
+    return response;
   },
-  function onRejected() {
+  function onRejected(error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
-    return Promise.reject();
+    // Preserve error object for error.response.data.error.code handling
+    return Promise.reject(error);
   }
 );
 

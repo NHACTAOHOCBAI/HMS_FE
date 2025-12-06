@@ -24,8 +24,8 @@ import { Category } from "@/interfaces/category"
 
 export function CategoryFilter({ categories }: { categories: Category[] }) {
     const items = categories.map((category) => ({
-        label: category.name,
-        value: category.name,
+        label: category.categoryName,
+        value: category.categoryName,
     }))
 
     const [open, setOpen] = React.useState(false)

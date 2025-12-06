@@ -18,6 +18,7 @@ export const getInvoices = async (params?: {
   status?: string;
   startDate?: string;
   endDate?: string;
+  sort?: string;
 }) => {
   return api.get("/api/billing/invoices", { params });
 };

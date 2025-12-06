@@ -43,6 +43,7 @@ export interface AppointmentCreateRequest {
   appointmentTime: string; // ISO 8601: "2025-12-05T09:00:00"
   type: AppointmentType;
   reason: string;
+  notes?: string;
 }
 
 export interface AppointmentUpdateRequest {

@@ -29,6 +29,7 @@ import { Payment, PaymentMethod } from "@/interfaces/billing";
 interface PaymentWithInvoice extends Payment {
   invoiceNumber: string;
   patientName: string;
+  invoiceId: string;
 }
 
 const formatCurrency = (amount: number) => {
@@ -43,8 +44,8 @@ const methodConfig: Record<PaymentMethod, { label: string; className: string }> 
     label: "Cash",
     className: "bg-green-100 text-green-800",
   },
-  CARD: {
-    label: "Card",
+  CREDIT_CARD: {
+    label: "Credit Card",
     className: "bg-blue-100 text-blue-800",
   },
   BANK_TRANSFER: {
@@ -54,10 +55,6 @@ const methodConfig: Record<PaymentMethod, { label: string; className: string }> 
   INSURANCE: {
     label: "Insurance",
     className: "bg-cyan-100 text-cyan-800",
-  },
-  OTHER: {
-    label: "Other",
-    className: "bg-gray-100 text-gray-800",
   },
 };
 
@@ -132,7 +129,7 @@ const paymentColumns: Column<PaymentWithInvoice>[] = [
 ];
 
 export default function PaymentHistoryPage() {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
   const [method, setMethod] = useState("ALL");
@@ -154,7 +151,7 @@ export default function PaymentHistoryPage() {
     setMethod("ALL");
     setStartDate(undefined);
     setEndDate(undefined);
-    setPage(1);
+    setPage(0);
   };
 
   const hasFilters = search || method !== "ALL" || startDate || endDate;
@@ -187,15 +184,14 @@ export default function PaymentHistoryPage() {
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Payment method" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Methods</SelectItem>
-            <SelectItem value="CASH">Cash</SelectItem>
-            <SelectItem value="CARD">Card</SelectItem>
-            <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
-            <SelectItem value="INSURANCE">Insurance</SelectItem>
-            <SelectItem value="OTHER">Other</SelectItem>
-          </SelectContent>
-        </Select>
+        <SelectContent>
+          <SelectItem value="ALL">All Methods</SelectItem>
+          <SelectItem value="CASH">Cash</SelectItem>
+          <SelectItem value="CREDIT_CARD">Credit Card</SelectItem>
+          <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
+          <SelectItem value="INSURANCE">Insurance</SelectItem>
+        </SelectContent>
+      </Select>
 
         {/* Start Date Picker */}
         <Popover>
@@ -258,7 +254,7 @@ export default function PaymentHistoryPage() {
         columns={paymentColumns}
         loading={isLoading}
         pagination={{
-          currentPage: data?.page ?? 1,
+          currentPage: (data?.page ?? 0) + 1,
           totalPages: Math.ceil((data?.total ?? 0) / limit),
           rowsPerPage: limit,
           totalItems: data?.total ?? 0,
@@ -266,7 +262,7 @@ export default function PaymentHistoryPage() {
         onPageChange={setPage}
         onRowsPerPageChange={(size) => {
           setLimit(size);
-          setPage(1);
+          setPage(0);
         }}
       />
     </div>

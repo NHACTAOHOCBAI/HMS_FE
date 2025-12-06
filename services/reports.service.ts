@@ -263,7 +263,7 @@ export const reportsService = {
       const response = await axiosInstance.get(`${BASE_URL}/revenue`, {
         params,
       });
-      return response.data.data;
+      return response.data;
     }
 
     await delay(800);
@@ -278,7 +278,7 @@ export const reportsService = {
       const response = await axiosInstance.get(`${BASE_URL}/appointments`, {
         params,
       });
-      return response.data.data;
+      return response.data;
     }
 
     await delay(600);
@@ -294,7 +294,7 @@ export const reportsService = {
         `${BASE_URL}/doctors/performance`,
         { params }
       );
-      return response.data.data;
+      return response.data;
     }
 
     await delay(700);
@@ -338,7 +338,7 @@ export const reportsService = {
         `${BASE_URL}/patients/activity`,
         { params }
       );
-      return response.data.data;
+      return response.data;
     }
 
     await delay(650);

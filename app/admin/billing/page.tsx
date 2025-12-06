@@ -42,12 +42,13 @@ const formatCurrency = (amount: number) => {
 };
 
 export default function InvoiceListPage() {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [sort, setSort] = useState("invoiceDate,desc");
   const debouncedSearch = useDebounce(search, 500);
 
   const { data, isLoading } = useInvoices(
@@ -56,7 +57,8 @@ export default function InvoiceListPage() {
     debouncedSearch,
     status,
     startDate?.toISOString(),
-    endDate?.toISOString()
+    endDate?.toISOString(),
+    sort
   );
 
   const { data: summary, isLoading: summaryLoading } = useInvoiceSummary();
@@ -66,7 +68,7 @@ export default function InvoiceListPage() {
     setStatus("ALL");
     setStartDate(undefined);
     setEndDate(undefined);
-    setPage(1);
+    setPage(0);
   };
 
   const hasFilters = search || status !== "ALL" || startDate || endDate;
@@ -178,6 +180,18 @@ export default function InvoiceListPage() {
           </SelectContent>
         </Select>
 
+        <Select value={sort} onValueChange={setSort}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="invoiceDate,desc">Date (newest)</SelectItem>
+            <SelectItem value="invoiceDate,asc">Date (oldest)</SelectItem>
+            <SelectItem value="totalAmount,desc">Total Amount (high to low)</SelectItem>
+            <SelectItem value="status,asc">Status (A-Z)</SelectItem>
+          </SelectContent>
+        </Select>
+
         {/* Start Date Picker */}
         <Popover>
           <PopoverTrigger asChild>
@@ -239,7 +253,7 @@ export default function InvoiceListPage() {
         columns={invoiceColumns}
         loading={isLoading}
         pagination={{
-          currentPage: data?.page ?? 1,
+          currentPage: (data?.page ?? 0) + 1,
           totalPages: Math.ceil((data?.total ?? 0) / limit),
           rowsPerPage: limit,
           totalItems: data?.total ?? 0,
@@ -247,7 +261,7 @@ export default function InvoiceListPage() {
         onPageChange={setPage}
         onRowsPerPageChange={(size) => {
           setLimit(size);
-          setPage(1);
+          setPage(0);
         }}
       />
     </div>

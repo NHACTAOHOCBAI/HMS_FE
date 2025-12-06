@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { format, subDays } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Download,
   Loader2,
@@ -204,7 +205,8 @@ export default function AppointmentStatsPage() {
   const [role, setRole] = useState<string>("ADMIN");
 
   useEffect(() => {
-    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    const { user } = useAuth();
+    const r = user?.role || null;
     setRole(r || "ADMIN");
   }, []);
 
@@ -370,7 +372,8 @@ export default function AppointmentStatsPage() {
               </Select>
             </div>
             <Button onClick={() => refetch()} disabled={isLoading}>
-              onClick={() => {
+              onClick=
+              {() => {
                 if (!validateRange()) return;
                 refetch();
               }}

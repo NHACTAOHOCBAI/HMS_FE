@@ -6,10 +6,9 @@ export type InvoiceStatus =
   | "CANCELLED";
 export type PaymentMethod =
   | "CASH"
-  | "CARD"
+  | "CREDIT_CARD"
   | "BANK_TRANSFER"
-  | "INSURANCE"
-  | "OTHER";
+  | "INSURANCE";
 
 export interface InvoiceItem {
   id: string;

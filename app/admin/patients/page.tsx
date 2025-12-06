@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePatients, useDeletePatient } from "@/hooks/queries/usePatient";
@@ -52,22 +52,26 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
+  ArrowUpDown,
 } from "lucide-react";
 import { format } from "date-fns";
-import {
-  Patient,
-  PatientListParams,
-  Gender,
-  BloodType,
-} from "@/interfaces/patient";
+import { Patient, PatientListParams } from "@/interfaces/patient";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ViewMode = "table" | "grid";
 
 export default function PatientsPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const canDelete = user?.role === "ADMIN";
   const [viewMode, setViewMode] = useState<ViewMode>("table");
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0); // 0-based for API
   const [pageSize, setPageSize] = useState(10);
+  const [sort, setSort] = useState<{ field: string; direction: "asc" | "desc" }>({
+    field: "fullName",
+    direction: "asc",
+  });
   const [filters, setFilters] = useState<PatientFilters>({
     search: "",
     gender: undefined,
@@ -82,6 +86,7 @@ export default function PatientsPage() {
     search: filters.search || undefined,
     gender: filters.gender,
     bloodType: filters.bloodType,
+    sort: `${sort.field},${sort.direction}`,
   };
 
   const { data, isLoading } = usePatients(params);
@@ -90,6 +95,19 @@ export default function PatientsPage() {
   const patients = data?.content ?? [];
   const totalPages = data?.totalPages ?? 1;
   const totalElements = data?.totalElements ?? 0;
+
+  const toggleSort = useCallback(
+    (field: string) => {
+      setSort((prev) => {
+        if (prev.field === field) {
+          return { field, direction: prev.direction === "asc" ? "desc" : "asc" };
+        }
+        return { field, direction: "asc" };
+      });
+      setPage(0);
+    },
+    []
+  );
 
   const handleDelete = useCallback((patient: Patient) => {
     setPatientToDelete(patient);
@@ -116,7 +134,7 @@ export default function PatientsPage() {
 
   const handleFiltersChange = useCallback((newFilters: PatientFilters) => {
     setFilters(newFilters);
-    setPage(1); // Reset to first page on filter change
+    setPage(0); // Reset to first page on filter change (0-based)
   }, []);
 
   const formatDate = (date: string | null) => {
@@ -132,6 +150,30 @@ export default function PatientsPage() {
     if (!gender) return "N/A";
     return gender.charAt(0) + gender.slice(1).toLowerCase();
   };
+
+  const renderSortIcon = (field: string) => {
+    if (sort.field !== field) return <ArrowUpDown className="h-4 w-4" />;
+    return (
+      <ArrowUpDown
+        className="h-4 w-4"
+        style={{ transform: sort.direction === "asc" ? "rotate(180deg)" : "none" }}
+      />
+    );
+  };
+
+  const tableSkeleton = useMemo(
+    () =>
+      Array.from({ length: 8 }).map((_, i) => (
+        <TableRow key={i}>
+          {Array.from({ length: 7 }).map((__, j) => (
+            <TableCell key={j}>
+              <Skeleton className="h-4 w-full" />
+            </TableCell>
+          ))}
+        </TableRow>
+      )),
+    []
+  );
 
   return (
     <div className="space-y-6">
@@ -158,11 +200,25 @@ export default function PatientsPage() {
       <Card>
         <CardHeader className="pb-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <PatientFiltersBar
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-            />
+            <PatientFiltersBar filters={filters} onFiltersChange={handleFiltersChange} />
             <div className="flex items-center gap-2">
+              <Select
+                value={`${sort.field},${sort.direction}`}
+                onValueChange={(val) => {
+                  const [field, direction] = val.split(",") as [string, "asc" | "desc"];
+                  setSort({ field, direction });
+                  setPage(0);
+                }}
+              >
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fullName,asc">Sort by Name (A-Z)</SelectItem>
+                  <SelectItem value="createdAt,desc">Sort by Created (newest)</SelectItem>
+                  <SelectItem value="dateOfBirth,asc">Sort by DOB (oldest)</SelectItem>
+                </SelectContent>
+              </Select>
               <Button
                 variant={viewMode === "table" ? "default" : "outline"}
                 size="icon"
@@ -183,8 +239,19 @@ export default function PatientsPage() {
 
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <div className="border-t">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {["Patient", "Email", "Phone", "Gender", "DOB", "Blood", "Insurance", ""].map(
+                      (h) => (
+                        <TableHead key={h}>{h}</TableHead>
+                      )
+                    )}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>{tableSkeleton}</TableBody>
+              </Table>
             </div>
           ) : patients.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -211,7 +278,7 @@ export default function PatientsPage() {
                 <PatientCard
                   key={patient.id}
                   patient={patient}
-                  onDelete={() => handleDelete(patient)}
+                  onDelete={canDelete ? () => handleDelete(patient) : undefined}
                   isDeleting={isDeleting && deleteId === patient.id}
                 />
               ))}
@@ -222,83 +289,108 @@ export default function PatientsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Patient</TableHead>
+                    <TableHead
+                      className="cursor-pointer"
+                      onClick={() => toggleSort("fullName")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Patient
+                        {renderSortIcon("fullName")}
+                      </div>
+                    </TableHead>
+                    <TableHead>Email</TableHead>
                     <TableHead>Phone</TableHead>
                     <TableHead>Gender</TableHead>
-                    <TableHead>Date of Birth</TableHead>
+                    <TableHead
+                      className="cursor-pointer"
+                      onClick={() => toggleSort("dateOfBirth")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Date of Birth
+                        {renderSortIcon("dateOfBirth")}
+                      </div>
+                    </TableHead>
                     <TableHead>Blood Type</TableHead>
+                    <TableHead>Insurance #</TableHead>
                     <TableHead className="w-[70px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {patients.map((patient) => (
-                    <TableRow
-                      key={patient.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleViewPatient(patient)}
-                    >
-                      <TableCell>
-                        <span className="font-medium">{patient.fullName}</span>
-                        {patient.email && (
-                          <p className="text-sm text-muted-foreground">
-                            {patient.email}
-                          </p>
-                        )}
-                      </TableCell>
-                      <TableCell>{patient.phoneNumber}</TableCell>
-                      <TableCell>
-                        {patient.gender && (
-                          <Badge variant="secondary">
-                            {getGenderLabel(patient.gender)}
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDate(patient.dateOfBirth)}
-                      </TableCell>
-                      <TableCell>
-                        {patient.bloodType && (
-                          <Badge
-                            variant="destructive"
-                            className="bg-red-100 text-red-700"
-                          >
-                            {patient.bloodType}
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleViewPatient(patient)}
-                            >
-                              <Eye className="h-4 w-4 mr-2" />
-                              View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/admin/patients/${patient.id}/edit`}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => handleDelete(patient)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {isLoading
+                    ? tableSkeleton
+                    : patients.map((patient) => (
+                        <TableRow
+                          key={patient.id}
+                          className="cursor-pointer hover:bg-muted/50"
+                          onClick={() => handleViewPatient(patient)}
+                        >
+                          <TableCell>
+                            <span className="font-medium">{patient.fullName}</span>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {patient.email || "N/A"}
+                          </TableCell>
+                          <TableCell>{patient.phoneNumber}</TableCell>
+                          <TableCell>
+                            {patient.gender && (
+                              <Badge variant="secondary">
+                                {getGenderLabel(patient.gender)}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {formatDate(patient.dateOfBirth)}
+                          </TableCell>
+                          <TableCell>
+                            {patient.bloodType && (
+                              <Badge
+                                variant="destructive"
+                                className="bg-red-100 text-red-700"
+                              >
+                                {patient.bloodType}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {patient.healthInsuranceNumber || "N/A"}
+                          </TableCell>
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => handleViewPatient(patient)}
+                                >
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/admin/patients/${patient.id}/edit`}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </Link>
+                                </DropdownMenuItem>
+                                {canDelete && (
+                                  <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      className="text-destructive focus:text-destructive"
+                                      onClick={() => handleDelete(patient)}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                 </TableBody>
               </Table>
             </div>
@@ -312,10 +404,10 @@ export default function PatientsPage() {
           <CardContent className="flex flex-wrap items-center justify-between gap-4 py-4">
             <p className="text-sm text-muted-foreground">
               Showing{" "}
-              <span className="font-medium">{(page - 1) * pageSize + 1}</span>{" "}
+              <span className="font-medium">{page * pageSize + 1}</span>{" "}
               to{" "}
               <span className="font-medium">
-                {Math.min(page * pageSize, totalElements)}
+                {Math.min((page + 1) * pageSize, totalElements)}
               </span>{" "}
               of <span className="font-medium">{totalElements}</span> patients
             </p>
@@ -329,7 +421,7 @@ export default function PatientsPage() {
                   value={String(pageSize)}
                   onValueChange={(value) => {
                     setPageSize(Number(value));
-                    setPage(1);
+                    setPage(0);
                   }}
                 >
                   <SelectTrigger className="h-9 w-20">
@@ -349,18 +441,18 @@ export default function PatientsPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  disabled={page === 1}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="px-3 text-sm">
-                  Page {page} of {totalPages}
+                  Page {page + 1} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="icon"
-                  disabled={page >= totalPages}
+                  disabled={page >= totalPages - 1}
                   onClick={() => setPage((p) => p + 1)}
                 >
                   <ChevronRight className="h-4 w-4" />

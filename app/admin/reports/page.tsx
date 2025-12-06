@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { format, startOfMonth, subDays } from "date-fns";
 import {
   DollarSign,
@@ -127,7 +128,8 @@ export default function ReportsDashboardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    const r = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+    const { user } = useAuth();
+    const r = user?.role || null;
     setRole(r || "ADMIN");
   }, []);
 

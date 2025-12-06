@@ -215,3 +215,59 @@ html {
     @apply rounded-xl border bg-card shadow-sm;
   }
 }
+
+@layer components {
+  /* Landing specific helpers */
+  .landing-hero-bg {
+    @apply relative isolate overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800;
+  }
+
+  .landing-cta {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .landing-cta:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .landing-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .landing-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@layer components {
+  /* Simple fade-in animations for landing */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out both;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out both;
+  }
+}

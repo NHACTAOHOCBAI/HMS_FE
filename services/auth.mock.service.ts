@@ -6,31 +6,70 @@ export type SignUpRequest = {
   password: string;
 };
 
-// Mock user database
-const MOCK_USERS = [
+// Mock user database - Test accounts for each role
+export const MOCK_USERS = [
   {
     username: "admin",
     email: "admin@hms.com",
-    password: "password",
+    password: "admin123",
     role: "ADMIN",
+    fullName: "Admin User",
+    employeeId: "emp-admin-001",
     accessToken: "mock-access-token-admin",
     refreshToken: "mock-refresh-token-admin",
   },
   {
     username: "doctor",
     email: "doctor@hms.com",
-    password: "password",
+    password: "doctor123",
     role: "DOCTOR",
+    fullName: "Dr. John Smith",
+    employeeId: "emp-101",
+    department: "Cardiology",
     accessToken: "mock-access-token-doctor",
     refreshToken: "mock-refresh-token-doctor",
   },
   {
+    username: "nurse",
+    email: "nurse@hms.com",
+    password: "nurse123",
+    role: "NURSE",
+    fullName: "Nurse Mary Johnson",
+    employeeId: "emp-nurse-001",
+    department: "General Ward",
+    accessToken: "mock-access-token-nurse",
+    refreshToken: "mock-refresh-token-nurse",
+  },
+  {
+    username: "receptionist",
+    email: "receptionist@hms.com",
+    password: "receptionist123",
+    role: "RECEPTIONIST",
+    fullName: "Sarah Williams",
+    employeeId: "emp-receptionist-001",
+    accessToken: "mock-access-token-receptionist",
+    refreshToken: "mock-refresh-token-receptionist",
+  },
+  {
     username: "patient",
     email: "patient@hms.com",
-    password: "password",
+    password: "patient123",
     role: "PATIENT",
+    fullName: "Patient Nguyen Van An",
+    patientId: "p001",
     accessToken: "mock-access-token-patient",
     refreshToken: "mock-refresh-token-patient",
+  },
+  {
+    username: "newdoctor",
+    email: "newdoctor@hms.com",
+    password: "password123",
+    role: "DOCTOR",
+    fullName: "Dr. New Test",
+    employeeId: "emp-new-doctor-001",
+    department: "General",
+    accessToken: "mock-access-token-newdoctor",
+    refreshToken: "mock-refresh-token-newdoctor",
   },
 ];
 
@@ -56,6 +95,8 @@ export const mockAuthService = {
       refreshToken: user.refreshToken,
       email: user.email,
       role: user.role,
+      employeeId: user.employeeId,
+      patientId: user.patientId,
     };
   },
 
@@ -112,12 +153,14 @@ export const mockAuthService = {
       email: credentials.email,
       password: credentials.password,
       role: "PATIENT", // Default role for new users
+      fullName: credentials.username,
+      patientId: `p-${Date.now()}`,
       accessToken: `mock-access-token-${credentials.username}`,
       refreshToken: `mock-refresh-token-${credentials.username}`,
     };
 
     // Add to mock database
-    MOCK_USERS.push(newUser);
+    MOCK_USERS.push(newUser as any);
 
     // Return successful signup response
     return {
@@ -128,6 +171,3 @@ export const mockAuthService = {
     };
   },
 };
-
-// Export mock users for testing purposes
-export { MOCK_USERS };

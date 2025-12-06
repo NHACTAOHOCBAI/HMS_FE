@@ -10,22 +10,22 @@ const statusConfig: Record<
 > = {
   SCHEDULED: {
     label: "Scheduled",
-    className: "bg-primary/10 text-primary hover:bg-primary/15",
+    className: "bg-blue-100 text-blue-800 border-blue-200",
     icon: <STATUS_ICONS.appointments.waiting className="h-3 w-3" />,
   },
   COMPLETED: {
     label: "Completed",
-    className: "bg-primary/10 text-primary hover:bg-primary/15",
+    className: "bg-green-100 text-green-800 border-green-200",
     icon: <STATUS_ICONS.appointments.completed className="h-3 w-3" />,
   },
   CANCELLED: {
     label: "Cancelled",
-    className: "bg-destructive/10 text-destructive hover:bg-destructive/15",
+    className: "bg-red-100 text-red-800 border-red-200",
     icon: <STATUS_ICONS.appointments.cancelled className="h-3 w-3" />,
   },
   NO_SHOW: {
     label: "No Show",
-    className: "bg-secondary text-foreground hover:bg-secondary/80",
+    className: "bg-gray-100 text-gray-800 border-gray-200",
     icon: <STATUS_ICONS.appointments.noShow className="h-3 w-3" />,
   },
 };
@@ -40,7 +40,7 @@ export function AppointmentStatusBadge({
   const config = statusConfig[status];
 
   return (
-    <Badge variant="secondary" className={`gap-1 ${config.className}`}>
+    <Badge variant="outline" className={`gap-1 ${config.className}`}>
       {config.icon}
       {config.label}
     </Badge>

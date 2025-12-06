@@ -63,7 +63,7 @@ export const usePatientAppointments = (patientId?: string) => {
     queryFn: () =>
       appointmentService.list({
         patientId,
-        page: 1,
+        page: 0, // 0-based pagination per spec
         size: 20,
         sort: "appointmentTime,desc",
       }),
@@ -78,7 +78,7 @@ export const useDoctorAppointments = (doctorId?: string) => {
     queryFn: () =>
       appointmentService.list({
         doctorId,
-        page: 1,
+        page: 0, // 0-based pagination per spec
         size: 20,
         sort: "appointmentTime,asc",
       }),
@@ -155,7 +155,10 @@ export const useUpdateAppointment = () => {
 };
 
 // Cancel appointment
-export const useCancelAppointment = () => {
+export const useCancelAppointment = (
+  currentUserId?: string,
+  currentUserRole?: string
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -165,7 +168,7 @@ export const useCancelAppointment = () => {
     }: {
       id: string;
       data: AppointmentCancelRequest;
-    }) => appointmentService.cancel(id, data),
+    }) => appointmentService.cancel(id, data, currentUserId, currentUserRole),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() });
       queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(id) });
@@ -180,11 +183,15 @@ export const useCancelAppointment = () => {
 };
 
 // Complete appointment
-export const useCompleteAppointment = () => {
+export const useCompleteAppointment = (
+  currentUserId?: string,
+  currentUserRole?: string
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => appointmentService.complete(id),
+    mutationFn: (id: string) =>
+      appointmentService.complete(id, currentUserId, currentUserRole),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() });
       queryClient.invalidateQueries({ queryKey: appointmentKeys.detail(id) });

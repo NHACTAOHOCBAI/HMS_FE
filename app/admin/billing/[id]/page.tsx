@@ -20,11 +20,13 @@ import { ItemTypeBadge } from "../_components/item-type-badge";
 import { CancelInvoiceDialog } from "../_components/cancel-invoice-dialog";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function InvoiceDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const { user } = useAuth();
   const { data: invoice, isLoading } = useInvoice(id);
   const { mutateAsync: cancelInvoice, isPending: isCancelling } =
     useCancelInvoice();
@@ -100,7 +102,7 @@ export default function InvoiceDetailPage() {
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>
-          {invoice.status === "UNPAID" && invoice.payments.length === 0 && (
+          {user?.role === "ADMIN" && invoice.status === "UNPAID" && invoice.payments.length === 0 && (
             <Button
               variant="outline"
               className="text-destructive hover:text-destructive"

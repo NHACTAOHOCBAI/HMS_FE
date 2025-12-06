@@ -66,6 +66,10 @@ const appointmentFormSchema = z.object({
     .string()
     .min(1, "Please enter reason for visit")
     .max(500, "Reason cannot exceed 500 characters"),
+  notes: z
+    .string()
+    .max(1000, "Notes cannot exceed 1000 characters")
+    .optional(),
 });
 
 type FormValues = z.infer<typeof appointmentFormSchema>;
@@ -97,6 +101,7 @@ export default function NewAppointmentPage() {
       appointmentTime: "",
       type: "CONSULTATION",
       reason: "",
+      notes: "",
     },
   });
 
@@ -182,6 +187,7 @@ export default function NewAppointmentPage() {
         appointmentTime,
         type: data.type,
         reason: data.reason,
+        notes: data.notes,
       },
       {
         onSuccess: () => {
@@ -526,6 +532,29 @@ export default function NewAppointmentPage() {
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <FormMessage />
                       <span>{field.value?.length || 0}/500</span>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              {/* Notes */}
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes (Staff only)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Additional notes about the appointment..."
+                        className="min-h-[100px] resize-none"
+                        maxLength={1000}
+                        {...field}
+                      />
+                    </FormControl>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <FormMessage />
+                      <span>{field.value?.length || 0}/1000</span>
                     </div>
                   </FormItem>
                 )}

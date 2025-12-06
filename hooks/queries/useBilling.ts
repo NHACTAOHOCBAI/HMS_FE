@@ -15,12 +15,13 @@ export const useInvoices = (
   search?: string,
   status?: string,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
+  sort?: string
 ) => {
   return useQuery({
-    queryKey: ["invoices", page, limit, search, status, startDate, endDate],
+    queryKey: ["invoices", page, limit, search, status, startDate, endDate, sort],
     queryFn: () =>
-      getInvoices({ page, limit, search, status, startDate, endDate }),
+      getInvoices({ page, limit, search, status, startDate, endDate, sort }),
   });
 };
 
@@ -62,6 +63,17 @@ export const useCreatePayment = () => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       queryClient.invalidateQueries({ queryKey: ["invoiceSummary"] });
       queryClient.invalidateQueries({ queryKey: ["payments"] });
+    },
+    onError: (error: any) => {
+      const code = error?.response?.data?.error?.code;
+      const msg =
+        {
+          DUPLICATE_PAYMENT: "Payment already processed",
+          INVOICE_ALREADY_PAID: "Invoice is already fully paid",
+          INVOICE_CANCELLED: "Cannot pay a cancelled invoice",
+          VALIDATION_ERROR: "Please check payment details",
+        }[code] || "Failed to record payment";
+      import("sonner").then(({ toast }) => toast.error(msg));
     },
   });
 };

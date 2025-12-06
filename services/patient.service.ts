@@ -296,7 +296,7 @@ export const getPatients = async (
   }
 
   const response = await api.get("/patients", { params });
-  return response.data.data;
+  return response.data;
 };
 
 // GET /api/patients/:id - Get patient by ID
@@ -316,7 +316,7 @@ export const getPatient = async (id: string): Promise<Patient> => {
   }
 
   const response = await api.get(`/patients/${id}`);
-  return response.data.data;
+  return response.data;
 };
 
 // GET /api/patients/me - Get current user's patient profile
@@ -328,7 +328,7 @@ export const getMyProfile = async (): Promise<Patient> => {
   }
 
   const response = await api.get("/patients/me");
-  return response.data.data;
+  return response.data;
 };
 
 // POST /api/patients - Create new patient
@@ -391,7 +391,7 @@ export const createPatient = async (
   }
 
   const response = await api.post("/patients", data);
-  return response.data.data;
+  return response.data;
 };
 
 // PUT /api/patients/:id - Update patient
@@ -442,7 +442,7 @@ export const updatePatient = async (
   }
 
   const response = await api.put(`/patients/${id}`, data);
-  return response.data.data;
+  return response.data;
 };
 
 // PUT /api/patients/me - Update own profile (patient self-service)
@@ -463,7 +463,7 @@ export const updateMyProfile = async (
   }
 
   const response = await api.put("/patients/me", data);
-  return response.data.data;
+  return response.data;
 };
 
 // DELETE /api/patients/:id - Soft delete patient
@@ -516,7 +516,7 @@ export const deletePatient = async (
   }
 
   const response = await api.delete(`/patients/${id}`);
-  return response.data.data;
+  return response.data;
 };
 
 // Utility functions for form transformations

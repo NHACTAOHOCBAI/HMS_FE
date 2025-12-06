@@ -14,9 +14,10 @@ import {
 interface MyDatePickerProps {
   value?: Date;
   onChange?: (date: Date | undefined) => void;
+  disabled?: (date: Date) => boolean;
 }
 
-const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
+const MyDatePicker = ({ value, onChange, disabled }: MyDatePickerProps) => {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -41,6 +42,7 @@ const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
               onChange?.(date);
               setOpen(false);
             }}
+            disabled={disabled}
           />
         </PopoverContent>
       </Popover>
