@@ -6,11 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTableParams } from '@/hooks/useTableParams'
 import { useCategory } from '@/hooks/queries/useCategory'
 import { Category } from '@/interfaces/category'
-import { useState } from 'react'
+import { use, useState } from 'react'
 
 import { useMedicalExams } from '@/hooks/queries/useMedicalExam'
 import { MedicalExamsColumns } from './columns'
 import { ReusableTable } from '../../_components/MyTable'
+import { AddMedicalExamDialog } from '../add-medical-exam/AddMedicalExamDialog'
+import { UpdateMedicalExamDialog } from '../update-medical-exam/UpdateMedicalExamDialog'
 
 const MedicalExamsPage = () => {
     const {
@@ -25,14 +27,16 @@ const MedicalExamsPage = () => {
     const { data, isLoading } = useMedicalExams(params);
     // console.log("Category data:", data);
     const handleOpenDelete = (id: string) => {
-        console.log("Deleting category with id:", id);
+
     };
     const handleOpenUpdate = (id: string) => {
-        console.log("Updating category with id:", id);
+        setUpdateMedicalExamId(id);
+        setOpenUpdate(true);
     };
     const [openNew, setOpenNew] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
-    const [updatedCategory, setUpdatedCategory] = useState<| null>(null);
+    const [updatedMedicalExamId, setUpdateMedicalExamId] = useState<string | null>(null);
+
     return (
         <>
             {/* LABEL */}
@@ -80,15 +84,12 @@ const MedicalExamsPage = () => {
                             />
                         </CardContent>
                     </Card>
-                    {/* <UpdateCategoryDialog
+                    <AddMedicalExamDialog open={openNew} setOpen={setOpenNew} />
+                    <UpdateMedicalExamDialog
                         open={openUpdate}
                         setOpen={setOpenUpdate}
-                        category={updatedCategory}
+                        medicalExamId={updatedMedicalExamId}
                     />
-                    <AddCategoryDialog
-                        open={openNew}
-                        setOpen={setOpenNew}
-                    /> */}
                 </>
             </div>
         </>

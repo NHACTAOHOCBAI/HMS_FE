@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,13 +8,22 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit3 } from "lucide-react";
 import { MedicalExam } from "@/interfaces/medicalExam";
+import { Prescription } from "@/interfaces/prescription";
+import PrescriptionDetailCard from "./PrescriptionCard";
+import { AddPrescriptionDialog } from "./AddPrescription";
 
 interface Props {
     exam: MedicalExam;
+    prescription?: Prescription
     onBack?: () => void;
 }
 
-export function ExamDetailCard({ exam, onBack }: Props) {
+export function ExamDetailCard({ exam, prescription, onBack }: Props) {
+
+    const [open, setOpen] = useState(false);
+
+
+
     return (
         <div className="max-w-4xl mx-auto mt-8 space-y-6">
             <div className="flex items-center justify-between">
@@ -128,6 +137,39 @@ export function ExamDetailCard({ exam, onBack }: Props) {
                     </div>
                 </CardContent>
             </Card>
+
+            {!prescription ? (
+                <PrescriptionDetailCard prescription={prescription} />
+            ) : (<>
+                <Card className="shadow-sm border rounded-2xl">
+                    <CardHeader>
+                        <CardTitle className="text-xl font-semibold">Prescription</CardTitle>
+                    </CardHeader>
+
+                    <Separator />
+
+                    <CardContent className="py-8">
+                        <p className="text-center text-muted-foreground mb-4">
+                            No prescription available for this exam.
+                        </p>
+
+                        <div className="flex justify-center">
+                            <Button className="flex items-center gap-2" variant="default"
+                                // mở modal thêm đơn thuốc
+                                onClick={() => {
+                                    setOpen(true);
+                                }}
+                            >
+                                <Edit3 size={16} />
+                                Add Prescription
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+                <AddPrescriptionDialog open={open} setOpen={setOpen} /></>
+            )}
+
+
         </div>
     );
 }

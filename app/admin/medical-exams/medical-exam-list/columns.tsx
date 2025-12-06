@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { FormItem } from "@/components/ui/form";
-import { Category } from "@/interfaces/category";
 import { ExamListItem } from "@/interfaces/medicalExam";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -53,16 +51,16 @@ export const MedicalExamsColumns = (
                                 />
                                 View
                             </DropdownMenuItem>
-
-                            <DropdownMenuItem onClick={() => handleOpenUpdate(item.id)}>
-                                <Pencil className="w-4 h-4 mr-2" />
-                                Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleOpenDelete(item.id)}>
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete
-                            </DropdownMenuItem>
                         </Link>
+
+                        <DropdownMenuItem onClick={() => handleOpenUpdate(item.id)}>
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenDelete(item.id)}>
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),

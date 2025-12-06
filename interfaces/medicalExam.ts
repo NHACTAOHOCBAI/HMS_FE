@@ -53,3 +53,28 @@ export interface ExamListItem {
     diagnosis: string;
     examDate: string; // ISO date string
 }
+export interface CreateMedicalExamDto {
+    appointmentId: string;
+    diagnosis: string;
+    symptoms: string;
+    treatment: string;
+    temperature: number;
+    bloodPressureSystolic: number;
+    bloodPressureDiastolic: number;
+    heartRate: number;
+    weight: number;
+    height: number;
+    notes?: string;
+}
+export type UpdateMedicalExamDto = {
+    diagnosis: string;
+    symptoms: string;
+    treatment: string;
+    temperature: number;
+    bloodPressureSystolic: number;
+    bloodPressureDiastolic: number;
+    heartRate: number;
+    weight: number;
+    height: number;
+    notes?: string;
+};

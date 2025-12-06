@@ -116,3 +116,16 @@ export const getMedicalExamById = async (id: string) => {
         }
     };
 }
+//createMedicalExam
+export const createMedicalExam = async (data: any) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+    console.log("Creating medical exam with data:", data);
+    return { ...data, id: "newly-created-id" };
+}
+//updateMedicalExam
+
+export const updateMedicalExam = async (id: string, data: any) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+    console.log("Updating medical exam with ID:", id, "and data:", data);
+    return { ...data, id };
+}
