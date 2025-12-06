@@ -27,7 +27,7 @@ const items = [
   },
   {
     title: "Medicines",
-    url: "admin/medicines/medicine-list",
+    url: "admin/medicines",
     icon: <Pill />,
   },
 ];
@@ -76,11 +76,10 @@ export default function AdminLayout({
                       <Link
                         key={item.title}
                         href={`/${item.url}`}
-                        className={`h-[50px] flex gap-[13px] items-center rounded-xl  hover:bg-[#F0F4F9] px-[7px] ${
-                          isActive
+                        className={`h-[50px] flex gap-[13px] items-center rounded-xl  hover:bg-[#F0F4F9] px-[7px] ${isActive
                             ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
                             : "bg-white"
-                        }`}
+                          }`}
                       >
                         {item.icon}
                         {item.title}
