@@ -120,3 +120,9 @@ export const updateMedicine = async (id: string, data: any): Promise<MedicineDet
   console.log("Updating medicine with ID:", id, "and data:", data);
   return { ...data, id };
 }
+///createMedicine
+export const createMedicine = async (data: any): Promise<MedicineDetail> => {
+  await new Promise((r) => setTimeout(r, 500)); // simulate latency
+  console.log("Creating medicine with data:", data);
+  return { ...data, id: "newly-created-id" };
+}

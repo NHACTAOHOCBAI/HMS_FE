@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Medicine } from "@/services/medicine.service";
+import { Medicine } from "@/interfaces/medicine";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 export const medicineListColumns = (

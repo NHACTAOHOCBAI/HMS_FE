@@ -33,8 +33,8 @@ import {
 } from "@/components/ui/select";
 import { Category } from "@/interfaces/category";
 import { useCategory, useUpdateCategory } from "@/hooks/queries/useCategory";
-import { Medicine } from "@/services/medicine.service";
 import { useMedicine, useMedicineById, useUpdateMedicine } from "@/hooks/queries/useMedicine";
+import { Medicine } from "@/interfaces/medicine";
 
 interface Props {
     open: boolean;

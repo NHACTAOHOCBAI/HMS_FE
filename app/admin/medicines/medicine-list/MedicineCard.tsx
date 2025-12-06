@@ -7,10 +7,11 @@ import { ReusableTable } from '../../_components/MyTable'
 import { useMedicine } from '@/hooks/queries/useMedicine'
 import { useTableParams } from '@/hooks/useTableParams'
 import { medicineListColumns } from './columns'
-import { Medicine } from '@/services/medicine.service'
 import { useCategory } from '@/hooks/queries/useCategory'
 import UpdateMedicineDialog from '../update-medicine/UpdateMedicineDialog'
 import { useState } from 'react'
+import { Medicine } from '@/interfaces/medicine'
+import { AddMedicineDialog } from '../add-medicine/AddMedicineDialog'
 
 const MedicineCard = () => {
     const {
@@ -35,6 +36,7 @@ const MedicineCard = () => {
         setUpdatedMedicine(medicine);
         setOpenUpdate(true);
     };
+    const [openNew, setOpenNew] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [updatedMedicine, setUpdatedMedicine] = useState<Medicine | null>(null);
     return (
@@ -65,7 +67,7 @@ const MedicineCard = () => {
 
                         <Button
                             className="ml-auto"
-                        // onClick={() => setOpenNew(true)}
+                            onClick={() => setOpenNew(true)}
                         >
                             Thêm Thuốc
                         </Button>
@@ -96,7 +98,13 @@ const MedicineCard = () => {
                 open={openUpdate}
                 setOpen={setOpenUpdate}
                 medicine={updatedMedicine}
-            /></>
+            />
+            <AddMedicineDialog
+                open={openNew}
+                setOpen={setOpenNew}
+            />
+
+        </>
 
     )
 }
