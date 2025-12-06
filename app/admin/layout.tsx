@@ -15,20 +15,25 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FileText, Pill } from "lucide-react";
+import { FileText, Paperclip, Pill } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 const items = [
   {
-    title: "Patients",
+    title: "Bệnh nhân",
     url: "admin/patients/patient-list",
     icon: <FileText />,
   },
   {
-    title: "Medicines",
+    title: "Thuốc",
     url: "admin/medicines",
     icon: <Pill />,
+  },
+  {
+    title: "khám bệnh",
+    url: "admin/medical-exams/medical-exam-list",
+    icon: < FileText />,
   },
 ];
 export default function AdminLayout({
@@ -77,8 +82,8 @@ export default function AdminLayout({
                         key={item.title}
                         href={`/${item.url}`}
                         className={`h-[50px] flex gap-[13px] items-center rounded-xl  hover:bg-[#F0F4F9] px-[7px] ${isActive
-                            ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
-                            : "bg-white"
+                          ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
+                          : "bg-white"
                           }`}
                       >
                         {item.icon}
