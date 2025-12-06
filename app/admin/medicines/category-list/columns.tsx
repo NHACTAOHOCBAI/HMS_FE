@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Category } from "@/interfaces/category";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export const categoryListColumns = (
     handleOpenDelete: (id: string) => void,
     handleOpenUpdate: (category: Category) => void
 ) => [
-
+        { key: "id", label: "ID", sortable: true },
         {
             key: "name",
             label: "Category Name",
@@ -30,20 +31,23 @@ export const categoryListColumns = (
 
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        {/* navigate khi click */}
+                        <Link href={`/admin/medicines/category-detail/${category.id}`}>
+                            <DropdownMenuItem>
+                                <Eye className="w-4 h-4 mr-2"
+                                />
+                                View
+                            </DropdownMenuItem>
 
-                        <DropdownMenuItem>
-                            <Eye className="w-4 h-4 mr-2" />
-                            View
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem onClick={() => handleOpenUpdate(category)}>
-                            <Pencil className="w-4 h-4 mr-2" />
-                            Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenDelete(category.id)}>
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
-                        </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleOpenUpdate(category)}>
+                                <Pencil className="w-4 h-4 mr-2" />
+                                Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleOpenDelete(category.id)}>
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                            </DropdownMenuItem>
+                        </Link>
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),

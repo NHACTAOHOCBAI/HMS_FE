@@ -1,8 +1,9 @@
 export interface Category {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     createdAt: string;
+    updatedAt?: string;
 }
 
 export interface CategoryResponse {

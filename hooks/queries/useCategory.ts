@@ -1,5 +1,5 @@
-import { createCategory, getCategories, updateCategory } from "@/services/category.service";
-import { keepPreviousData, QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createCategory, getCategories, getCategoryById, updateCategory } from "@/services/category.service";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TableParams } from "../useTableParams";
 export const useCategory = (params: TableParams) => {
     return useQuery({
@@ -32,3 +32,10 @@ export const useCreateCategory = () => {
         },
     });
 };
+//useCategoryById
+export const useCategoryById = ({ id }: { id: string }) => {
+    return useQuery({
+        queryKey: ["category", id],
+        queryFn: () => getCategoryById(id),
+    });
+}

@@ -98,3 +98,14 @@ export const createCategory = async (data: any) => {
     console.log("Creating category with data:", data);
     return data;
 };
+//getCategoryById
+export const getCategoryById = async (id: string) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+    console.log("Fetching category with ID:", id);
+    const category = mockCategories.find((cat) => cat.id === id);
+    if (!category) {
+        throw new Error(`Category with ID ${id} not found`);
+    }
+    return category;
+
+};
