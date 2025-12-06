@@ -10,6 +10,7 @@ import { categoryListColumns } from './columns'
 import { Category } from '@/interfaces/category'
 import { useState } from 'react'
 import UpdateCategoryDialog from '../update-category/UpdateCategoryDialog'
+import { AddCategoryDialog } from '../add-category/AddCategoryDialog'
 
 const CategoryCard = () => {
     const {
@@ -30,6 +31,7 @@ const CategoryCard = () => {
         setUpdatedCategory(category);
         setOpenUpdate(true);
     };
+    const [openNew, setOpenNew] = useState(false);
     const [openUpdate, setOpenUpdate] = useState(false);
     const [updatedCategory, setUpdatedCategory] = useState<Category | null>(null);
     return (<>
@@ -44,7 +46,7 @@ const CategoryCard = () => {
 
                     <Button
                         className="ml-auto"
-                    // onClick={() => setOpenNew(true)}
+                        onClick={() => setOpenNew(true)}
                     >
                         Thêm Loại Thuốc
                     </Button>
@@ -74,6 +76,10 @@ const CategoryCard = () => {
             open={openUpdate}
             setOpen={setOpenUpdate}
             category={updatedCategory}
+        />
+        <AddCategoryDialog
+            open={openNew}
+            setOpen={setOpenNew}
         />
     </>
 

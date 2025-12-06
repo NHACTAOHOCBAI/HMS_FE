@@ -40,7 +40,6 @@ const AddMedicineSchema = z.object({
     unit: z.string().min(1, "Đơn vị không được để trống"),
     concentration: z.string().min(1, "Nồng độ không được để trống"),
     packaging: z.string().min(1, "Đóng gói không được để trống"),
-
     quantity: z.number().min(0, "Số lượng phải lớn hơn hoặc bằng 0"),
     purchasePrice: z.number().min(0, "Giá nhập phải lớn hơn hoặc bằng 0"),
     sellingPrice: z.number().min(0, "Giá bán phải lớn hơn hoặc bằng 0"),
@@ -69,6 +68,22 @@ export function AddMedicineDialog({ open, setOpen }: Props) {
 
     const form = useForm<z.infer<typeof AddMedicineSchema>>({
         resolver: zodResolver(AddMedicineSchema),
+        defaultValues: {
+            name: "",
+            activeIngredient: "",
+            unit: "",
+            concentration: "",
+            packaging: "",
+            quantity: 0,
+            purchasePrice: 0,
+            sellingPrice: 0,
+            expiresAt: "",
+            manufacturer: "",
+            categoryId: "",
+            description: "",
+            sideEffects: "",
+            storageConditions: "",
+        },
     });
 
     const onSubmit = (values: z.infer<typeof AddMedicineSchema>) => {

@@ -92,3 +92,9 @@ export const updateCategory = async (id: string, data: any) => {
     console.log("Updating category with ID:", id, "and data:", data);
     return data;
 };
+//createCategory
+export const createCategory = async (data: any) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+    console.log("Creating category with data:", data);
+    return data;
+};
