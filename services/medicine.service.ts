@@ -1,36 +1,7 @@
 import { TableParams } from "@/hooks/useTableParams";
+import { Medicine, MedicineDetail, MedicineResponse } from "@/interfaces/medicine";
 
-export interface Category {
-  id: string;
-  name: string;
-}
 
-export interface Medicine {
-  id: string;
-  name: string;
-  activeIngredient: string;
-  unit: string;
-  concentration: string;
-  packaging: string;
-  quantity: number;
-  purchasePrice: number;
-  sellingPrice: number;
-  expiresAt: string;
-  manufacturer: string;
-  category: Category;
-  createdAt: string;
-}
-
-export interface MedicineResponse {
-  status: string;
-  data: {
-    content: Medicine[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-  };
-}
 
 export const mockMedicines: Medicine[] = [
   {
@@ -112,3 +83,40 @@ export const getMedicines = async (params: TableParams): Promise<MedicineRespons
     },
   };
 };
+
+//getMedicineById
+export const getMedicineById = async (id: string): Promise<MedicineDetail> => {
+  await new Promise((r) => setTimeout(r, 300)); // simulate latency for 300ms
+
+  console.log("Fetching medicine by ID:", id);
+
+  return {
+    "id": "med001",
+    "name": "Amoxicillin 500mg Updated",
+    "activeIngredient": "Amoxicillin",
+    "unit": "capsule",
+    "description": "Antibiotic for bacterial infections - updated",
+    "concentration": "500mg",
+    "packaging": "Box of 30 capsules",
+    "quantity": 1000,
+    "purchasePrice": 5500,
+    "sellingPrice": 8500,
+    "expiresAt": "2027-06-30",
+    "manufacturer": "GSK",
+    "sideEffects": "Nausea, diarrhea, allergic reactions",
+    "storageConditions": "Store below 25°C, keep dry",
+    "category": {
+      "id": "cat001",
+      "name": "Antibiotics",
+      "description": "Medications that fight bacterial infections"
+    },
+    "createdAt": "2025-12-02T10:30:00Z",
+    "updatedAt": "2025-12-02T11:00:00Z"
+  };
+};
+//updateMedicine
+export const updateMedicine = async (id: string, data: any): Promise<MedicineDetail> => {
+  await new Promise((r) => setTimeout(r, 500)); // simulate latency
+  console.log("Updating medicine with ID:", id, "and data:", data);
+  return { ...data, id };
+}

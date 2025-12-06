@@ -86,3 +86,9 @@ export const getCategories = async (params: TableParams) => {
         },
     };
 };
+//updateCategory
+export const updateCategory = async (id: string, data: any) => {
+    await new Promise((r) => setTimeout(r, 500)); // simulate latency
+    console.log("Updating category with ID:", id, "and data:", data);
+    return data;
+};

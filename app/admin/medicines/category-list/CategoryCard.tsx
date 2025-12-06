@@ -8,6 +8,8 @@ import { useTableParams } from '@/hooks/useTableParams'
 import { useCategory } from '@/hooks/queries/useCategory'
 import { categoryListColumns } from './columns'
 import { Category } from '@/interfaces/category'
+import { useState } from 'react'
+import UpdateCategoryDialog from '../update-category/UpdateCategoryDialog'
 
 const CategoryCard = () => {
     const {
@@ -25,8 +27,11 @@ const CategoryCard = () => {
         console.log("Deleting category with id:", id);
     };
     const handleOpenUpdate = (category: Category) => {
-        console.log("Updating category:", category);
+        setUpdatedCategory(category);
+        setOpenUpdate(true);
     };
+    const [openUpdate, setOpenUpdate] = useState(false);
+    const [updatedCategory, setUpdatedCategory] = useState<Category | null>(null);
     return (<>
         <Card>
             <CardHeader>
@@ -65,11 +70,11 @@ const CategoryCard = () => {
                 />
             </CardContent>
         </Card>
-        {/* <UpdateCategoryDialog
+        <UpdateCategoryDialog
             open={openUpdate}
             setOpen={setOpenUpdate}
             category={updatedCategory}
-        /> */}
+        />
     </>
 
     )
