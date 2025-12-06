@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PatientItem } from "@/interfaces/patient";
 import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 // 🟦 Columns
 export const userColumns = (
   handleOpenDelete: (id: string) => void,
@@ -36,10 +37,12 @@ export const userColumns = (
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-          <DropdownMenuItem>
-            <Eye className="w-4 h-4 mr-2" />
-            View
-          </DropdownMenuItem>
+          <Link href={`/admin/patients/detail-patient/${row.id}`}>
+            <DropdownMenuItem>
+              <Eye className="w-4 h-4 mr-2" />
+              View
+            </DropdownMenuItem>
+          </Link>
 
           <DropdownMenuItem onClick={() => handleOpenUpdate(row.id)}>
             <Pencil className="w-4 h-4 mr-2" />

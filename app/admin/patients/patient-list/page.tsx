@@ -86,17 +86,6 @@ const UserTablePage = () => {
             </SelectContent>
           </Select>
 
-          <Select onValueChange={(v) => updateFilter("status", v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="new">New</SelectItem>
-              <SelectItem value="waiting">Waiting</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-            </SelectContent>
-          </Select>
-
           <Button onClick={() => setOpenNew(true)} className="ml-auto">
             New Patient
           </Button>

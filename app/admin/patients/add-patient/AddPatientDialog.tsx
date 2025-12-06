@@ -37,6 +37,7 @@ interface Props {
 const AddPatientSchema = z.object({
   fullName: z
     .string("Full name is required")
+    .min(1, "adsadsads")
     .max(255, "Full name must be at most 255 characters"),
 
   dateOfBirth: z
