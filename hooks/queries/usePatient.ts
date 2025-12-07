@@ -1,18 +1,55 @@
-import { createPatient, getPatients } from "@/services/patient.service";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-const usePatient = (page: number, limit: number) => {
+import { TableParams } from "@/hooks/useTableParams";
+import {
+  createPatient,
+  deletePatient,
+  getPatientById,
+  getPatients,
+  updatePatient,
+} from "@/services/patient.service";
+import {
+  useQuery,
+  keepPreviousData,
+  useQueryClient,
+  useMutation,
+} from "@tanstack/react-query";
+export const usePatient = (params: TableParams) => {
   return useQuery({
-    queryKey: ["mock-users", page, limit],
-    queryFn: () => getPatients({ page, limit }),
+    queryKey: ["patients", params],
+    queryFn: () => getPatients(params),
+    placeholderData: keepPreviousData,
   });
 };
-const useCreatePatient = () => {
+export const usePatientById = (id: string) => {
+  return useQuery({
+    queryKey: ["patient by id", id],
+    queryFn: () => getPatientById(id),
+    placeholderData: keepPreviousData,
+  });
+};
+export const useCreatePatient = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createPatient,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["mock-users"] });
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
     },
   });
 };
-export { usePatient, useCreatePatient };
+export const useUpdatePatient = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updatePatient,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
+    },
+  });
+};
+export const useDeletePatient = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deletePatient,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patients"] });
+    },
+  });
+};

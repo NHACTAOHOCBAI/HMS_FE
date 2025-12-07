@@ -1,15 +1,26 @@
-export type Patient = {
-  id: number;
-  avatar: string | null; // Đường dẫn/URL avatar, null nếu không có
+export interface Patient {
+  id: string;
   fullName: string;
-  dateOfBirth: string; // Có thể dùng Date object hoặc string
-  gender: "Male" | "Female";
-  status: PatientStatus;
-};
-export type PatientStatus =
-  | "New"
-  | "Waiting"
-  | "In Visit"
-  | "Completed"
-  | "Active"
-  | "Inactive";
+  email: string;
+  dateOfBirth: string;
+  gender: "MALE" | "FEMALE" | "OTHER";
+  phoneNumber: string;
+  address: string;
+  identificationNumber: string;
+  bloodType: string;
+  allergies: string;
+  relativeFullName: string;
+  relativePhoneNumber: string;
+  relativeRelationship: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  deletedBy: string | null;
+}
+export interface PatientItem {
+  id: string;
+  fullName: string;
+  gender: "MALE" | "FEMALE" | "OTHER";
+  phoneNumber: string;
+  bloodType: string;
+}

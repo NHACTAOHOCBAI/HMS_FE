@@ -97,11 +97,7 @@ function FormLabel({
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn(
-        "data-[error=true]:text-destructive",
-        className,
-        "font-medium"
-      )}
+      className={cn("data-[error=true]:text-destructive", className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -159,7 +155,13 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
     </p>
   );
 }
-
+function RequiredLabel({ children }: { children: string }) {
+  return (
+    <span>
+      {children} <span className="text-red-500">*</span>
+    </span>
+  );
+}
 export {
   useFormField,
   Form,
@@ -169,4 +171,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  RequiredLabel,
 };

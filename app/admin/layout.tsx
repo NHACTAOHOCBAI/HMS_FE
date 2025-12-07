@@ -14,24 +14,52 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FileText, Pill } from "lucide-react";
+import {
+  CalendarDays,
+  FileText,
+  Paperclip,
+  Pill,
+  Users,
+  Calendar,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+
 const items = [
   {
-    title: "Patients",
+    title: "Bệnh nhân",
     url: "admin/patients/patient-list",
     icon: <FileText />,
   },
   {
-    title: "Medicines",
-    url: "admin/medicines/medicine-list",
+    title: "Thuốc",
+    url: "admin/medicines",
     icon: <Pill />,
   },
+  {
+    title: "Nhân sự",
+    url: "admin/employees",
+    icon: <Users />,
+  },
+  {
+    title: "Lịch làm việc",
+    url: "admin/work-schedules",
+    icon: <Calendar />,
+  },
+  {
+    title: "Khám bệnh",
+    url: "admin/medical-exams/medical-exam-list",
+    icon: <FileText />,
+  },
+  {
+    title: "Appointments",
+    url: "admin/appointments/appointment-list",
+    icon: <CalendarDays />,
+  },
 ];
+
 export default function AdminLayout({
   children,
 }: {
@@ -61,6 +89,7 @@ export default function AdminLayout({
 
   const breadcrumbs = generateBreadcrumbs(pathname);
   const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
@@ -72,12 +101,12 @@ export default function AdminLayout({
                 <SidebarMenu>
                   {items.map((item) => {
                     const isActive =
-                      names[2].toUpperCase() === item.title.toUpperCase();
+                      names[2]?.toUpperCase() === item.title.toUpperCase();
                     return (
                       <Link
                         key={item.title}
                         href={`/${item.url}`}
-                        className={`h-[50px] flex gap-[13px] items-center rounded-xl  hover:bg-[#F0F4F9] px-[7px] ${
+                        className={`h-[50px] flex gap-[13px] items-center rounded-xl hover:bg-[#F0F4F9] px-[7px] ${
                           isActive
                             ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
                             : "bg-white"
@@ -115,7 +144,6 @@ export default function AdminLayout({
           </div>
           <div className="p-[50px]">{children}</div>
         </main>
-        <Toaster />
       </SidebarProvider>
     </QueryClientProvider>
   );

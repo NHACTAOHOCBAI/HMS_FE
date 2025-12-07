@@ -1,64 +1,58 @@
-import { Medicine } from "@/interfaces/medicine";
-import { Column } from "../../_components/MyTable";
-import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Medicine } from "@/interfaces/medicine";
+import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
-export const medicineColumns: Column<Medicine>[] = [
-  { key: "id", label: "Id" },
-  { key: "name", label: "Name" },
-  { key: "purchasePrice", label: "Purchase Price" },
-  { key: "sellingPrice", label: "Selling Price" },
-  { key: "expiresAt", label: "Expires At" },
-  { key: "unit", label: "Unit" },
-  { key: "quantity", label: "Quantity" },
-  {
-    key: "action",
-    label: "Actions",
-    render: (medicine) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+export const medicineListColumns = (
+    handleOpenDelete: (id: string) => void,
+    handleOpenUpdate: (medicine: Medicine) => void
+) => [
+        { key: "id", label: "ID", sortable: true },
+        { key: "name", label: "Name", sortable: true },
+        { key: "activeIngredient", label: "Active Ingredient" },
+        { key: "unit", label: "Unit" },
+        { key: "concentration", label: "Concentration" },
+        { key: "packaging", label: "Packaging" },
+        { key: "quantity", label: "Quantity" },
+        { key: "purchasePrice", label: "Purchase Price" },
+        { key: "sellingPrice", label: "Selling Price" },
+        { key: "expiresAt", label: "Expires At" },
+        { key: "manufacturer", label: "Manufacturer" },
+        {
+            key: "category",
+            label: "Category",
+            render: (medicine: Medicine) => medicine.category?.name || "-"
+        },
+        { key: "createdAt", label: "Created At" },
+        {
+            key: "action",
+            label: "Actions",
+            render: (medicine: Medicine) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
 
-          {/* 👁 View */}
-          <Link href={`/admin/medicines/${medicine.id}`}>
-            <DropdownMenuItem>
-              <Eye className=" w-4 h-4 mr-2" />
-              View
-            </DropdownMenuItem>
-          </Link>
-
-          {/* ✏ Edit */}
-          <Link href={`/admin/medicines/${medicine.id}/update-medicine`}>
-            <DropdownMenuItem onClick={() => console.log("Edit", medicine.id)}>
-              <Pencil className="w-4 h-4 mr-2" />
-              Edit
-            </DropdownMenuItem>
-          </Link>
-          {/* 🗑 Delete */}
-          <DropdownMenuItem
-            className="text-red-600 focus:text-red-600"
-            onClick={() => console.log("Delete", medicine.id)}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-];
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <Link href={`/admin/medicines/medicine-detail/${medicine.id}`}>
+                            <DropdownMenuItem>
+                                <Eye className="w-4 h-4 mr-2" />
+                                View
+                            </DropdownMenuItem>
+                        </Link>
+                        <DropdownMenuItem onClick={() => handleOpenUpdate(medicine)}>
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenDelete(medicine.id)}>
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ),
+        },];
