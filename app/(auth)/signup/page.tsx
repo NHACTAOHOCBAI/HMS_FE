@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { mockAuthService } from "@/services/auth.mock.service";
+import { authService } from "@/services/auth.service";
+import { AuthError } from "@/services/auth.service";
 import {
   Card,
   CardContent,
@@ -19,14 +20,25 @@ import {
 } from "@/components/ui/card";
 import z from "zod";
 
+// Password regex: 8+ chars, uppercase, lowercase, number, special char
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 export const signupSchema = z
   .object({
-    username: z.string().min(1, "Username is required"),
-    email: z.email({ message: "Invalid email address" }),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    // Username field commented out - API only requires email and password
+    // username: z.string().min(1, "Username is required"),
+    email: z.string().email({ message: "Invalid email address" }),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        passwordRegex,
+        "Password must contain uppercase, lowercase, number, and special character"
+      ),
     confirmPassword: z
       .string()
-      .min(6, "Confirm Password must be at least 6 characters"),
+      .min(8, "Confirm Password must be at least 8 characters"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -38,7 +50,7 @@ export type SignUpCredentials = z.infer<typeof signupSchema>;
 const SignUpPage = () => {
   const router = useRouter();
   const [credentials, setCredentials] = useState<SignUpCredentials>({
-    username: "",
+    // username: "", // Commented out - not used in current API
     email: "",
     password: "",
     confirmPassword: "",
@@ -58,32 +70,50 @@ const SignUpPage = () => {
       return;
     }
 
-    if (credentials.password.length < 6) {
-      setErrorMessage("Password must be at least 6 characters");
+    // Password strength validation
+    if (!passwordRegex.test(credentials.password)) {
+      setErrorMessage(
+        "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
+      );
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await mockAuthService.signup({
-        username: credentials.username,
+      // signup method in mock service does register + auto-login
+      const response = await authService.signup({
         email: credentials.email,
         password: credentials.password,
       });
 
-      // Store tokens in localStorage
+      // Store tokens in localStorage (returned from auto-login)
       localStorage.setItem("accessToken", response.accessToken);
       localStorage.setItem("refreshToken", response.refreshToken);
-      localStorage.setItem("userEmail", response.email);
-      localStorage.setItem("userRole", response.role);
+      localStorage.setItem("userEmail", response.user.email);
+      localStorage.setItem("userRole", response.user.role);
+      localStorage.setItem("userId", response.user.id);
 
       // Redirect to admin dashboard after successful signup
       router.push("/admin");
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
+      if (error instanceof AuthError) {
+        switch (error.code) {
+          case "EMAIL_ALREADY_EXISTS":
+            setErrorMessage(
+              "This email is already registered. Please login instead."
+            );
+            break;
+          case "VALIDATION_ERROR":
+            setErrorMessage(
+              error.details?.[0]?.message ||
+                "Invalid input. Please check your credentials."
+            );
+            break;
+          default:
+            setErrorMessage("Failed to create account. Please try again.");
+        }
       } else {
-        setErrorMessage("Failed to create account. Please try again.");
+        setErrorMessage("An unexpected error occurred. Please try again.");
       }
       console.error("Signup error:", error);
     } finally {
@@ -142,8 +172,8 @@ const SignUpPage = () => {
                 </div>
               )}
 
-              {/* Username Field */}
-              <div className="space-y-2">
+              {/* Username Field - Commented out, may be needed later */}
+              {/* <div className="space-y-2">
                 <Label
                   htmlFor="username"
                   className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
@@ -167,7 +197,7 @@ const SignUpPage = () => {
                   placeholder="Enter your username"
                   disabled={isLoading}
                 />
-              </div>
+              </div> */}
 
               {/* Email Field */}
               <div className="space-y-2">

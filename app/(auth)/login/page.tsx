@@ -4,13 +4,13 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Hotel } from "lucide-react";
 import { Input } from "@/components/ui/input";
-// import { authService } from "@/services/auth.service";
-import { mockAuthService as authService } from "@/services/auth.mock.service";
+import { authService } from "@/services/auth.service";
+import { AuthError } from "@/services/auth.service";
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  email: z.email({ message: "Invalid email address" }),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export type LoginCredentials = z.infer<typeof loginSchema>;
@@ -35,13 +35,30 @@ const LoginPage = () => {
       // Store tokens in localStorage
       localStorage.setItem("accessToken", response.accessToken);
       localStorage.setItem("refreshToken", response.refreshToken);
-      localStorage.setItem("userEmail", response.email);
-      localStorage.setItem("userRole", response.role);
+      localStorage.setItem("userEmail", response.user.email);
+      localStorage.setItem("userRole", response.user.role);
+      localStorage.setItem("userId", response.user.id);
 
       // Redirect to admin dashboard
       router.push("/admin");
     } catch (error) {
-      setErrorMessage("Invalid email or password. Please try again.");
+      if (error instanceof AuthError) {
+        switch (error.code) {
+          case "INVALID_CREDENTIALS":
+            setErrorMessage("Wrong email or password. Please try again.");
+            break;
+          case "VALIDATION_ERROR":
+            setErrorMessage(
+              error.details?.[0]?.message ||
+                "Invalid input. Please check your credentials."
+            );
+            break;
+          default:
+            setErrorMessage("Login failed. Please try again.");
+        }
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again.");
+      }
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
