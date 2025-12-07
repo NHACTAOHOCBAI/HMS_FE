@@ -69,7 +69,7 @@ const ResetPasswordPage = () => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Redirect to login with success message
-      router.push("/password-reset/new-password/success");
+      router.push("/login?reset=success");
     } catch (error) {
       setErrorMessage("Failed to reset password. Please try again.");
       console.error("Password reset error:", error);
