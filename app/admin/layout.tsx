@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FileText, Pill } from "lucide-react";
+import { CalendarDays, FileText, Pill } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -29,6 +29,11 @@ const items = [
     title: "Medicines",
     url: "admin/medicines/medicine-list",
     icon: <Pill />,
+  },
+  {
+    title: "Appointments",
+    url: "admin/appointments/appointment-list",
+    icon: <CalendarDays />,
   },
 ];
 export default function AdminLayout({
