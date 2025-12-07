@@ -1,68 +1,87 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Hotel } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { authService } from "@/services/auth.service";
 import { AuthError } from "@/services/auth.service";
 import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useLogin } from "@/hooks/queries/useAuth";
 
 export const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters"),
 });
 
 export type LoginCredentials = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
   const router = useRouter();
-  const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: "",
-    password: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrorMessage("");
-    setIsLoading(true);
-    try {
-      const response = await authService.login(credentials);
+  const { mutate: login, isPending } = useLogin();
 
-      // Store tokens in localStorage
-      localStorage.setItem("accessToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
-      localStorage.setItem("userEmail", response.user.email);
-      localStorage.setItem("userRole", response.user.role);
-      localStorage.setItem("userId", response.user.id);
+  const form = useForm<LoginCredentials>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-      // Redirect to admin dashboard
-      router.push("/admin");
-    } catch (error) {
-      if (error instanceof AuthError) {
-        switch (error.code) {
-          case "INVALID_CREDENTIALS":
-            setErrorMessage("Wrong email or password. Please try again.");
-            break;
-          case "VALIDATION_ERROR":
-            setErrorMessage(
-              error.details?.[0]?.message ||
-                "Invalid input. Please check your credentials."
-            );
-            break;
-          default:
-            setErrorMessage("Login failed. Please try again.");
+  const onSubmit = (data: LoginCredentials) => {
+    login(data, {
+      onSuccess: (response) => {
+        // Store tokens in localStorage
+        localStorage.setItem("accessToken", response.accessToken);
+        localStorage.setItem("refreshToken", response.refreshToken);
+        localStorage.setItem("userEmail", response.user.email);
+        localStorage.setItem("userRole", response.user.role);
+        localStorage.setItem("userId", response.user.id);
+
+        toast.success("Login successful! Redirecting...");
+
+        // Redirect to admin dashboard
+        router.push("/admin");
+      },
+      onError: (error) => {
+        if (error instanceof AuthError) {
+          switch (error.code) {
+            case "INVALID_CREDENTIALS":
+              toast.error("Wrong email or password. Please try again.");
+              break;
+            case "VALIDATION_ERROR":
+              toast.error(
+                error.details?.[0]?.message ||
+                  "Invalid input. Please check your credentials."
+              );
+              break;
+            default:
+              toast.error("Login failed. Please try again.");
+          }
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
         }
-      } else {
-        setErrorMessage("An unexpected error occurred. Please try again.");
-      }
-      console.error("Login error:", error);
-    } finally {
-      setIsLoading(false);
-    }
+        console.error("Login error:", error);
+      },
+    });
   };
 
   return (
@@ -102,92 +121,83 @@ const LoginPage = () => {
 
           {/* Card Content - Form */}
           <div className="px-6 py-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Error Message */}
-              {errorMessage && (
-                <div className="bg-error-100 border border-error-600 text-error-600 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
-                  <span className="shrink-0 mt-0.5">⚠️</span>
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
-              {/* email Field */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
-                >
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={credentials.email}
-                  onChange={(e) =>
-                    setCredentials({
-                      ...credentials,
-                      email: e.target.value,
-                    })
-                  }
-                  className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
-                  placeholder="Enter your email"
-                  disabled={isLoading}
-                />
-              </div>
-
-              {/* Password Field */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
-                    required
-                    value={credentials.password}
-                    onChange={(e) =>
-                      setCredentials({
-                        ...credentials,
-                        password: e.target.value,
-                      })
-                    }
-                    className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
-                    placeholder="Enter your password"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    disabled={isLoading}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full h-9 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading}
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
               >
-                {isLoading ? "Logging in..." : "Login"}
-              </button>
-            </form>
+                {/* Email Field */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]">
+                        Email
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="text"
+                          autoComplete="email"
+                          className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                          placeholder="Enter your email"
+                          disabled={isPending}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Password Field */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]">
+                        Password
+                      </FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="current-password"
+                            className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                            placeholder="Enter your password"
+                            disabled={isPending}
+                          />
+                        </FormControl>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          disabled={isPending}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
+                          )}
+                        </button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="w-full h-9 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isPending}
+                >
+                  {isPending ? "Logging in..." : "Login"}
+                </button>
+              </form>
+            </Form>
           </div>
 
           {/* Card Footer */}

@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Hospital } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { authService } from "@/services/auth.service";
 import { AuthError } from "@/services/auth.service";
 import {
   Card,
@@ -19,6 +17,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useSignup } from "@/hooks/queries/useAuth";
 
 // Password regex: 8+ chars, uppercase, lowercase, number, special char
 const passwordRegex =
@@ -28,17 +38,19 @@ export const signupSchema = z
   .object({
     // Username field commented out - API only requires email and password
     // username: z.string().min(1, "Username is required"),
-    email: z.string().email({ message: "Invalid email address" }),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email({ message: "Invalid email address" }),
     password: z
       .string()
+      .min(1, "Password is required")
       .min(8, "Password must be at least 8 characters")
       .regex(
         passwordRegex,
         "Password must contain uppercase, lowercase, number, and special character"
       ),
-    confirmPassword: z
-      .string()
-      .min(8, "Confirm Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Confirm Password is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -49,76 +61,61 @@ export type SignUpCredentials = z.infer<typeof signupSchema>;
 
 const SignUpPage = () => {
   const router = useRouter();
-  const [credentials, setCredentials] = useState<SignUpCredentials>({
-    // username: "", // Commented out - not used in current API
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrorMessage("");
+  const { mutate: signup, isPending } = useSignup();
 
-    // Validation
-    if (credentials.password !== credentials.confirmPassword) {
-      setErrorMessage("Passwords do not match");
-      return;
-    }
+  const form = useForm<SignUpCredentials>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    // Password strength validation
-    if (!passwordRegex.test(credentials.password)) {
-      setErrorMessage(
-        "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
-      );
-      return;
-    }
+  const onSubmit = (data: SignUpCredentials) => {
+    signup(
+      { email: data.email, password: data.password },
+      {
+        onSuccess: (response) => {
+          // Store tokens in localStorage (returned from auto-login)
+          localStorage.setItem("accessToken", response.accessToken);
+          localStorage.setItem("refreshToken", response.refreshToken);
+          localStorage.setItem("userEmail", response.user.email);
+          localStorage.setItem("userRole", response.user.role);
+          localStorage.setItem("userId", response.user.id);
 
-    setIsLoading(true);
-    try {
-      // signup method in mock service does register + auto-login
-      const response = await authService.signup({
-        email: credentials.email,
-        password: credentials.password,
-      });
+          toast.success("Account created successfully! Redirecting...");
 
-      // Store tokens in localStorage (returned from auto-login)
-      localStorage.setItem("accessToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
-      localStorage.setItem("userEmail", response.user.email);
-      localStorage.setItem("userRole", response.user.role);
-      localStorage.setItem("userId", response.user.id);
-
-      // Redirect to admin dashboard after successful signup
-      router.push("/admin");
-    } catch (error) {
-      if (error instanceof AuthError) {
-        switch (error.code) {
-          case "EMAIL_ALREADY_EXISTS":
-            setErrorMessage(
-              "This email is already registered. Please login instead."
-            );
-            break;
-          case "VALIDATION_ERROR":
-            setErrorMessage(
-              error.details?.[0]?.message ||
-                "Invalid input. Please check your credentials."
-            );
-            break;
-          default:
-            setErrorMessage("Failed to create account. Please try again.");
-        }
-      } else {
-        setErrorMessage("An unexpected error occurred. Please try again.");
+          // Redirect to admin dashboard after successful signup
+          router.push("/admin");
+        },
+        onError: (error) => {
+          if (error instanceof AuthError) {
+            switch (error.code) {
+              case "EMAIL_ALREADY_EXISTS":
+                toast.error(
+                  "This email is already registered. Please login instead."
+                );
+                break;
+              case "VALIDATION_ERROR":
+                toast.error(
+                  error.details?.[0]?.message ||
+                    "Invalid input. Please check your credentials."
+                );
+                break;
+              default:
+                toast.error("Failed to create account. Please try again.");
+            }
+          } else {
+            toast.error("An unexpected error occurred. Please try again.");
+          }
+          console.error("Signup error:", error);
+        },
       }
-      console.error("Signup error:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
 
   const handleGoogleSignup = () => {
@@ -163,202 +160,165 @@ const SignUpPage = () => {
 
           {/* Card Content - Form */}
           <CardContent className="px-6 py-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Error Message */}
-              {errorMessage && (
-                <div className="bg-red-50 border border-red-600 text-red-600 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
-                  <span className="shrink-0 mt-0.5">⚠️</span>
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
-              {/* Username Field - Commented out, may be needed later */}
-              {/* <div className="space-y-2">
-                <Label
-                  htmlFor="username"
-                  className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
-                >
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  autoComplete="username"
-                  required
-                  value={credentials.username}
-                  onChange={(e) =>
-                    setCredentials({
-                      ...credentials,
-                      username: e.target.value,
-                    })
-                  }
-                  className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
-                  placeholder="Enter your username"
-                  disabled={isLoading}
-                />
-              </div> */}
-
-              {/* Email Field */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="email"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                {/* Email Field */}
+                <FormField
+                  control={form.control}
                   name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={credentials.email}
-                  onChange={(e) =>
-                    setCredentials({
-                      ...credentials,
-                      email: e.target.value,
-                    })
-                  }
-                  className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
-                  placeholder="Enter your email"
-                  disabled={isLoading}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]">
+                        Email
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="text"
+                          autoComplete="email"
+                          className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                          placeholder="Enter your email"
+                          disabled={isPending}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              {/* Password Field */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="password"
-                  className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
+                {/* Password Field */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]">
+                        Password
+                      </FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="new-password"
+                            className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                            placeholder="Enter your password"
+                            disabled={isPending}
+                          />
+                        </FormControl>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          disabled={isPending}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
+                          )}
+                        </button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Confirm Password Field */}
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]">
+                        Confirm password
+                      </FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type={showConfirmPassword ? "text" : "password"}
+                            autoComplete="new-password"
+                            className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
+                            placeholder="Confirm your password"
+                            disabled={isPending}
+                          />
+                        </FormControl>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          disabled={isPending}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
+                          )}
+                        </button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="w-full h-9 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200"
+                  disabled={isPending}
                 >
-                  Password
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    required
-                    value={credentials.password}
-                    onChange={(e) =>
-                      setCredentials({
-                        ...credentials,
-                        password: e.target.value,
-                      })
-                    }
-                    className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
-                    placeholder="Enter your password"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    disabled={isLoading}
+                  {isPending ? "Creating account..." : "Sign up"}
+                </Button>
+
+                {/* Separator with OR */}
+                <div className="relative flex items-center justify-center">
+                  <Separator className="absolute bg-[rgba(0,0,0,0.1)]" />
+                  <div className="relative bg-white px-2">
+                    <span className="text-xs text-[#717182] uppercase">or</span>
+                  </div>
+                </div>
+
+                {/* Google Sign Up Button */}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGoogleSignup}
+                  className="w-full h-9 bg-white border border-[rgba(0,0,0,0.1)] hover:bg-gray-50 text-neutral-950 text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200"
+                  disabled={isPending}
+                >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password Field */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="confirmPassword"
-                  className="text-sm font-medium text-neutral-950 tracking-[-0.1504px]"
-                >
-                  Confirm password
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    required
-                    value={credentials.confirmPassword}
-                    onChange={(e) =>
-                      setCredentials({
-                        ...credentials,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    className="h-9 bg-[#f3f3f5] border-transparent rounded-lg px-3 py-1 pr-10 text-sm tracking-[-0.1504px] placeholder:text-[#717182]"
-                    placeholder="Confirm your password"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    disabled={isLoading}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-[#717182] hover:text-neutral-950" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full h-9 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200"
-                disabled={isLoading}
-              >
-                {isLoading ? "Creating account..." : "Sign up"}
-              </Button>
-
-              {/* Separator with OR */}
-              <div className="relative flex items-center justify-center">
-                <Separator className="absolute bg-[rgba(0,0,0,0.1)]" />
-                <div className="relative bg-white px-2">
-                  <span className="text-xs text-[#717182] uppercase">or</span>
-                </div>
-              </div>
-
-              {/* Google Sign Up Button */}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleSignup}
-                className="w-full h-9 bg-white border border-[rgba(0,0,0,0.1)] hover:bg-gray-50 text-neutral-950 text-sm font-medium tracking-[-0.1504px] rounded-lg transition-colors duration-200"
-                disabled={isLoading}
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19.576 10.229c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.351z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.591A9.996 9.996 0 0010 20z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M4.405 11.9c-.2-.6-.314-1.241-.314-1.9 0-.659.114-1.3.314-1.9V5.509H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.491L4.405 11.9z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.509L4.405 8.1C5.19 5.737 7.395 3.977 10 3.977z"
-                    fill="#EA4335"
-                  />
-                </svg>
-                Sign up with Google
-              </Button>
-            </form>
+                    <path
+                      d="M19.576 10.229c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 01-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.351z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.591A9.996 9.996 0 0010 20z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M4.405 11.9c-.2-.6-.314-1.241-.314-1.9 0-.659.114-1.3.314-1.9V5.509H1.064A9.996 9.996 0 000 10c0 1.614.386 3.14 1.064 4.491L4.405 11.9z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M10 3.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C14.959.99 12.695 0 10 0 6.09 0 2.71 2.24 1.064 5.509L4.405 8.1C5.19 5.737 7.395 3.977 10 3.977z"
+                      fill="#EA4335"
+                    />
+                  </svg>
+                  Sign up with Google
+                </Button>
+              </form>
+            </Form>
           </CardContent>
 
           {/* Card Footer */}
