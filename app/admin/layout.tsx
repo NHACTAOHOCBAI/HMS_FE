@@ -14,7 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import {
   CalendarDays,
   FileText,
@@ -88,63 +88,60 @@ export default function AdminLayout({
   }
 
   const breadcrumbs = generateBreadcrumbs(pathname);
-  const queryClient = new QueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SidebarProvider>
-        <Sidebar>
-          <SidebarContent>
-            <SidebarGroup>
-              <div className="h-[114px]">Logo here</div>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {items.map((item) => {
-                    const isActive =
-                      names[2]?.toUpperCase() === item.title.toUpperCase();
-                    return (
-                      <Link
-                        key={item.title}
-                        href={`/${item.url}`}
-                        className={`h-[50px] flex gap-[13px] items-center rounded-xl hover:bg-[#F0F4F9] px-[7px] ${
-                          isActive
-                            ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
-                            : "bg-white"
-                        }`}
-                      >
-                        {item.icon}
-                        {item.title}
-                      </Link>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-        <main className="flex-1">
-          <div className="w-full h-14 border-b-app-azure-100 border flex items-center gap-5">
-            <SidebarTrigger />
-            <Breadcrumb>
-              <BreadcrumbList>
-                {breadcrumbs.map((item) => (
-                  <React.Fragment key={item.href}>
-                    <BreadcrumbItem>
-                      {item.isLast ? (
-                        <p className="text-app-primary-blue-700">{item.name}</p>
-                      ) : (
-                        <p>{item.name}</p>
-                      )}
-                    </BreadcrumbItem>
-                    {!item.isLast && <BreadcrumbSeparator />}
-                  </React.Fragment>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-          <div className="p-[50px]">{children}</div>
-        </main>
-      </SidebarProvider>
-    </QueryClientProvider>
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarContent>
+          <SidebarGroup>
+            <div className="h-[114px]">Logo here</div>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => {
+                  const isActive =
+                    names[2]?.toUpperCase() === item.title.toUpperCase();
+                  return (
+                    <Link
+                      key={item.title}
+                      href={`/${item.url}`}
+                      className={`h-[50px] flex gap-[13px] items-center rounded-xl hover:bg-[#F0F4F9] px-[7px] ${
+                        isActive
+                          ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
+                          : "bg-white"
+                      }`}
+                    >
+                      {item.icon}
+                      {item.title}
+                    </Link>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+      <main className="flex-1">
+        <div className="w-full h-14 border-b-app-azure-100 border flex items-center gap-5">
+          <SidebarTrigger />
+          <Breadcrumb>
+            <BreadcrumbList>
+              {breadcrumbs.map((item) => (
+                <React.Fragment key={item.href}>
+                  <BreadcrumbItem>
+                    {item.isLast ? (
+                      <p className="text-app-primary-blue-700">{item.name}</p>
+                    ) : (
+                      <p>{item.name}</p>
+                    )}
+                  </BreadcrumbItem>
+                  {!item.isLast && <BreadcrumbSeparator />}
+                </React.Fragment>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+        <div className="p-[50px]">{children}</div>
+      </main>
+    </SidebarProvider>
   );
 }
