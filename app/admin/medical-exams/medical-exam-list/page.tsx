@@ -46,51 +46,46 @@ const MedicalExamsPage = () => {
             </div>
             {/* TAB */}
             <div className="mt-4 flex w-full flex-col gap-6">
-                {/* Content for Medical Examinations management goes here */}
-                <>
-                    <Card>
-                        <CardHeader>
-                            <div className="mb-4 flex items-center gap-4">
-                                <Input
-                                    placeholder="Tìm kiếm..."
-                                    className="h-[50px] rounded-[30px] w-[460px]"
-                                    onChange={(e) => updateSearch(e.target.value)}
-                                />
 
-                                <Button
-                                    className="ml-auto"
-                                    onClick={() => setOpenNew(true)}
-                                >
-                                    Thêm hồ sơ khám bệnh
-                                </Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <ReusableTable
-                                data={data?.data.content ?? []}
-                                columns={MedicalExamsColumns(handleOpenDelete, handleOpenUpdate)}
-                                loading={isLoading}
-                                pagination={{
-                                    currentPage: params.page,
-                                    totalPages: data?.data.totalPages ?? 1,
-                                    rowsPerPage: params.limit,
-                                    totalItems: data?.data.totalElements ?? 0,
-                                }}
-                                onPageChange={updatePage}
-                                onRowsPerPageChange={updateLimit}
-                                onSort={updateSort}
-                                sortBy={params.sortBy}
-                                sortOrder={params.sortOrder as "asc" | "desc" | undefined}
-                            />
-                        </CardContent>
-                    </Card>
-                    <AddMedicalExamDialog open={openNew} setOpen={setOpenNew} />
-                    <UpdateMedicalExamDialog
-                        open={openUpdate}
-                        setOpen={setOpenUpdate}
-                        medicalExamId={updatedMedicalExamId}
+                <div className="mb-4 flex items-center gap-4">
+                    <Input
+                        placeholder="Tìm kiếm..."
+                        className="h-[50px] rounded-[30px] w-[460px]"
+                        onChange={(e) => updateSearch(e.target.value)}
                     />
-                </>
+
+                    <Button
+                        className="ml-auto"
+                        onClick={() => setOpenNew(true)}
+                    >
+                        Thêm hồ sơ khám bệnh
+                    </Button>
+                </div>
+
+                <ReusableTable
+                    data={data?.data.content ?? []}
+                    columns={MedicalExamsColumns(handleOpenDelete, handleOpenUpdate)}
+                    loading={isLoading}
+                    pagination={{
+                        currentPage: params.page,
+                        totalPages: data?.data.totalPages ?? 1,
+                        rowsPerPage: params.limit,
+                        totalItems: data?.data.totalElements ?? 0,
+                    }}
+                    onPageChange={updatePage}
+                    onRowsPerPageChange={updateLimit}
+                    onSort={updateSort}
+                    sortBy={params.sortBy}
+                    sortOrder={params.sortOrder as "asc" | "desc" | undefined}
+                />
+
+                <AddMedicalExamDialog open={openNew} setOpen={setOpenNew} />
+                <UpdateMedicalExamDialog
+                    open={openUpdate}
+                    setOpen={setOpenUpdate}
+                    medicalExamId={updatedMedicalExamId}
+                />
+
             </div>
         </>
     )

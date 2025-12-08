@@ -35,43 +35,40 @@ const CategoryCard = () => {
     const [openUpdate, setOpenUpdate] = useState(false);
     const [updatedCategory, setUpdatedCategory] = useState<Category | null>(null);
     return (<>
-        <Card>
-            <CardHeader>
-                <div className="mb-4 flex items-center gap-4">
-                    <Input
-                        placeholder="Search category..."
-                        className="h-[50px] rounded-[30px] w-[460px]"
-                        onChange={(e) => updateSearch(e.target.value)}
-                    />
 
-                    <Button
-                        className="ml-auto"
-                        onClick={() => setOpenNew(true)}
-                    >
-                        Thêm Loại Thuốc
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                {/* Table medicine */}
-                <ReusableTable
-                    data={data?.data.content ?? []}
-                    columns={categoryListColumns(handleOpenDelete, handleOpenUpdate)}
-                    loading={isLoading}
-                    pagination={{
-                        currentPage: params.page,
-                        totalPages: data?.data.totalPages ?? 1,
-                        rowsPerPage: params.limit,
-                        totalItems: data?.data.totalElements ?? 0,
-                    }}
-                    onPageChange={updatePage}
-                    onRowsPerPageChange={updateLimit}
-                    onSort={updateSort}
-                    sortBy={params.sortBy}
-                    sortOrder={params.sortOrder as "asc" | "desc" | undefined}
-                />
-            </CardContent>
-        </Card>
+        <div className="mb-4 flex items-center gap-4">
+            <Input
+                placeholder="Search category..."
+                className="h-[50px] rounded-[30px] w-[460px]"
+                onChange={(e) => updateSearch(e.target.value)}
+            />
+
+            <Button
+                className="ml-auto"
+                onClick={() => setOpenNew(true)}
+            >
+                Thêm Loại Thuốc
+            </Button>
+        </div>
+
+        {/* Table medicine */}
+        <ReusableTable
+            data={data?.data.content ?? []}
+            columns={categoryListColumns(handleOpenDelete, handleOpenUpdate)}
+            loading={isLoading}
+            pagination={{
+                currentPage: params.page,
+                totalPages: data?.data.totalPages ?? 1,
+                rowsPerPage: params.limit,
+                totalItems: data?.data.totalElements ?? 0,
+            }}
+            onPageChange={updatePage}
+            onRowsPerPageChange={updateLimit}
+            onSort={updateSort}
+            sortBy={params.sortBy}
+            sortOrder={params.sortOrder as "asc" | "desc" | undefined}
+        />
+
         <UpdateCategoryDialog
             open={openUpdate}
             setOpen={setOpenUpdate}

@@ -1,5 +1,6 @@
 export type AppointmentStatus =
   | "SCHEDULED"
+  | "CHECKED_IN"
   | "COMPLETED"
   | "CANCELLED"
   | "NO_SHOW";
@@ -12,6 +13,9 @@ export interface Appointment {
     id: string;
     fullName: string;
     phoneNumber?: string;
+    dateOfBirth?: string;
+    bloodType?: string;
+    allergies?: string;
   };
 
   doctor: {
@@ -37,6 +41,10 @@ export interface AppointmentItem {
   patient: {
     id: string;
     fullName: string;
+    dateOfBirth?: string;
+    phoneNumber?: string;
+    bloodType?: string;
+    allergies?: string;
   };
   doctor: {
     id: string;

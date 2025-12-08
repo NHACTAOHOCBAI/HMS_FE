@@ -18,10 +18,10 @@ import {
 import {
   CalendarDays,
   FileText,
-  Paperclip,
   Pill,
   Users,
   Calendar,
+  UserCheck
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,6 +32,10 @@ const items = [
     title: "Bệnh nhân",
     url: "admin/patients/patient-list",
     icon: <FileText />,
+  }, {
+    title: "Lễ tân",
+    url: "admin/reception-desk",
+    icon: <UserCheck />,
   },
   {
     title: "Thuốc",
@@ -104,11 +108,10 @@ export default function AdminLayout({
                     <Link
                       key={item.title}
                       href={`/${item.url}`}
-                      className={`h-[50px] flex gap-[13px] items-center rounded-xl hover:bg-[#F0F4F9] px-[7px] ${
-                        isActive
-                          ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
-                          : "bg-white"
-                      }`}
+                      className={`h-[50px] flex gap-[13px] items-center rounded-xl hover:bg-[#F0F4F9] px-[7px] ${isActive
+                        ? "bg-app-primary-blue-100 text-app-primary-blue-700 font-semibold"
+                        : "bg-white"
+                        }`}
                     >
                       {item.icon}
                       {item.title}
