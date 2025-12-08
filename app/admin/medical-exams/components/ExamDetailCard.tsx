@@ -138,7 +138,7 @@ export function ExamDetailCard({ exam, prescription, onBack }: Props) {
                 </CardContent>
             </Card>
 
-            {!prescription ? (
+            {prescription ? (
                 <PrescriptionDetailCard prescription={prescription} />
             ) : (<>
                 <Card className="shadow-sm border rounded-2xl">
