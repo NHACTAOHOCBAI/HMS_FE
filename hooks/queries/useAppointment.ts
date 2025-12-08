@@ -6,6 +6,7 @@ import {
   updateAppointment,
   cancelAppointment,
   completeAppointment,
+  checkIn,
 } from "@/services/appointment.service";
 
 import {
@@ -84,6 +85,19 @@ export const useCompleteAppointment = () => {
   return useMutation({
     mutationFn: completeAppointment,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+    },
+  });
+};
+// check-in
+export const useCheckInAppointment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => checkIn(id),
+
+    onSuccess: () => {
+      // refresh lại danh sách appointments
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
   });

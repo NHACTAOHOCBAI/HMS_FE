@@ -38,9 +38,8 @@ const generateMockAppointments = (): Appointment[] => {
         department: i % 2 === 0 ? "Cardiology" : "Neurology",
         phoneNumber: "0909999999",
       },
-      appointmentTime: `2025-12-${String((i % 28) + 1).padStart(2, "0")}T0${
-        i % 9
-      }:00:00`,
+      appointmentTime: `2025-12-${String((i % 28) + 1).padStart(2, "0")}T0${i % 9
+        }:00:00`,
       status: APPOINTMENT_STATUSES[i % APPOINTMENT_STATUSES.length],
       type: APPOINTMENT_TYPES[i % APPOINTMENT_TYPES.length],
       reason: i % 3 === 0 ? "Chest pain" : "General check-up",
@@ -130,5 +129,10 @@ export const completeAppointment = async (id: string) => {
 
   return true;
 };
+//checkIn
+export const checkIn = async (id: string) => {
+  console.log("checkIn appointment:", id);
 
+  return true;
+};
 export const APPOINTMENTS: Appointment[] = generateMockAppointments();

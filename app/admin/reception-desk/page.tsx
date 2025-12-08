@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { UserCheck, Calendar, Clock, AlertCircle, Search, User, Phone } from "lucide-react";
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -9,11 +9,47 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
-import { Appointment, Patient, Employee } from "../lib/types";
+import { useAppointments } from "@/hooks/queries/useAppointment";
+import { useTableParams } from "@/hooks/useTableParams";
+import { formatTime } from "@/lib/utils";
+import { AppointmentItem } from "@/interfaces/appointment";
 
-const page = () => {
-    const
-    const { data: appointments } = useAppointments();
+const ReceptionDesk = () => {
+    const {
+        params,
+        debouncedSearch,
+        updateSearch,
+        updateFilter,
+        updatePage,
+        updateLimit,
+        updateSort,
+    } = useTableParams();
+    useEffect(() => {
+        updateSearch("hit");
+    }, []);
+
+    // gọi API
+    const { data, isLoading } = useAppointments(params);
+
+    // bảo vệ data
+    const appointments = useMemo(() => {
+        return data?.data.content || [];
+    }, [data]);
+
+    // 1️⃣ Tất cả lịch hẹn hôm nay
+    const todayAppointments = useMemo(() => {
+        return appointments.filter((a) => new Date(a.appointmentTime).toDateString() === new Date().toDateString());
+    }, [appointments]);
+
+    // 2️⃣ Đã check-in
+    const checkedInAppointments = useMemo(() => {
+        return todayAppointments.filter((a) => a.status === "CHECKED_IN");
+    }, [todayAppointments]);
+
+    // 3️⃣ Các lịch hẹn còn đợi tiếp nhận
+    const filteredAppointments = useMemo(() => {
+        return todayAppointments.filter((a) => a.status !== "CHECKED_IN");
+    }, [todayAppointments]);
 
     return (
         <>
@@ -34,7 +70,7 @@ const page = () => {
                         </div>
                         <div>
                             <p className="text-gray-600">Lịch hẹn hôm nay</p>
-                            {/* <p className="text-lg font-semibold">{todayAppointments.length}</p> */}
+                            <p className="text-lg font-semibold">{todayAppointments.length}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -46,7 +82,7 @@ const page = () => {
                         </div>
                         <div>
                             <p className="text-gray-600">Đã tiếp nhận</p>
-                            {/* <p className="text-lg font-semibold">{checkedInAppointments.length}</p> */}
+                            <p className="text-lg font-semibold">{checkedInAppointments.length}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -58,26 +94,30 @@ const page = () => {
                         </div>
                         <div>
                             <p className="text-gray-600">Chờ tiếp nhận</p>
-                            {/* <p className="text-lg font-semibold">
+                            <p className="text-lg font-semibold">
                                 {todayAppointments.length - checkedInAppointments.length}
-                            </p> */}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
 
             </div>
             {/* Appointment list */}
-            <Card>
+            <Card className="mt-6">
                 <CardHeader>
                     <h2 className="font-semibold text-gray-900">Danh sách chờ tiếp nhận hôm nay</h2>
                 </CardHeader>
 
-                <CardContent className="divide-y">
+                <CardContent className="divide-y ">
                     {filteredAppointments.length ? (
                         filteredAppointments.map((appointment) => {
-                            const patient = getPatient(appointment.patientId);
-                            const doctor = getDoctor(appointment.doctorId);
+                            const patient = appointment.patient;
+                            const doctor = appointment.doctor;
                             if (!patient) return null;
+
+                            function handleCheckInClick(appointment: AppointmentItem): void {
+                                // cần thêm api check-in
+                            }
 
                             return (
                                 <div key={appointment.id} className="p-6">
@@ -108,7 +148,7 @@ const page = () => {
                                                         <p className="text-gray-600">Số điện thoại</p>
                                                         <div className="flex items-center gap-2">
                                                             <Phone className="w-4 h-4 text-gray-400" />
-                                                            <p>{patient.phoneNumber}</p>
+                                                            {/* <p>{patient.phoneNumber}</p> */}
                                                         </div>
                                                     </div>
 
@@ -133,14 +173,14 @@ const page = () => {
                                                 </div>
 
                                                 {/* Allergies */}
-                                                {patient.allergies && patient.allergies !== "None" && (
+                                                {/* {patient.allergies && patient.allergies !== "None" && (
                                                     <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded flex gap-2">
                                                         <AlertCircle className="w-5 h-5 text-red-600" />
                                                         <p className="text-red-700 text-sm">
                                                             <b>Cảnh báo dị ứng:</b> {patient.allergies}
                                                         </p>
                                                     </div>
-                                                )}
+                                                )} */}
                                             </div>
                                         </div>
 
@@ -168,4 +208,13 @@ const page = () => {
     )
 }
 
-export default page
+export default ReceptionDesk
+const isToday = (datetimeString: string) => {
+    const d = new Date(datetimeString);
+    const now = new Date();
+    return (
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate()
+    );
+}
