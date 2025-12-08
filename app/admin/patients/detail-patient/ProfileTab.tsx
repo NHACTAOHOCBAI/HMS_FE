@@ -1,6 +1,7 @@
 "use client";
 
 import { usePatientById } from "@/hooks/queries/usePatient";
+import { formatDateTimeVi } from "@/lib/utils";
 
 const Item = ({ label, value }: { label: string; value?: string | null }) => (
   <div className="flex flex-col gap-1">
@@ -58,9 +59,9 @@ const ProfileTab = ({ id }: { id: string }) => {
 
       {/* ================= System Information ================= */}
       <Section title="System Information">
-        <Item label="Created at" value={patient.createdAt} />
-        <Item label="Updated at" value={patient.updatedAt} />
-        <Item label="Deleted at" value={patient.deletedAt} />
+        <Item label="Created at" value={formatDateTimeVi(patient.createdAt)} />
+        <Item label="Updated at" value={formatDateTimeVi(patient.updatedAt)} />
+        <Item label="Deleted at" value={formatDateTimeVi(patient.deletedAt)} />
         <Item label="Deleted by" value={patient.deletedBy} />
       </Section>
     </div>

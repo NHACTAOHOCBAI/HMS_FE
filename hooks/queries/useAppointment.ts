@@ -7,6 +7,7 @@ import {
   cancelAppointment,
   completeAppointment,
   checkIn,
+  getAppointmentsByPatient,
 } from "@/services/appointment.service";
 
 import {
@@ -100,5 +101,13 @@ export const useCheckInAppointment = () => {
       // refresh lại danh sách appointments
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
     },
+  });
+};
+
+export const useAppointmentByPatient = (id: string) => {
+  return useQuery({
+    queryKey: ["appointment-by-patient", id],
+    queryFn: () => getAppointmentsByPatient(id),
+    placeholderData: keepPreviousData,
   });
 };

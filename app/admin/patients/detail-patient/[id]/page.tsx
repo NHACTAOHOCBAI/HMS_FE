@@ -2,7 +2,7 @@
 import MyTab from "@/app/admin/_components/MyTabs";
 import MedicalRecordTab from "@/app/admin/patients/detail-patient/MedicalRecordTab";
 import ProfileTab from "@/app/admin/patients/detail-patient/ProfileTab";
-import ScheduleTab from "@/app/admin/patients/detail-patient/ScheduleTab";
+import AppointmentTab from "@/app/admin/patients/detail-patient/ScheduleTab";
 import { useParams } from "next/navigation";
 
 const DetailPatient = () => {
@@ -18,8 +18,8 @@ const DetailPatient = () => {
       content: <MedicalRecordTab id={patientId} />,
     },
     {
-      title: "Schedule",
-      content: <ScheduleTab id={patientId} />,
+      title: "Appointment",
+      content: <AppointmentTab id={patientId} />,
     },
   ];
   return (

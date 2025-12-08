@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useDebounce } from "./useDebounce";
 
 export interface TableParams {
-  page?: number;
-  limit?: number;
+  page: number;
+  limit: number;
   search?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";

@@ -38,8 +38,9 @@ const generateMockAppointments = (): Appointment[] => {
         department: i % 2 === 0 ? "Cardiology" : "Neurology",
         phoneNumber: "0909999999",
       },
-      appointmentTime: `2025-12-${String((i % 28) + 1).padStart(2, "0")}T0${i % 9
-        }:00:00`,
+      appointmentTime: `2025-12-${String((i % 28) + 1).padStart(2, "0")}T0${
+        i % 9
+      }:00:00`,
       status: APPOINTMENT_STATUSES[i % APPOINTMENT_STATUSES.length],
       type: APPOINTMENT_TYPES[i % APPOINTMENT_TYPES.length],
       reason: i % 3 === 0 ? "Chest pain" : "General check-up",
@@ -135,4 +136,15 @@ export const checkIn = async (id: string) => {
 
   return true;
 };
+// getAppointmentsByPatient
+export const getAppointmentsByPatient = async (patientId: string) => {
+  await new Promise((r) => setTimeout(r, 300)); // simulate latency
+
+  console.log("Fetching appointments for patient:", patientId);
+
+  const data = APPOINTMENTS.filter((apt) => apt.patient.id === patientId);
+
+  return data;
+};
+
 export const APPOINTMENTS: Appointment[] = generateMockAppointments();

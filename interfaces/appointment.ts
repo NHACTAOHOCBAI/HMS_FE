@@ -12,17 +12,14 @@ export interface Appointment {
   patient: {
     id: string;
     fullName: string;
-    phoneNumber?: string;
-    dateOfBirth?: string;
-    bloodType?: string;
-    allergies?: string;
+    phoneNumber: string;
   };
 
   doctor: {
     id: string;
     fullName: string;
     department: string;
-    phoneNumber?: string;
+    phoneNumber: string;
   };
 
   appointmentTime: string;
@@ -41,10 +38,6 @@ export interface AppointmentItem {
   patient: {
     id: string;
     fullName: string;
-    dateOfBirth?: string;
-    phoneNumber?: string;
-    bloodType?: string;
-    allergies?: string;
   };
   doctor: {
     id: string;

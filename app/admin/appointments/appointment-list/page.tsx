@@ -35,6 +35,7 @@ import { PopoverTrigger } from "@radix-ui/react-popover";
 import { Calendar } from "@/components/ui/calendar";
 import { AddAppointmentDialog } from "@/app/admin/appointments/add-appointment/AddAppointmentDialog";
 import { UpdateAppointmentDialog } from "@/app/admin/appointments/updpate-appointment/UpdateAppointmentDialog";
+import AppointmentDetailDialog from "@/app/admin/appointments/detail-appointment/DetailAppointmentDialog";
 
 const AppointmentTablePage = () => {
   const {
@@ -46,12 +47,22 @@ const AppointmentTablePage = () => {
     updateSort,
     updateFilter,
   } = useTableParams();
+  const [openDetail, setOpenDetail] = useState(false);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [updatedId, setUpdatedId] = useState<string | null>(null);
   const [openCancel, setOpenCancel] = useState(false);
   const [openComplete, setOpenComplete] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [openNew, setOpenNew] = useState(false);
+  const handleOpenDetail = (id: string) => {
+    setDetailId(id);
+    setOpenDetail(true);
+  };
+  const handleOpenUpdate = (id: string) => {
+    setUpdatedId(id);
+    setOpenUpdate(true);
+  };
   const handleOpenCancel = (id: string) => {
     setSelectedId(id);
     setOpenCancel(true);
@@ -86,10 +97,6 @@ const AppointmentTablePage = () => {
       onSuccess: () => toast.success("Appointment completed"),
       onError: (err) => toast.error(err.message),
     });
-  };
-  const handleOpenUpdate = (id: string) => {
-    setUpdatedId(id);
-    setOpenUpdate(true);
   };
   return (
     <>
@@ -193,7 +200,8 @@ const AppointmentTablePage = () => {
           columns={appointmentColumns(
             handleOpenCancel,
             handleOpenComplete,
-            handleOpenUpdate
+            handleOpenUpdate,
+            handleOpenDetail
           )}
           loading={isLoading}
           pagination={{
@@ -213,6 +221,11 @@ const AppointmentTablePage = () => {
         appointmentId={updatedId}
         open={openUpdate}
         setOpen={setOpenUpdate}
+      />
+      <AppointmentDetailDialog
+        appointmentId={detailId}
+        open={openDetail}
+        setOpen={setOpenDetail}
       />
       <AddAppointmentDialog open={openNew} setOpen={setOpenNew} />
       {/* Cancel dialog */}

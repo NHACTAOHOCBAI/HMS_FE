@@ -11,18 +11,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AppointmentItem } from "@/interfaces/appointment";
 import { Eye, MoreHorizontal, Trash2, CheckCircle, Pencil } from "lucide-react";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { formatDateTimeVi } from "@/lib/utils";
 
 // 🎨 Map màu cho STATUS
-const statusColor: Record<string, string> = {
+export const statusColor: Record<string, string> = {
   SCHEDULED: "bg-blue-500/30 border-blue-500 text-blue-500",
   COMPLETED: "bg-green-500/30 border-green-500 text-green-500",
   CANCELLED: "bg-red-500/30 border-red-500 text-red-500",
 };
 
 // 🎨 Map màu cho TYPE
-const typeColor: Record<string, string> = {
+export const typeColor: Record<string, string> = {
   CONSULTATION: "bg-purple-500",
   FOLLOW_UP: "bg-yellow-500",
   EMERGENCY: "bg-orange-500",
@@ -32,7 +32,8 @@ const typeColor: Record<string, string> = {
 export const appointmentColumns = (
   handleOpenCancel: (id: string) => void,
   handleOpenComplete: (id: string) => void,
-  handleOpenUpdate: (id: string) => void
+  handleOpenUpdate: (id: string) => void,
+  handleOpenDetail: (id: string) => void
 ): Column<AppointmentItem>[] => [
   { key: "id", label: "Id", sortable: true },
 
@@ -53,10 +54,11 @@ export const appointmentColumns = (
     label: "Department",
     render: (row) => row.doctor.department,
   },
-
-  { key: "appointmentTime", label: "Time", sortable: true },
-
-  // 🎨 STATUS = Badge màu
+  {
+    key: "appointmentTime",
+    label: "Time",
+    render: (row) => <div>{formatDateTimeVi(row.appointmentTime)}</div>,
+  },
   {
     key: "status",
     label: "Status",
@@ -93,13 +95,10 @@ export const appointmentColumns = (
 
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-          <Link href={`/admin/appointments/${row.id}`}>
-            <DropdownMenuItem>
-              <Eye className="w-4 h-4 mr-2" />
-              View
-            </DropdownMenuItem>
-          </Link>
+          <DropdownMenuItem onClick={() => handleOpenDetail(row.id)}>
+            <Eye className="w-4 h-4 mr-2" />
+            View
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleOpenUpdate(row.id)}>
             <Pencil className="w-4 h-4 mr-2" />
             Edit
