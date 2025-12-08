@@ -91,6 +91,7 @@ const generateTimeSlotsWithSchedule = (
       .padStart(2, "0")}`;
     slots.push({
       time,
+      datetime: `${date}T${time}:00`, // Added datetime
       available: !bookedTimes.includes(time),
       current: time === currentTime,
     });
