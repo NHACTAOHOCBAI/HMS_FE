@@ -269,8 +269,8 @@ export const getPatients = async (
     if (params.sort) {
       const [field, direction] = params.sort.split(",");
       filtered.sort((a, b) => {
-        const aVal = (a as Record<string, unknown>)[field];
-        const bVal = (b as Record<string, unknown>)[field];
+        const aVal = (a as any)[field];
+        const bVal = (b as any)[field];
         if (typeof aVal === "string" && typeof bVal === "string") {
           return direction === "desc"
             ? bVal.localeCompare(aVal)
