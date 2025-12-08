@@ -1,19 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertCircle, Info, UserCheck } from "lucide-react";
+import { AlertCircle, UserCheck } from "lucide-react";
+import { Info } from "./InfoItem";
+import { AppointmentItem } from "@/interfaces/appointment";
 
 {/* Dialog Check-in */ }
-export const CheckInDialog = (open: boolean, setIsDialogOpen: any, selectedAppointment: any, getPatient: any, getDoctor: any, handleConfirmCheckIn: any) => {
+export const CheckInDialog = ({ isDialogOpen, setIsDialogOpen, selectedAppointment, handleConfirmCheckIn }: { isDialogOpen: boolean, setIsDialogOpen: any, selectedAppointment: AppointmentItem | null, handleConfirmCheckIn: any }) => {
+    if (!isDialogOpen) return null;
+    if (!selectedAppointment) return null;
+
     return (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} >
             <DialogContent className="max-w-lg">
                 <DialogHeader>
                     <DialogTitle>Xác nhận tiếp nhận bệnh nhân</DialogTitle>
                 </DialogHeader>
 
                 {selectedAppointment && (() => {
-                    const patient = getPatient(selectedAppointment.patientId);
-                    const doctor = getDoctor(selectedAppointment.doctorId);
+                    const patient = selectedAppointment.patient;
+                    const doctor = selectedAppointment.doctor;
+
 
                     return (
                         <div className="space-y-6">
@@ -30,7 +36,7 @@ export const CheckInDialog = (open: boolean, setIsDialogOpen: any, selectedAppoi
                                         value={
                                             patient
                                                 ? new Date(
-                                                    patient.dateOfBirth
+                                                    patient.dateOfBirth ?? ""
                                                 ).toLocaleDateString("vi-VN")
                                                 : ""
                                         }
@@ -51,7 +57,7 @@ export const CheckInDialog = (open: boolean, setIsDialogOpen: any, selectedAppoi
                                     <Info label="Bác sĩ" value={`BS. ${doctor?.fullName}`} />
                                     <Info
                                         label="Loại khám"
-                                        value={getTypeText(selectedAppointment.type)}
+                                        value={selectedAppointment.type}
                                     />
                                     <div className="col-span-2">
                                         <Info

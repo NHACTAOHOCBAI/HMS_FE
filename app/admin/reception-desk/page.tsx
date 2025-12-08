@@ -13,6 +13,8 @@ import { useAppointments } from "@/hooks/queries/useAppointment";
 import { useTableParams } from "@/hooks/useTableParams";
 import { formatTime } from "@/lib/utils";
 import { AppointmentItem } from "@/interfaces/appointment";
+import { CheckInDialog } from "./DialogCheckIn";
+import { is } from "date-fns/locale";
 
 const ReceptionDesk = () => {
     const {
@@ -24,13 +26,11 @@ const ReceptionDesk = () => {
         updateLimit,
         updateSort,
     } = useTableParams();
-    useEffect(() => {
-        updateSearch("hit");
-    }, []);
-
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState<AppointmentItem | null>(null);
     // gọi API
     const { data, isLoading } = useAppointments(params);
-
+    const handleConfirmCheckIn = () => setIsDialogOpen(false);
     // bảo vệ data
     const appointments = useMemo(() => {
         return data?.data.content || [];
@@ -116,7 +116,8 @@ const ReceptionDesk = () => {
                             if (!patient) return null;
 
                             function handleCheckInClick(appointment: AppointmentItem): void {
-                                // cần thêm api check-in
+                                setSelectedAppointment(appointment);
+                                setIsDialogOpen(true);
                             }
 
                             return (
@@ -148,7 +149,7 @@ const ReceptionDesk = () => {
                                                         <p className="text-gray-600">Số điện thoại</p>
                                                         <div className="flex items-center gap-2">
                                                             <Phone className="w-4 h-4 text-gray-400" />
-                                                            {/* <p>{patient.phoneNumber}</p> */}
+                                                            <p>{patient.phoneNumber}</p>
                                                         </div>
                                                     </div>
 
@@ -173,14 +174,14 @@ const ReceptionDesk = () => {
                                                 </div>
 
                                                 {/* Allergies */}
-                                                {/* {patient.allergies && patient.allergies !== "None" && (
+                                                {patient.allergies && patient.allergies !== "None" && (
                                                     <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded flex gap-2">
                                                         <AlertCircle className="w-5 h-5 text-red-600" />
                                                         <p className="text-red-700 text-sm">
                                                             <b>Cảnh báo dị ứng:</b> {patient.allergies}
                                                         </p>
                                                     </div>
-                                                )} */}
+                                                )}
                                             </div>
                                         </div>
 
@@ -204,6 +205,12 @@ const ReceptionDesk = () => {
                     )}
                 </CardContent>
             </Card>
+            {/* Check-in dialog */}
+            <CheckInDialog
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
+                selectedAppointment={selectedAppointment}
+                handleConfirmCheckIn={handleConfirmCheckIn} />
         </>
     )
 }
