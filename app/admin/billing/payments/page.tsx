@@ -26,6 +26,7 @@ import { CalendarIcon, ArrowLeft, X, Wallet, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Payment, PaymentMethod } from "@/interfaces/billing";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -137,6 +138,7 @@ const paymentColumns: Column<PaymentWithInvoice>[] = [
 ];
 
 export default function PaymentHistoryPage() {
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
@@ -380,6 +382,7 @@ export default function PaymentHistoryPage() {
           setLimit(size);
           setPage(0);
         }}
+        onRowClick={(row) => router.push(`/admin/billing/${row.invoiceId}`)}
       />
     </div>
   );

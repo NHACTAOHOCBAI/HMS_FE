@@ -3,7 +3,7 @@
 import { Column } from "@/app/admin/_components/MyTable";
 import { Invoice } from "@/interfaces/billing";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Eye, CreditCard } from "lucide-react";
+import { MoreHorizontal, Eye, CreditCard, XCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,17 @@ import {
 import Link from "next/link";
 import { InvoiceStatusBadge } from "./_components/invoice-status-badge";
 
-export const invoiceColumns: Column<Invoice>[] = [
+interface InvoiceColumnActions {
+  onViewDetails: (invoice: Invoice) => void;
+  onRecordPayment: (invoice: Invoice) => void;
+  onCancelInvoice: (invoice: Invoice) => void;
+}
+
+export const getInvoiceColumns = ({
+  onViewDetails,
+  onRecordPayment,
+  onCancelInvoice,
+}: InvoiceColumnActions): Column<Invoice>[] => [
   {
     key: "invoiceNumber",
     label: "Invoice #",
@@ -30,7 +40,6 @@ export const invoiceColumns: Column<Invoice>[] = [
       return new Date(row.invoiceDate).toLocaleDateString();
     },
   },
-
   {
     key: "totalAmount",
     label: "Total",
@@ -91,17 +100,37 @@ export const invoiceColumns: Column<Invoice>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <Link href={`/admin/billing/${row.id}`}>
+              <button
+                type="button"
+                onClick={() => onViewDetails(row)}
+                className="flex items-center gap-2 w-full text-left"
+              >
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
-              </Link>
+              </button>
             </DropdownMenuItem>
             {row.status !== "PAID" && row.status !== "CANCELLED" && (
               <DropdownMenuItem asChild>
-                <Link href={`/admin/billing/${row.id}/payment`}>
+                <button
+                  type="button"
+                  onClick={() => onRecordPayment(row)}
+                  className="flex items-center gap-2 w-full text-left"
+                >
                   <CreditCard className="mr-2 h-4 w-4" />
                   Record Payment
-                </Link>
+                </button>
+              </DropdownMenuItem>
+            )}
+            {row.status === "UNPAID" && (row.payments?.length ?? 0) === 0 && (
+              <DropdownMenuItem asChild>
+                <button
+                  type="button"
+                  onClick={() => onCancelInvoice(row)}
+                  className="flex items-center gap-2 w-full text-left text-destructive hover:text-destructive"
+                >
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancel Invoice
+                </button>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

@@ -46,6 +46,7 @@ type Props<T> = {
 
   // Loading từ React Query
   loading?: boolean;
+  onRowClick?: (row: T) => void;
 };
 
 // Skeleton row component
@@ -105,6 +106,7 @@ export function ReusableTable<T>({
   onPageChange,
   onRowsPerPageChange,
   loading = false,
+  onRowClick,
 }: Props<T>) {
   const { currentPage, totalPages, rowsPerPage } = pagination;
 
@@ -139,7 +141,11 @@ export function ReusableTable<T>({
             ) : (
               // Data rows
               data.map((row, i) => (
-                <TableRow key={i}>
+                <TableRow
+                  key={i}
+                  className={onRowClick ? "cursor-pointer hover:bg-muted/60" : ""}
+                  onClick={() => onRowClick?.(row)}
+                >
                   {columns.map((col, idx) => (
                     <TableCell key={idx}>
                       {col.render ? col.render(row) : (row as any)[col.key]}

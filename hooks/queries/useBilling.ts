@@ -24,6 +24,15 @@ export const billingKeys = {
     [...billingKeys.invoices(), "by-appointment", appointmentId] as const,
   patientInvoices: (patientId: string, params?: PatientInvoiceParams) =>
     [...billingKeys.invoices(), "by-patient", patientId, params] as const,
+  paymentsList: (params?: {
+    page: number;
+    limit: number;
+    search?: string;
+    method?: string;
+    startDate?: string;
+    endDate?: string;
+    sort?: string;
+  }) => [...billingKeys.payments(), "list", params] as const,
   payments: () => [...billingKeys.all, "payments"] as const,
   paymentDetail: (id: string) =>
     [...billingKeys.payments(), "detail", id] as const,
@@ -186,19 +195,20 @@ export const usePayments = (
   endDate?: string,
   sort?: string,
 ) => {
+  const params = {
+    page,
+    limit,
+    search,
+    method,
+    startDate,
+    endDate,
+    sort,
+  };
+
   return useQuery({
-    queryKey: billingKeys.payments(),
-    queryFn: () =>
-      billingService.getPayments({
-        page,
-        limit,
-        search,
-        method,
-        startDate,
-        endDate,
-        sort,
-      }),
-    select: (response) => response.data.data,
+    queryKey: billingKeys.paymentsList(params),
+    queryFn: () => billingService.getPayments(params),
+    select: (response) => response.data,
   });
 };
 

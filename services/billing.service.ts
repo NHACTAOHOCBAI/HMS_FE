@@ -85,7 +85,7 @@ export const cancelInvoice = async (
   id: string,
   data: { cancelReason: string },
 ) =>
-  api.patch<{ status: string; data: Invoice }>(
+  api.post<{ status: string; data: Invoice }>(
     `/api/billing/invoices/${id}/cancel`,
     data,
   );
@@ -115,5 +115,8 @@ export const getPayments = async (params?: {
 
 export const getPaymentSummaryCards =
   async (): Promise<PaymentSummaryCards> => {
-    return api.get("/api/billing/payments/summary-cards");
+    const response = await api.get<{ data: PaymentSummaryCards }>(
+      "/api/billing/payments/summary-cards",
+    );
+    return response.data.data;
   };

@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import {
   useInvoiceList,
   usePaymentSummaryCards,
+  useCancelInvoice,
 } from "@/hooks/queries/useBilling";
-import { invoiceColumns } from "./columns";
+import { getInvoiceColumns } from "./columns";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
   Select,
@@ -36,6 +37,9 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CancelInvoiceDialog } from "@/app/admin/billing/_components/cancel-invoice-dialog";
+import { Invoice } from "@/interfaces/billing";
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -75,6 +79,40 @@ export default function InvoiceListPage() {
   };
 
   const hasFilters = search || status !== "ALL" || startDate || endDate;
+
+  const router = useRouter();
+  const { mutateAsync: cancelInvoiceMutation, isPending: isCanceling } =
+    useCancelInvoice();
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedInvoiceToCancel, setSelectedInvoiceToCancel] =
+    useState<Invoice | null>(null);
+
+  const handleOpenCancelDialog = (invoice: Invoice) => {
+    setSelectedInvoiceToCancel(invoice);
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelConfirm = async (reason: string) => {
+    if (!selectedInvoiceToCancel) return;
+    await cancelInvoiceMutation({
+      id: selectedInvoiceToCancel.id,
+      reason,
+    });
+    setCancelDialogOpen(false);
+    setSelectedInvoiceToCancel(null);
+  };
+
+  const handleCancelClose = () => {
+    setCancelDialogOpen(false);
+    setSelectedInvoiceToCancel(null);
+  };
+
+  const columns = getInvoiceColumns({
+    onViewDetails: (invoice) => router.push(`/admin/billing/${invoice.id}`),
+    onRecordPayment: (invoice) =>
+      router.push(`/admin/billing/${invoice.id}/payment`),
+    onCancelInvoice: handleOpenCancelDialog,
+  });
 
   return (
     <div className="space-y-6">
@@ -259,7 +297,7 @@ export default function InvoiceListPage() {
 
       <ReusableTable
         data={data?.content ?? []}
-        columns={invoiceColumns}
+        columns={columns}
         loading={isLoading}
         pagination={{
           currentPage: (data?.page ?? 0) + 1,
@@ -272,6 +310,14 @@ export default function InvoiceListPage() {
           setLimit(size);
           setPage(0);
         }}
+      />
+
+      <CancelInvoiceDialog
+        open={cancelDialogOpen}
+        onOpenChange={handleCancelClose}
+        invoiceNumber={selectedInvoiceToCancel?.invoiceNumber ?? ""}
+        onConfirm={handleCancelConfirm}
+        isLoading={isCanceling}
       />
     </div>
   );

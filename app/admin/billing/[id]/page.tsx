@@ -13,6 +13,7 @@ import {
   XCircle,
   AlertTriangle,
   ExternalLink,
+  FileSearch,
 } from "lucide-react";
 import Link from "next/link";
 import { InvoiceStatusBadge } from "../_components/invoice-status-badge";
@@ -98,14 +99,25 @@ export default function InvoiceDetailPage() {
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline">
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>
+          {invoice?.appointmentId && (
+            <Button variant="outline" asChild>
+              <Link
+                href={`/admin/exams/${invoice.appointmentId}`}
+                className="flex items-center gap-2"
+              >
+                <FileSearch className="h-4 w-4" />
+                View Medical Exam
+              </Link>
+            </Button>
+          )}
           {user?.role === "ADMIN" &&
             invoice.status === "UNPAID" &&
-            invoice.payments.length === 0 && (
+            (invoice.payments?.length ?? 0) === 0 && (
               <Button
                 variant="outline"
                 className="text-destructive hover:text-destructive"
@@ -260,6 +272,7 @@ export default function InvoiceDetailPage() {
               />
             </CardContent>
           </Card>
+
         </div>
 
         <div className="space-y-6">

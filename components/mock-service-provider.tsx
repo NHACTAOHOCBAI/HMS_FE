@@ -7,11 +7,12 @@ export function MockServiceProvider() {
     if (process.env.NEXT_PUBLIC_API_MOCK !== "true") return;
     if (typeof window === "undefined") return;
     import("../mocks/browser")
-      .then(({ worker }) =>
+      .then(({ worker }) => {
         worker.start({
           onUnhandledRequest: "bypass",
-        }),
-      )
+        });
+        console.log("MSW worker started");
+      })
       .catch((err) => {
         console.error("MSW worker failed to start", err);
       });
