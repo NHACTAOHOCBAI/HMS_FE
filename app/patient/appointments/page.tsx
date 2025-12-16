@@ -1,9 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { AppointmentListShared } from "@/components/appointment/AppointmentListShared";
 
-const PatientAppointmentsPage = () => {
-  return <AppointmentListShared role="PATIENT" />;
-};
-
-export default PatientAppointmentsPage;
+export default function PatientAppointmentsPage() {
+  return (
+    <Suspense fallback={<div className="p-6" />}>
+      <AppointmentListShared role="PATIENT" />
+    </Suspense>
+  );
+}

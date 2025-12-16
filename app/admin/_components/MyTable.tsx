@@ -69,7 +69,7 @@ export function ReusableTable<T>({
   loading = false,
   onRowClick,
 }: Props<T>) {
-  const { currentPage, totalPages, rowsPerPage } = pagination;
+  const { currentPage, totalPages, rowsPerPage, totalItems } = pagination;
 
   return (
     <div className="flex flex-col justify-between min-h-[500px] gap-5">

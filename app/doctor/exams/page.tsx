@@ -62,8 +62,9 @@ export default function DoctorExamsPage() {
     status: status !== "ALL" ? (status as any) : undefined,
   });
 
-  const exams = data?.content || [];
-  const totalPages = data?.totalPages || 1;
+  const exams = data?.data?.content || [];
+  const totalPages = data?.data?.totalPages || 1;
+  const totalElements = data?.data?.totalElements || 0;
 
   const filtered = useMemo(() => {
     if (!debouncedSearch) return exams;
@@ -225,15 +226,15 @@ export default function DoctorExamsPage() {
             </Table>
           </div>
 
-          {!isLoading && data && data.totalElements > 0 && (
+          {!isLoading && totalElements > 0 && (
             <div className="px-6 py-4 border-t">
               <DataTablePagination
                 currentPage={page}
                 totalPages={totalPages}
-                totalElements={data.totalElements}
+                totalElements={totalElements}
                 pageSize={size}
                 onPageChange={setPage}
-                infoText={`Hiển thị ${page * size + 1}-${Math.min((page + 1) * size, data.totalElements)} / ${data.totalElements}`}
+                infoText={`Hiển thị ${page * size + 1}-${Math.min((page + 1) * size, totalElements)} / ${totalElements}`}
               />
             </div>
           )}

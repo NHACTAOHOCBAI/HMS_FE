@@ -132,9 +132,11 @@ export function MedicalExamDetailView({
               </p>
               <p>
                 <strong>DOB:</strong>{" "}
-                {patientData
+                {patientData?.dateOfBirth
                   ? format(new Date(patientData.dateOfBirth), "PPP")
-                  : "Loading..."}
+                  : patientData
+                    ? "N/A"
+                    : "Loading..."}
               </p>
               <p>
                 <strong>Gender:</strong> {patientData?.gender || "Loading..."}

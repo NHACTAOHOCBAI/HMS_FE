@@ -101,9 +101,7 @@ export const createMedicalExam = async (data: MedicalExamCreateRequest) => {
     updatedAt: new Date().toISOString(),
     hasPrescription: false,
   };
-  // This won't actually add to the shared mock data array in a real scenario
-  // but for local simulation it works.
-  // mockMedicalExams.push(newExam);
+  mockMedicalExams.push(newExam);
   return newExam;
 };
 
@@ -146,6 +144,7 @@ export const updateMedicalExam = async (
     updatedAt: new Date().toISOString(),
   };
 
+  mockMedicalExams[index] = updatedExam;
   return updatedExam;
 };
 
@@ -183,7 +182,52 @@ export const createPrescriptionMock = async (
     updatedAt: new Date().toISOString(),
   };
 
+  mockMedicalExams[examIndex] = {
+    ...exam,
+    hasPrescription: true,
+    prescription: newPrescription,
+    updatedAt: new Date().toISOString(),
+  };
+
   return newPrescription;
+};
+
+export const updatePrescriptionMock = async (
+  examId: string,
+  data: PrescriptionCreateRequest
+) => {
+  await delay(500);
+  const examIndex = mockMedicalExams.findIndex((e) => e.id === examId);
+  if (examIndex === -1) throw new Error("Medical exam not found");
+
+  const exam = mockMedicalExams[examIndex];
+  if (!exam.prescription) {
+    throw new Error("Prescription not found for this exam");
+  }
+
+  const updatedPrescription: Prescription = {
+    ...exam.prescription,
+    notes: data.notes,
+    items: data.items.map((item, idx) => ({
+      id: exam.prescription!.items[idx]?.id ?? `rxi${idx + 1}`,
+      medicine: { id: item.medicineId, name: `Medicine ${item.medicineId}` },
+      quantity: item.quantity,
+      unitPrice: exam.prescription!.items[idx]?.unitPrice ?? 10000,
+      dosage: item.dosage,
+      durationDays: item.durationDays,
+      instructions: item.instructions,
+    })),
+    updatedAt: new Date().toISOString(),
+  };
+
+  mockMedicalExams[examIndex] = {
+    ...exam,
+    hasPrescription: true,
+    prescription: updatedPrescription,
+    updatedAt: new Date().toISOString(),
+  };
+
+  return updatedPrescription;
 };
 
 export const getPrescriptionByExam = async (examId: string) => {
@@ -205,6 +249,7 @@ const medicalExamService = {
   getList: getMedicalExams,
   update: updateMedicalExam,
   createPrescription: createPrescriptionMock,
+  updatePrescription: updatePrescriptionMock,
   getPrescriptionByExam: getPrescriptionByExam,
   // Add other mock implementations as needed
 };

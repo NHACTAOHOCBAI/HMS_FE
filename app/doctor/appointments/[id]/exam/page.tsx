@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MedicalExamForm } from "@/app/admin/exams/_components/medical-exam-form";
 
 import { useAppointment } from "@/hooks/queries/useAppointment";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { useCreateMedicalExam } from "@/hooks/queries/useMedicalExam";
 import { MedicalExamFormValues } from "@/lib/schemas/medical-exam";
 
@@ -109,7 +109,7 @@ export default function CreateExamFromAppointmentPage() {
             onSubmit={(values) => handleSubmit(values, "FINALIZED")}
             onSubmitWithStatus={handleSubmit}
             isSubmitting={createMutation.isPending}
-            userRole={user?.role}
+            userRole={user?.role as UserRole | undefined}
           />
         </CardContent>
       </Card>

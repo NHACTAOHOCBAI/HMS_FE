@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { MedicalExamDetailView } from "../_components/MedicalExamDetailView";
 import { useMedicalExam } from "@/hooks/queries/useMedicalExam";
@@ -68,7 +68,7 @@ export default function MedicalExamDetailPage() {
     <RoleGuard allowedRoles={["ADMIN", "DOCTOR", "NURSE"]}>
       <MedicalExamDetailView
         medicalExam={medicalExam}
-        userRole={user?.role as any}
+        userRole={user?.role as UserRole | undefined}
       />
     </RoleGuard>
   );

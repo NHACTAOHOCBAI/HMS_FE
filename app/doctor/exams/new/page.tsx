@@ -6,7 +6,7 @@ import { MedicalExamFormValues } from "@/lib/schemas/medical-exam";
 import { useCreateMedicalExam } from "@/hooks/queries/useMedicalExam";
 import { useAppointment } from "@/hooks/queries/useAppointment";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export default function CreateMedicalExamPage() {
+function CreateMedicalExamPageClient() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,7 +52,7 @@ export default function CreateMedicalExamPage() {
         status,
       });
 
-      const examId = result.data.data.id;
+      const examId = result.id;
       toast.success("Medical exam created successfully");
 
       // Show prompt to add prescription
@@ -111,5 +111,13 @@ export default function CreateMedicalExamPage() {
         </AlertDialogContent>
       </AlertDialog>
     </>
+  );
+}
+
+export default function CreateMedicalExamPage() {
+  return (
+    <Suspense fallback={<div className="p-6" />}>
+      <CreateMedicalExamPageClient />
+    </Suspense>
   );
 }

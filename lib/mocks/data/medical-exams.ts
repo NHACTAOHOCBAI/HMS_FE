@@ -70,7 +70,7 @@ export const mockMedicalExams: MedicalExam[] = [
       prescribedAt: formatISO(subDays(baseDate, 6)),
       notes: "Use under the tongue at the onset of chest pain. Do not exceed 3 tablets in 15 minutes.",
       items: [
-        { id: "rxi-002", medicine: { id: "med-002", name: "Nitroglycerin 0.4mg" }, quantity: 25, unitPrice: 2000, dosage: "1 tablet as needed", durationDays: null, instructions: "For emergency use." },
+        { id: "rxi-002", medicine: { id: "med-002", name: "Nitroglycerin 0.4mg" }, quantity: 25, unitPrice: 2000, dosage: "1 tablet as needed", instructions: "For emergency use." },
       ],
       createdAt: formatISO(subDays(baseDate, 6)),
       updatedAt: formatISO(subDays(baseDate, 6)),

@@ -54,7 +54,7 @@ export interface MedicalExam {
   updatedAt: string;
   updatedBy?: string;
   hasPrescription?: boolean;
-  prescription?: PrescriptionDisplay;
+  prescription?: Prescription;
   cancelReason?: string;
 }
 
@@ -111,23 +111,6 @@ export interface MedicalExamListParams {
 }
 
 // ============ Prescription ============
-
-export interface PrescriptionItemDisplay {
-  medicineId: string;
-  medicineName: string;
-  quantity: number;
-  dosage: string;
-  frequency: string;
-  duration: string;
-  instructions?: string;
-}
-
-export interface PrescriptionDisplay {
-  id: string;
-  notes?: string;
-  items: PrescriptionItemDisplay[];
-  createdAt: string;
-}
 
 export interface PrescriptionItem {
   id: string;

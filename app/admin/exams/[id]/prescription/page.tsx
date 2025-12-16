@@ -84,11 +84,14 @@ export default function ManagePrescriptionPage() {
 
   const defaultValues = exam.prescription
     ? {
-        ...exam.prescription,
         items: exam.prescription.items.map((item) => ({
-          ...item,
-          medicineId: item.medicineId.toString(),
+          medicineId: item.medicine.id.toString(),
+          quantity: item.quantity,
+          dosage: item.dosage,
+          duration: item.durationDays ? String(item.durationDays) : "",
+          notes: item.instructions,
         })),
+        notes: exam.prescription.notes,
       }
     : undefined;
 

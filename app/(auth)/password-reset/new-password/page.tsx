@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { Suspense, useState, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Hotel, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -265,4 +265,10 @@ const ResetPasswordPage = () => {
   );
 };
 
-export default ResetPasswordPage;
+export default function ResetPasswordPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <ResetPasswordPage />
+    </Suspense>
+  );
+}

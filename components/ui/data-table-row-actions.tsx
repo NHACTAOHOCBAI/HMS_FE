@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,7 +17,7 @@ export interface DataTableRowAction {
   /** Action label */
   label: string;
   /** Action icon - defaults based on label if not provided */
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | React.ElementType;
   /** onClick handler */
   onClick?: () => void;
   /** href for navigation */
@@ -76,7 +77,7 @@ export function DataTableRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {actions.map((action, index) => {
-            const Icon = action.icon || getDefaultIcon(action.label);
+            const iconValue = action.icon ?? getDefaultIcon(action.label);
             const isDestructive =
               action.destructive ||
               action.label.toLowerCase().includes("delete");
@@ -89,11 +90,22 @@ export function DataTableRowActions({
                   isDestructive ? "text-destructive focus:text-destructive" : ""
                 }
               >
-                {typeof Icon === "function" ? (
-                  <Icon className="mr-2 h-4 w-4" />
-                ) : (
-                  Icon
-                )}
+                {(() => {
+                  if (React.isValidElement(iconValue)) {
+                    return iconValue;
+                  }
+
+                  if (
+                    typeof iconValue === "function" ||
+                    (typeof iconValue === "object" && iconValue !== null)
+                  ) {
+                    return React.createElement(iconValue as React.ElementType, {
+                      className: "mr-2 h-4 w-4",
+                    });
+                  }
+
+                  return iconValue;
+                })()}
                 {action.label}
               </DropdownMenuItem>
             );

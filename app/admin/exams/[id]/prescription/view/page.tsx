@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { PrescriptionDetailView } from "../../../_components/PrescriptionDetailView";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -71,7 +71,7 @@ export default function PrescriptionDetailPage() {
     <RoleGuard allowedRoles={["ADMIN", "DOCTOR", "NURSE", "PATIENT"]}>
       <PrescriptionDetailView
         prescription={prescription}
-        userRole={user?.role}
+        userRole={user?.role as UserRole | undefined}
       />
     </RoleGuard>
   );

@@ -11,9 +11,14 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }) {
   const queryClient = useMemo(() => new QueryClient(), []);
-  const { role } = useAuth();
+  const { user } = useAuth();
+  const role = user?.role;
 
   // Redirect to appropriate role-based layout
+  if (!role) {
+    redirect("/login");
+  }
+
   if (role === "DOCTOR") {
     redirect("/doctor/appointments");
   } else if (role === "ADMIN") {

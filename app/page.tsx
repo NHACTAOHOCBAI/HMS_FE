@@ -23,7 +23,9 @@ const redirectMap: Record<UserRole, string> = {
 const fallbackRedirect = "/admin";
 
 export default function LandingPage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
+  const isAuthenticated = !!user;
+  const role = user?.role as UserRole | undefined;
   const router = useRouter();
 
   const { appointmentPath, loginPath, signupPath } = useMemo(() => {
@@ -37,14 +39,14 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user?.role) {
-      const destination = redirectMap[user.role] || fallbackRedirect;
+    if (!isLoading && isAuthenticated && role) {
+      const destination = redirectMap[role] || fallbackRedirect;
       router.replace(destination);
     }
-  }, [isLoading, isAuthenticated, user, router]);
+  }, [isLoading, isAuthenticated, role, router]);
 
   const handleBookAppointment = () => {
-    if (isAuthenticated && user?.role === "PATIENT") {
+    if (isAuthenticated && role === "PATIENT") {
       router.push(appointmentPath);
       return;
     }
@@ -63,7 +65,7 @@ export default function LandingPage() {
     return <Loading fullScreen />;
   }
 
-  if (isAuthenticated && user?.role) {
+  if (isAuthenticated && role) {
     return <div className="min-h-screen bg-background" />;
   }
 

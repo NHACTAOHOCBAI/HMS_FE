@@ -8,7 +8,7 @@ export function exportToCSV(
   }
 
   const headers = Array.from(
-    rows.reduce((set, row) => {
+    rows.reduce<Set<string>>((set, row) => {
       Object.keys(row || {}).forEach((k) => set.add(k));
       return set;
     }, new Set<string>()),

@@ -62,7 +62,7 @@ export default function PatientHistoryPage() {
         ]);
 
         const apptContent = apptRes?.content || [];
-        const examContent = examRes?.content || [];
+        const examContent = examRes?.data?.content || [];
         const invoiceContent = invoiceRes?.data?.content || [];
 
         const mapped: TimelineEvent[] = [

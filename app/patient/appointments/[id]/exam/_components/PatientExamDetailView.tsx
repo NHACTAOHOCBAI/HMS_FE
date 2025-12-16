@@ -116,17 +116,19 @@ export function PatientExamDetailView({
                     <TableHead>Medicine</TableHead>
                     <TableHead>Dosage</TableHead>
                     <TableHead>Duration</TableHead>
-                    <TableHead>Notes</TableHead>
+                    <TableHead>Instructions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {medicalExam.prescription.items.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">
-                        {item.medicineName}
+                        {item.medicine.name}
                       </TableCell>
                       <TableCell>{item.dosage}</TableCell>
-                      <TableCell>{item.duration}</TableCell>
+                      <TableCell>
+                        {item.durationDays ? `${item.durationDays} days` : "N/A"}
+                      </TableCell>
                       <TableCell>{item.instructions || "-"}</TableCell>
                     </TableRow>
                   ))}

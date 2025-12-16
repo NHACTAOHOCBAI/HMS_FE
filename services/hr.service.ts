@@ -119,7 +119,7 @@ export const hrService = {
     await delay(500);
     const index = deptData.findIndex((d) => d.id === id);
     if (index !== -1) {
-      const updatedData = { ...data };
+      const updatedData: Partial<Department> = { ...data };
       
       // If headDoctorId is being updated, also update headDoctorName
       if (data.headDoctorId) {
@@ -243,19 +243,20 @@ export const hrService = {
   getDoctorSchedules: async (params: {
     departmentId?: string;
     doctorId?: string;
-    startDate: string;
-    endDate: string;
+    startDate?: string;
+    endDate?: string;
     status?: string;
     page?: number;
     size?: number;
   }) => {
     await delay(500);
     let filtered = [...scheduleData];
-    if (params.startDate) {
-      filtered = filtered.filter((s) => s.workDate >= params.startDate);
+    const { startDate, endDate } = params;
+    if (startDate) {
+      filtered = filtered.filter((s) => s.workDate >= startDate);
     }
-    if (params.endDate) {
-      filtered = filtered.filter((s) => s.workDate <= params.endDate);
+    if (endDate) {
+      filtered = filtered.filter((s) => s.workDate <= endDate);
     }
     if (params.departmentId) {
       filtered = filtered.filter(
