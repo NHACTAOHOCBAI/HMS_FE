@@ -140,6 +140,14 @@ export const useTimeSlots = (
     queryFn: () =>
       appointmentService.getTimeSlots(doctorId, date, excludeAppointmentId),
     enabled: !!doctorId && !!date,
+    // Don't cache - always fetch fresh slots
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    // Retry on failure (Eureka service discovery can be flaky)
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
 };
 

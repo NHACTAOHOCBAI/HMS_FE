@@ -67,6 +67,7 @@ export interface MedicalExamListItem {
   diagnosis?: string;
   examDate: string;
   hasPrescription?: boolean;
+  prescription?: Prescription;
 }
 
 export interface MedicalExamCreateRequest {

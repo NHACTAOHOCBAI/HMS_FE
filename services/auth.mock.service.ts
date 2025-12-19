@@ -11,7 +11,7 @@ export const MOCK_USERS = [
   {
     username: "admin",
     email: "admin@hms.com",
-    password: "admin123",
+    password: "Admin123!@",
     role: "ADMIN",
     fullName: "Admin User",
     employeeId: "emp-admin-001",

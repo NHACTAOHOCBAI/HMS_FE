@@ -25,7 +25,7 @@ export const medicineFormSchema = z.object({
   purchasePrice: z.any(),
   sellingPrice: z.any(),
   expiresAt: z.string().min(1, "Expiry date is required"),
-  categoryId: z.string().optional().or(z.literal("")),
+  categoryId: z.string().min(1, "Category is required"),
 });
 
 export type MedicineFormValues = z.infer<typeof medicineFormSchema>;

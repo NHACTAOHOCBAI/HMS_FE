@@ -79,8 +79,8 @@ export default function DepartmentsPage() {
   const totalPages = data?.totalPages ?? 1;
 
   // Calculate stats
-  const activeCount = useMemo(() => departments.filter(d => d.status === "ACTIVE").length, [departments]);
-  const inactiveCount = useMemo(() => departments.filter(d => d.status === "INACTIVE").length, [departments]);
+  const activeCount = useMemo(() => departments.filter((d: Department) => d.status === "ACTIVE").length, [departments]);
+  const inactiveCount = useMemo(() => departments.filter((d: Department) => d.status === "INACTIVE").length, [departments]);
 
   const handleDeleteClick = (dept: Department) => {
     setDepartmentToDelete(dept);
@@ -191,7 +191,7 @@ export default function DepartmentsPage() {
                     </TableCell>
                   </TableRow>
                 ) : departments.length ? (
-                  departments.map((row) => (
+                  departments.map((row: Department) => (
                     <TableRow
                       key={row.id}
                       accent="violet"

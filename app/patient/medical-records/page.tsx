@@ -42,9 +42,9 @@ export default function PatientMedicalRecordsPage() {
 
   const { data, isLoading } = useMedicalExamList(queryParams);
 
-  const exams = data?.data?.content || [];
-  const totalPages = data?.data?.totalPages || 0;
-  const totalElements = data?.data?.totalElements || 0;
+  const exams = data?.content || [];
+  const totalPages = data?.totalPages || 0;
+  const totalElements = data?.totalElements || 0;
 
   if (!user || user.role !== "PATIENT") {
     return (

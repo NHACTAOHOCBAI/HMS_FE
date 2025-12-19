@@ -37,6 +37,7 @@ import { MetricCard } from "../_components/metric-card";
 import { ChartCard } from "../_components/chart-card";
 import { useAppointmentStats } from "@/hooks/queries/useReports";
 import { useDepartments, useEmployees } from "@/hooks/queries/useHr";
+import { Department, Employee } from "@/interfaces/hr";
 import { exportToCSV } from "@/lib/utils/export";
 import { useRouter } from "next/navigation";
 import { EmptyReportState } from "@/components/reports/EmptyReportState";
@@ -351,7 +352,7 @@ export default function AppointmentStatsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">All Departments</SelectItem>
-                  {departments.map((dept) => (
+                  {departments.map((dept: Department) => (
                     <SelectItem key={dept.id} value={dept.id}>
                       {dept.name}
                     </SelectItem>
@@ -367,7 +368,7 @@ export default function AppointmentStatsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">All Doctors</SelectItem>
-                  {doctors.map((doc) => (
+                  {doctors.map((doc: Employee) => (
                     <SelectItem key={doc.id} value={doc.id}>
                       {doc.fullName}
                     </SelectItem>

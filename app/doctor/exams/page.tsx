@@ -62,9 +62,9 @@ export default function DoctorExamsPage() {
     status: status !== "ALL" ? (status as any) : undefined,
   });
 
-  const exams = data?.data?.content || [];
-  const totalPages = data?.data?.totalPages || 1;
-  const totalElements = data?.data?.totalElements || 0;
+  const exams = data?.content || [];
+  const totalPages = data?.totalPages || 1;
+  const totalElements = data?.totalElements || 0;
 
   const filtered = useMemo(() => {
     if (!debouncedSearch) return exams;
@@ -171,7 +171,7 @@ export default function DoctorExamsPage() {
                     </TableCell>
                   </TableRow>
                 ) : filtered.length ? (
-                  filtered.map((exam) => (
+                  filtered.map((exam: MedicalExamListItem) => (
                     <TableRow key={exam.id}>
                       <TableCell className="font-medium">
                         <Link

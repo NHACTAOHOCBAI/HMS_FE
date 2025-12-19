@@ -15,7 +15,7 @@ import { USE_MOCK } from "@/lib/mocks/toggle";
 import { mockSchedules, mockPatients, mockEmployees } from "@/lib/mocks";
 import { subDays, addDays, set } from "date-fns";
 
-const BASE_URL = "/api/appointments";
+const BASE_URL = "/appointments";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const today = new Date();
@@ -255,8 +255,8 @@ export const appointmentService = {
     params: AppointmentListParams,
   ): Promise<PaginatedResponse<Appointment>> => {
     if (!USE_MOCK) {
-      const response = await axiosInstance.get(BASE_URL, { params });
-      return response.data;
+      const response = await axiosInstance.get(`${BASE_URL}/all`, { params });
+      return response.data.data; // Extract from ApiResponse wrapper
     }
 
     await delay(300);
@@ -340,7 +340,7 @@ export const appointmentService = {
   getById: async (id: string): Promise<Appointment | null> => {
     if (!USE_MOCK) {
       const response = await axiosInstance.get(`${BASE_URL}/${id}`);
-      return response.data;
+      return response.data.data; // Extract from ApiResponse wrapper
     }
 
     await delay(200);
@@ -351,8 +351,14 @@ export const appointmentService = {
   // Create new appointment
   create: async (data: AppointmentCreateRequest): Promise<Appointment> => {
     if (!USE_MOCK) {
-      const response = await axiosInstance.post(BASE_URL, data);
-      return response.data;
+      console.log("[DEBUG] Creating appointment with payload:", JSON.stringify(data, null, 2));
+      try {
+        const response = await axiosInstance.post(BASE_URL, data);
+        return response.data.data;
+      } catch (error: any) {
+        console.error("[DEBUG] Create Appointment Error:", JSON.stringify(error.response?.data, null, 2));
+        throw error;
+      }
     }
 
     await delay(300);
@@ -487,8 +493,14 @@ export const appointmentService = {
     data: AppointmentUpdateRequest,
   ): Promise<Appointment> => {
     if (!USE_MOCK) {
-      const response = await axiosInstance.patch(`${BASE_URL}/${id}`, data);
-      return response.data;
+      console.log("[DEBUG] Updating appointment", id, "with payload:", JSON.stringify(data, null, 2));
+      try {
+        const response = await axiosInstance.put(`${BASE_URL}/${id}`, data);
+        return response.data.data;
+      } catch (error: any) {
+        console.error("[DEBUG] Update Appointment Error:", JSON.stringify(error.response?.data, null, 2));
+        throw error;
+      }
     }
 
     await delay(300);
@@ -577,7 +589,7 @@ export const appointmentService = {
         `${BASE_URL}/${id}/cancel`,
         data,
       );
-      return response.data;
+      return response.data.data;
     }
 
     await delay(300);
@@ -685,17 +697,21 @@ export const appointmentService = {
     excludeAppointmentId?: string,
   ): Promise<TimeSlot[]> => {
     if (!USE_MOCK) {
-      const response = await axiosInstance.get(`${BASE_URL}/slots`, {
-        params: { doctorId, date },
-      });
-      return response.data;
+      try {
+        const response = await axiosInstance.get(`${BASE_URL}/slots`, {
+          params: { doctorId, date },
+        });
+        return response.data.data;
+      } catch (error: any) {
+        console.error("❌ [AppointmentService] Error fetching time slots:", error.message);
+        throw error;
+      }
     }
 
     await delay(200);
     const mockAppointments = getMockAppointments();
 
-    console.log("DEBUG getTimeSlots called with:", { doctorId, date });
-    console.log("DEBUG Total mockSchedules:", mockSchedules.length);
+    // Mock mode - using local data
     const doctorSchedule = mockSchedules.find(
       (s: any) => s.employeeId === doctorId && s.workDate === date,
     );

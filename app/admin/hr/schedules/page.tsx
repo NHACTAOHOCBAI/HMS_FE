@@ -61,6 +61,8 @@ import type {
   ScheduleRequest,
   ScheduleStatus,
   EmployeeSchedule,
+  Department,
+  Employee,
 } from "@/interfaces/hr";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
@@ -154,7 +156,7 @@ export default function SchedulesPage() {
   const employees = employeesData?.content ?? [];
 
   const filtered = useMemo(() => {
-    return schedules.map((item) => ({
+    return schedules.map((item: EmployeeSchedule) => ({
       ...item,
       shift: inferShift(item.startTime),
     }));
@@ -189,7 +191,7 @@ export default function SchedulesPage() {
 
   const editInitial = useMemo(() => {
     if (!editId) return undefined;
-    const item = schedules.find((s) => s.id === editId);
+    const item = schedules.find((s: EmployeeSchedule) => s.id === editId);
     if (!item) return undefined;
     return {
       employeeId: item.employeeId,
@@ -330,7 +332,7 @@ export default function SchedulesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">All Departments</SelectItem>
-                {departments.map((dept) => (
+                {departments.map((dept: Department) => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
                   </SelectItem>
@@ -346,7 +348,7 @@ export default function SchedulesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">All Employees</SelectItem>
-                {employees.map((emp) => (
+                {employees.map((emp: Employee) => (
                   <SelectItem key={emp.id} value={emp.id}>
                     {emp.fullName}
                   </SelectItem>
@@ -398,7 +400,7 @@ export default function SchedulesPage() {
                     {weekDays.map((day) => {
                       const dateStr = format(day, "yyyy-MM-dd");
                       const dayItems = filtered.filter(
-                        (s) => s.workDate === dateStr && s.shift === shift.key
+                        (s: EmployeeSchedule & { shift: string }) => s.workDate === dateStr && s.shift === shift.key
                       );
                       return (
                         <div
@@ -418,7 +420,7 @@ export default function SchedulesPage() {
                               className="flex flex-col gap-2"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              {dayItems.map((item) => (
+                              {dayItems.map((item: EmployeeSchedule) => (
                                 <div
                                   key={item.id}
                                   className="rounded-lg border bg-slate-50 px-3 py-2 text-sm shadow-sm"
@@ -463,7 +465,7 @@ export default function SchedulesPage() {
             <div className="space-y-3">
               {monthDays.map((day) => {
                 const dateStr = format(day, "yyyy-MM-dd");
-                const dayItems = filtered.filter((s) => s.workDate === dateStr);
+                const dayItems = filtered.filter((s: EmployeeSchedule & { shift: string }) => s.workDate === dateStr);
                 return (
                   <div
                     key={dateStr}
@@ -486,7 +488,7 @@ export default function SchedulesPage() {
                     </div>
                     {dayItems.length ? (
                       <div className="mt-2 grid gap-2 md:grid-cols-2">
-                        {dayItems.map((item) => (
+                        {dayItems.map((item: EmployeeSchedule) => (
                           <div
                             key={item.id}
                             className="rounded-md border bg-slate-50 px-3 py-2 text-sm"
@@ -533,12 +535,12 @@ export default function SchedulesPage() {
       </Card>
 
       <Drawer open={!!editId} onOpenChange={(open) => !open && setEditId(null)}>
-        <DrawerContent>
+        <DrawerContent className="max-h-[85vh]">
           <DrawerHeader>
             <DrawerTitle>Edit Schedule</DrawerTitle>
             <DrawerDescription>Update slot details.</DrawerDescription>
           </DrawerHeader>
-          <div className="px-4 pb-6">
+          <div className="px-4 pb-6 overflow-y-auto">
             <ScheduleForm
               onSubmit={handleUpdate}
               isLoading={updateSchedule.isPending}

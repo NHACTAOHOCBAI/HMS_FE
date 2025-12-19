@@ -91,16 +91,18 @@ function EditAppointmentForm() {
   const onSubmit = async (data: FormValues) => {
     if (!appointment) return;
 
-    const appointmentTime =
-      format(data.appointmentDate, "yyyy-MM-dd") +
-      "T" +
-      data.appointmentTime +
-      ":00";
+    // Construct Date object to get ISO string (UTC) for backend Instant
+    const [hours, minutes] = data.appointmentTime.split(":").map(Number);
+    const date = new Date(data.appointmentDate);
+    date.setHours(hours, minutes, 0, 0);
+    const appointmentTime = date.toISOString();
 
     updateMutation.mutate(
       {
         id,
         data: {
+          patientId: appointment.patient.id,
+          doctorId: appointment.doctor.id,
           appointmentTime,
           type: data.type,
           reason: data.reason,

@@ -47,6 +47,7 @@ import {
 import { MetricCard } from "../../_components/metric-card";
 import { useDoctorPerformance } from "@/hooks/queries/useReports";
 import { useDepartments } from "@/hooks/queries/useHr";
+import { Department } from "@/interfaces/hr";
 import type { DoctorPerformanceItem } from "@/interfaces/reports";
 import { cn } from "@/lib/utils";
 import { exportToCSV } from "@/lib/utils/export";
@@ -269,7 +270,7 @@ export default function DoctorPerformancePage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">All Departments</SelectItem>
-                  {departments.map((dept) => (
+                  {departments.map((dept: Department) => (
                     <SelectItem key={dept.id} value={dept.id}>
                       {dept.name}
                     </SelectItem>

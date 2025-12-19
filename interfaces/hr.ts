@@ -34,7 +34,7 @@ export interface Employee {
   departmentName?: string; // For display
   specialization?: string;
   licenseNumber?: string;
-  email: string;
+  email?: string;
   phoneNumber?: string;
   address?: string;
   status: EmployeeStatus;
@@ -47,14 +47,15 @@ export interface EmployeeRequest {
   accountId?: string;
   fullName: string;
   role: EmployeeRole;
-  departmentId?: string;
+  departmentId: string; // Required by backend - @NotBlank
   specialization?: string;
-  licenseNumber?: string;
-  email: string;
-  phoneNumber?: string;
+  licenseNumber?: string; // Pattern: XX-12345 (2 uppercase letters, dash, 5 digits)
+  phoneNumber?: string; // Pattern: 10-15 digits
   address?: string;
   status: EmployeeStatus;
   hiredAt?: string;
+  email?: string;
+  // Note: email is NOT part of backend EmployeeRequest DTO - NOW IT IS
 }
 
 export type ScheduleStatus = "AVAILABLE" | "BOOKED" | "CANCELLED";

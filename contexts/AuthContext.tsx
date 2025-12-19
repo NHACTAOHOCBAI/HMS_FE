@@ -38,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Load user from cookies on mount
   useEffect(() => {
+    console.log("[AuthContext] Initializing - reading cookies...");
     const email = Cookies.get("userEmail");
     const role = Cookies.get("userRole");
     const fullName = Cookies.get("userFullName");
@@ -45,7 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const patientId = Cookies.get("userPatientId");
     const department = Cookies.get("userDepartment");
 
+    console.log("[AuthContext] Cookies found:", { email, role, fullName });
+
     if (email && role) {
+      console.log("[AuthContext] Setting user from cookies");
       setUser({
         email,
         role,
@@ -54,84 +58,118 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         patientId,
         department,
       });
+    } else {
+      console.log("[AuthContext] No valid cookies found, user stays null");
     }
     setIsLoading(false);
+    console.log("[AuthContext] isLoading set to false");
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Import dynamically to avoid circular dependency
-    const { mockAuthService } = await import("@/services/auth.mock.service");
-    const { MOCK_USERS } = await import("@/services/auth.mock.service");
+    // Check USE_MOCK to decide which service to use
+    // Dynamic imports to avoid issues regardless of mode
+    const { USE_MOCK } = await import("@/lib/mocks/toggle");
+    
+    if (USE_MOCK) {
+      // Import dynamically to avoid circular dependency
+      const { mockAuthService } = await import("@/services/auth.mock.service");
+      const { MOCK_USERS } = await import("@/services/auth.mock.service");
 
-    const response = await mockAuthService.login({ email, password });
+      const response = await mockAuthService.login({ email, password });
 
-    // Find full user details
-    const userDetails = MOCK_USERS.find((u) => u.email === email);
-    console.log("[AuthContext] Login - email:", email);
-    console.log("[AuthContext] Login - userDetails found:", userDetails);
-    console.log("[AuthContext] Login - response.role:", response.role);
+      // Find full user details
+      const userDetails = MOCK_USERS.find((u) => u.email === email);
+      console.log("[AuthContext] Mock Login - email:", email);
+      
+      // Store in cookies
+      Cookies.set("accessToken", response.accessToken, { expires: 7 });
+      Cookies.set("refreshToken", response.refreshToken, { expires: 30 });
+      Cookies.set("userEmail", response.email, { expires: 7 });
+      Cookies.set("userRole", response.role, { expires: 7 });
 
-    // Store in cookies
-    Cookies.set("accessToken", response.accessToken, { expires: 7 });
-    Cookies.set("refreshToken", response.refreshToken, { expires: 30 });
-    Cookies.set("userEmail", response.email, { expires: 7 });
-    Cookies.set("userRole", response.role, { expires: 7 });
+      // Sync to localStorage
+      localStorage.setItem("accessToken", response.accessToken);
+      localStorage.setItem("userEmail", response.email);
+      localStorage.setItem("userRole", response.role);
 
-    // Sync to localStorage for compatibility
-    localStorage.setItem("accessToken", response.accessToken);
-    localStorage.setItem("userEmail", response.email);
-    localStorage.setItem("userRole", response.role);
+      // Handle extra details (Mock only for now)
+      if (userDetails) {
+        if (userDetails.fullName) Cookies.set("userFullName", userDetails.fullName, { expires: 7 });
+        if (userDetails.employeeId) Cookies.set("userEmployeeId", userDetails.employeeId, { expires: 7 });
+        if (userDetails.patientId) Cookies.set("userPatientId", userDetails.patientId, { expires: 7 });
+        if (userDetails.department) Cookies.set("userDepartment", userDetails.department, { expires: 7 });
+        
+        // LocalStorage for Doctor
+        if (response.role === "DOCTOR" && userDetails.employeeId) {
+          localStorage.setItem("userEmployeeId", userDetails.employeeId);
+        } else {
+          localStorage.removeItem("userEmployeeId");
+        }
+      }
 
-    // Store doctorId in localStorage for doctor-specific pages
-    if (response.role === "DOCTOR" && userDetails?.employeeId) {
-      console.log(
-        "[AuthContext] Storing employeeId in localStorage:",
-        userDetails.employeeId
-      );
-      localStorage.setItem("userEmployeeId", userDetails.employeeId);
+      setUser({
+        email: response.email,
+        role: response.role,
+        fullName: userDetails?.fullName,
+        employeeId: userDetails?.employeeId,
+        patientId: userDetails?.patientId,
+        department: userDetails?.department,
+      });
+
+      handleRedirect(response.role);
     } else {
-      localStorage.removeItem("userEmployeeId");
+      // Real Backend Login
+      const { authService } = await import("@/services/auth.service");
+      console.log("[AuthContext] Real Login - using authService");
+      
+      const response = await authService.login({ email, password });
+      
+      // Store tokens
+      Cookies.set("accessToken", response.accessToken, { expires: 7 });
+      Cookies.set("refreshToken", response.refreshToken, { expires: 30 });
+      Cookies.set("userEmail", response.email, { expires: 7 });
+      Cookies.set("userRole", response.role, { expires: 7 });
+
+      localStorage.setItem("accessToken", response.accessToken);
+      localStorage.setItem("userEmail", response.email);
+      localStorage.setItem("userRole", response.role);
+
+      // Store IDs if present in response
+      if (response.employeeId) {
+        Cookies.set("userEmployeeId", response.employeeId, { expires: 7 });
+        if (response.role === "DOCTOR") localStorage.setItem("userEmployeeId", response.employeeId);
+      }
+      if (response.patientId) {
+        Cookies.set("userPatientId", response.patientId, { expires: 7 });
+      }
+      
+      // Note: Real login might not return fullName/dep immediately. 
+      // We rely on subsequent /me or profile fetches, or set defaults.
+      // We will set fullName to email as fallback until profile loaded
+      const fullName = response.email; 
+      Cookies.set("userFullName", fullName, { expires: 7 });
+
+      setUser({
+        email: response.email,
+        role: response.role,
+        fullName: fullName, 
+        employeeId: response.employeeId,
+        patientId: response.patientId,
+      });
+
+      handleRedirect(response.role);
     }
+  };
 
-    if (userDetails) {
-      if (userDetails.fullName) {
-        Cookies.set("userFullName", userDetails.fullName, { expires: 7 });
-      }
-      if (userDetails.employeeId) {
-        console.log(
-          "[AuthContext] Setting employeeId cookie:",
-          userDetails.employeeId
-        );
-        Cookies.set("userEmployeeId", userDetails.employeeId, { expires: 7 });
-      }
-      if (userDetails.patientId) {
-        Cookies.set("userPatientId", userDetails.patientId, { expires: 7 });
-      }
-      if (userDetails.department) {
-        Cookies.set("userDepartment", userDetails.department, { expires: 7 });
-      }
-    }
-
-    // Set user state
-    setUser({
-      email: response.email,
-      role: response.role,
-      fullName: userDetails?.fullName,
-      employeeId: userDetails?.employeeId,
-      patientId: userDetails?.patientId,
-      department: userDetails?.department,
-    });
-
-    // Redirect based on role
-    if (response.role === "PATIENT") {
+  const handleRedirect = (role: string) => {
+    if (role === "PATIENT") {
       router.push("/patient/appointments");
-    } else if (response.role === "RECEPTIONIST") {
+    } else if (role === "RECEPTIONIST") {
       router.push("/admin/patients");
-    } else if (response.role === "DOCTOR") {
-      // Add specific redirection for DOCTOR
+    } else if (role === "DOCTOR") {
       router.push("/doctor/appointments");
     } else {
-      router.push("/admin"); // Fallback for other admin-like roles, if any
+      router.push("/admin");
     }
   };
 

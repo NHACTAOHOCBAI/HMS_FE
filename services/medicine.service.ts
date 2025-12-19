@@ -57,6 +57,7 @@ export const getMedicines = async (
   params: MedicineListParams = {},
 ): Promise<MedicineListResponse> => {
   if (USE_MOCK) {
+    // ... mock logic ...
     await new Promise((r) => setTimeout(r, 300));
     const { page = 1, size = 10, search = "", categoryId } = params;
     const keyword = search.trim().toLowerCase();
@@ -87,8 +88,41 @@ export const getMedicines = async (
     };
   }
 
-  const res = await api.get("/medicines", { params });
-  return res.data;
+  // Build RSQL filter string
+  const filterParts: string[] = [];
+  
+  if (params.search) {
+     const searchTerm = params.search.trim();
+     if (searchTerm) {
+        // Search by name or activeIngredient
+        filterParts.push(`(name==*${searchTerm}*,activeIngredient==*${searchTerm}*)`);
+     }
+  }
+
+  if (params.categoryId) {
+      filterParts.push(`category.id==${params.categoryId}`);
+  }
+
+  const filterString = filterParts.join(';');
+
+  const apiParams: Record<string, any> = {
+      page: (params.page || 1) - 1,
+      size: params.size || 10,
+  };
+
+  if (filterString) {
+      // MedicineController expects 'search' param for RSQL, not 'filter'
+      apiParams.search = filterString;
+  }
+  
+  if (params.sort) {
+      apiParams.sort = params.sort;
+  }
+
+  // Use /medicines endpoint (MedicineController root) instead of /medicines/all (GenericController)
+  const res = await api.get("/medicines", { params: apiParams });
+  console.log("[DEBUG] getMedicines response sample:", res.data.data?.content?.[0]);
+  return res.data.data; 
 };
 
 export const getMedicine = async (id: string): Promise<Medicine> => {
@@ -100,19 +134,22 @@ export const getMedicine = async (id: string): Promise<Medicine> => {
   }
 
   const res = await api.get(`/medicines/${id}`);
-  return res.data;
+  console.log("[DEBUG] getMedicine response:", res.data.data);
+  return res.data.data;
 };
 
 export const createMedicine = async (
   data: CreateMedicineRequest,
 ): Promise<Medicine> => {
   if (USE_MOCK) {
+    // ... mock implementation ...
     await new Promise((r) => setTimeout(r, 500));
     const now = new Date().toISOString();
-    const cat = categoriesDB.find((c) => c.id === data.categoryId); // Use categoriesDB here
+    const cat = categoriesDB.find((c) => c.id === data.categoryId); 
     const newMedicine: Medicine = {
       id: `med-${Date.now()}`,
       name: data.name,
+      // ... fields ...
       activeIngredient: data.activeIngredient || null,
       unit: data.unit,
       description: data.description || null,
@@ -131,7 +168,7 @@ export const createMedicine = async (
   }
 
   const res = await api.post("/medicines", data);
-  return res.data;
+  return res.data.data;
 };
 
 export const updateMedicine = async (
@@ -144,7 +181,7 @@ export const updateMedicine = async (
     if (index === -1) throw new Error("Medicine not found");
 
     const cat = data.categoryId
-      ? categoriesDB.find((c) => c.id === data.categoryId) // Use categoriesDB here
+      ? categoriesDB.find((c) => c.id === data.categoryId)
       : null;
 
     MEDICINES[index] = {
@@ -156,8 +193,9 @@ export const updateMedicine = async (
     return MEDICINES[index];
   }
 
-  const res = await api.patch(`/medicines/${id}`, data);
-  return res.data;
+  // Use PUT instead of PATCH because GenericController does not verify PATCH, and MedicineController only supports PATCH /stock
+  const res = await api.put(`/medicines/${id}`, data);
+  return res.data.data;
 };
 
 export const deleteMedicine = async (id: string): Promise<void> => {

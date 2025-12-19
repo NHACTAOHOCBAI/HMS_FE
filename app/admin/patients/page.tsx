@@ -88,6 +88,10 @@ export default function PatientsPage() {
   const { data, isLoading } = usePatients(params);
   const { mutate: deletePatient, isPending: isDeleting } = useDeletePatient();
 
+  console.log("[PatientsPage] Current params:", params);
+  console.log("[PatientsPage] Query data:", data);
+  console.log("[PatientsPage] Patients count:", data?.content?.length);
+
   const patients = data?.content ?? [];
   const totalPages = data?.totalPages ?? 1;
   const totalElements = data?.totalElements ?? 0;
@@ -209,8 +213,8 @@ export default function PatientsPage() {
       <FilterPills
         filters={[
           { id: "all", label: "All", count: totalElements },
-          { id: "male", label: "Male", count: patients.filter(p => p.gender?.toUpperCase() === "MALE").length },
-          { id: "female", label: "Female", count: patients.filter(p => p.gender?.toUpperCase() === "FEMALE").length },
+          { id: "male", label: "Male", count: patients.filter((p: Patient) => p.gender?.toUpperCase() === "MALE").length },
+          { id: "female", label: "Female", count: patients.filter((p: Patient) => p.gender?.toUpperCase() === "FEMALE").length },
         ]}
         activeFilter={quickFilter}
         onFilterChange={(id) => {
@@ -319,7 +323,7 @@ export default function PatientsPage() {
           ) : viewMode === "grid" ? (
             // Grid View
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {patients.map((patient) => (
+              {patients.map((patient: Patient) => (
                 <PatientCard
                   key={patient.id}
                   patient={patient}
@@ -363,7 +367,7 @@ export default function PatientsPage() {
                 <TableBody>
                   {isLoading
                     ? tableSkeleton
-                    : patients.map((patient) => (
+                    : patients.map((patient: Patient) => (
                         <TableRow
                           key={patient.id}
                           className="cursor-pointer hover:bg-sky-50/50 border-b border-slate-100"

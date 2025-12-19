@@ -28,7 +28,7 @@ export default function PatientPrescriptionsPage() {
   });
 
   // Filter for exams that have prescriptions
-  const allExams = data?.data?.content || [];
+  const allExams = data?.content || [];
   const examsWithPrescriptions = useMemo(
     () => allExams.filter((exam) => exam.prescription),
     [allExams]
@@ -85,7 +85,7 @@ export default function PatientPrescriptionsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {prescriptions.map((prescription: any) => (
+          {prescriptions.map((prescription) => (
             <Card
               key={prescription.id}
               className="hover:shadow-md transition-shadow cursor-pointer"
@@ -116,8 +116,10 @@ export default function PatientPrescriptionsPage() {
                       </div>
                       <div>
                         <span className="font-medium">Medicines:</span>{" "}
-                        {prescription.itemCount}{" "}
-                        {prescription.itemCount === 1 ? "item" : "items"}
+                        {prescription.prescription?.items?.length || 0}{" "}
+                        {(prescription.prescription?.items?.length || 0) === 1
+                          ? "item"
+                          : "items"}
                       </div>
                     </div>
                   </div>
@@ -132,10 +134,10 @@ export default function PatientPrescriptionsPage() {
       )}
 
       {/* Pagination */}
-      {totalElements > 0 && data?.data && (
+      {totalElements > 0 && data && (
         <DataTablePagination
           currentPage={page}
-          totalPages={data.data.totalPages || 1}
+          totalPages={data.totalPages || 1}
           totalElements={totalElements}
           pageSize={pageSize}
           onPageChange={setPage}

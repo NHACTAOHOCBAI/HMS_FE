@@ -1,6 +1,6 @@
 import axios from "axios";
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BE_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_BE_BASE_URL || "http://localhost:8080/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -9,13 +9,31 @@ const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   function (config) {
-    // Do something before request is sent
+    // Skip adding Authorization header for auth endpoints
+    const authEndpoints = ['/auth/login', '/auth/register', '/auth/refresh'];
+    const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint));
+    
+    if (isAuthEndpoint) {
+      return config;
+    }
+    
+    // Attach Authorization header if token exists
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      console.log(`[Axios] Requesting ${config.url}. Token exists? ${!!token}`);
+      console.log(`[Axios] Full URL: ${config.baseURL}${config.url}`);
+      console.log(`[Axios] Params:`, config.params);
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
     return config;
   },
   function (error) {
     // Do something with request error
     return Promise.reject(error);
   },
+
 );
 
 // Add a response interceptor

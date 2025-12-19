@@ -35,7 +35,12 @@ export function DepartmentStatusBadge({
   status,
   showIcon = true,
 }: DepartmentStatusBadgeProps) {
-  const config = statusConfig[status];
+  // Fallback for unknown or undefined status
+  const config = statusConfig[status] || {
+    label: status || "Unknown",
+    className: "bg-gray-100 text-gray-500 hover:bg-gray-100",
+    icon: XCircle,
+  };
   const Icon = config.icon;
 
   return (

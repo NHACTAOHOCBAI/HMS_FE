@@ -11,7 +11,7 @@ import {
 } from "@/interfaces/reports";
 import { USE_MOCK } from "@/lib/mocks/toggle";
 
-const BASE_URL = "/api/reports";
+const BASE_URL = "/reports";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Mock data for development

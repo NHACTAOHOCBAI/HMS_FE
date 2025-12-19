@@ -69,10 +69,16 @@ export default function PatientDetailPage() {
   const { data: patient, isLoading, error } = usePatient(patientId);
   const { mutate: deletePatient, isPending: isDeleting } = useDeletePatient();
 
-  // Fetch appointments for this patient
+  // Fetch appointments for this patient using the dedicated endpoint
   const { data: appointmentsData, isLoading: loadingAppointments } = useQuery({
     queryKey: ["patient-appointments", patientId],
-    queryFn: () => appointmentService.list({ patientId, size: 50 }),
+    queryFn: async () => {
+      const response = await (await import("@/config/axios")).default.get(
+        `/appointments/by-patient/${patientId}`,
+        { params: { size: 50 } }
+      );
+      return response.data.data; // Extract from ApiResponse wrapper
+    },
     enabled: !!patientId,
   });
 

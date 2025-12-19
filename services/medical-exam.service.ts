@@ -9,6 +9,11 @@ import {
 } from "@/interfaces/medical-exam";
 import { mockMedicalExams } from "@/lib/mocks/data/medical-exams"; // IMPORT THE CENTRAL MOCK DATA
 import { invoices } from "@/mocks/handlers/billing"; // Import invoices for auto-generation
+import axiosInstance from "@/config/axios";
+import { USE_MOCK } from "@/lib/mocks/toggle";
+
+const BASE_URL_EXAMS = "/exams";
+const BASE_URL_PRESCRIPTIONS = "/prescriptions";
 
 // Helper to simulate delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -16,6 +21,12 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // ============ Mock Functions for Development ============
 
 export const getMedicalExams = async (params?: MedicalExamListParams) => {
+  if (!USE_MOCK) {
+    const response = await axiosInstance.get(`${BASE_URL_EXAMS}/all`, { params });
+    // Backend returns ApiResponse<PageResponse<T>> - extract data.data
+    return response.data.data;
+  }
+
   await delay(500);
   let filtered = [...mockMedicalExams];
 
@@ -64,11 +75,21 @@ export const getMedicalExams = async (params?: MedicalExamListParams) => {
 };
 
 export const getMedicalExam = async (id: string) => {
+  if (!USE_MOCK) {
+    const response = await axiosInstance.get(`${BASE_URL_EXAMS}/${id}`);
+    return response.data.data;
+  }
+
   await delay(300);
   return mockMedicalExams.find((e) => e.id === id);
 };
 
 export const getMedicalExamByAppointment = async (appointmentId: string) => {
+  if (!USE_MOCK) {
+    const response = await axiosInstance.get(`${BASE_URL_EXAMS}/by-appointment/${appointmentId}`);
+    return response.data.data;
+  }
+
   await delay(300);
   return mockMedicalExams.find((e) => e.appointment.id === appointmentId);
 };
@@ -78,6 +99,23 @@ export const createMedicalExam = async (
   doctorInfo?: { id: string; fullName: string },
   patientInfo?: { id: string; fullName: string }
 ) => {
+  if (!USE_MOCK) {
+    console.log("📞 [MedicalExamService] Creating medical exam with payload:", data);
+    try {
+      const response = await axiosInstance.post(BASE_URL_EXAMS, data);
+      console.log("✅ [MedicalExamService] Created successfully:", response.data);
+      return response.data.data;
+    } catch (error: any) {
+      console.error("❌ [MedicalExamService] Error creating medical exam:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        errorData: error.response?.data,
+        payload: data,
+      });
+      throw error;
+    }
+  }
+
   await delay(500);
   const status: ExamStatus = data.status || "PENDING";
   const newExam: MedicalExam = {
@@ -114,6 +152,11 @@ export const updateMedicalExam = async (
   id: string,
   data: MedicalExamUpdateRequest
 ) => {
+  if (!USE_MOCK) {
+    const response = await axiosInstance.patch(`${BASE_URL_EXAMS}/${id}`, data);
+    return response.data.data;
+  }
+
   await delay(500);
   const index = mockMedicalExams.findIndex((e) => e.id === id);
   if (index === -1) throw new Error("Medical Exam not found");
@@ -157,6 +200,16 @@ export const createPrescriptionMock = async (
   examId: string,
   data: PrescriptionCreateRequest
 ) => {
+  if (!USE_MOCK) {
+    // Backend expects POST /exams/{examId}/prescriptions (nested resource pattern)
+    // Not POST /prescriptions with examId in body
+    const response = await axiosInstance.post(
+      `${BASE_URL_EXAMS}/${examId}/prescriptions`,
+      data
+    );
+    return response.data.data;
+  }
+
   await delay(500);
   const examIndex = mockMedicalExams.findIndex((e) => e.id === examId);
   if (examIndex === -1) throw new Error("Medical exam not found");
@@ -194,7 +247,7 @@ export const createPrescriptionMock = async (
     updatedAt: new Date().toISOString(),
   };
 
-  // AUTO-GENERATE INVOICE when prescription is created
+  // AUTO-GENERATE INVOICE when prescription is created (Backend handles this)
   const consultationFee = 200000; // Base consultation fee
   const medicineItems = newPrescription.items.map((item) => ({
     id: `item-${Date.now()}-${item.id}`,
@@ -255,6 +308,16 @@ export const updatePrescriptionMock = async (
   examId: string,
   data: PrescriptionCreateRequest
 ) => {
+  if (!USE_MOCK) {
+    // Current Backend PrescriptionController likely DOES NOT support update.
+    // I will try standard PATCH /prescriptions/{id} if I can find ID.
+    // But if controller doesn't have it, it will 404.
+    // Let's assume for now we cannot update or we try a hypothetical endpoint.
+    // If user didn't ask to implement missing backend features, I should just try best guess or throw.
+    // Throwing is safer to avoid confusion.
+    throw new Error("Update prescription not implemented in backend yet");
+  }
+
   await delay(500);
   const examIndex = mockMedicalExams.findIndex((e) => e.id === examId);
   if (examIndex === -1) throw new Error("Medical exam not found");
@@ -290,6 +353,12 @@ export const updatePrescriptionMock = async (
 };
 
 export const getPrescriptionByExam = async (examId: string) => {
+  if (!USE_MOCK) {
+    // Correct Path: GET /exams/{examId}/prescription
+    const response = await axiosInstance.get(`${BASE_URL_EXAMS}/${examId}/prescription`);
+    return { data: response.data.data }; // Match mock structure return { data: ... }
+  }
+
   await delay(300);
   const exam = mockMedicalExams.find((e) => e.id === examId);
   if (!exam || !exam.prescription) {

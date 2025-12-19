@@ -33,7 +33,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { Textarea } from "@/components/ui/textarea";
-import { ScheduleRequest } from "@/interfaces/hr";
+import { ScheduleRequest, Employee } from "@/interfaces/hr";
 import { useEmployees } from "@/hooks/queries/useHr";
 import { Check, ChevronsUpDown, Calendar } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
@@ -149,7 +149,7 @@ export default function ScheduleForm({
                           className="w-full justify-between"
                         >
                           {field.value
-                            ? employees.find((emp) => emp.id === field.value)
+                            ? employees.find((emp: Employee) => emp.id === field.value)
                                 ?.fullName
                             : "Select employee"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -161,7 +161,7 @@ export default function ScheduleForm({
                         <CommandInput placeholder="Search employee" />
                         <CommandEmpty>No employee found.</CommandEmpty>
                         <CommandGroup>
-                          {employees.map((emp) => (
+                          {employees.map((emp: Employee) => (
                             <CommandItem
                               key={emp.id}
                               value={emp.fullName}

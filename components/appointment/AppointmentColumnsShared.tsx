@@ -68,14 +68,24 @@ function ColumnActions({
         </DropdownMenuItem>
 
         {canEdit && (
-          <DropdownMenuItem onClick={() => onEdit(appointment)}>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(appointment);
+            }}
+          >
             <Pencil className="mr-2 h-4 w-4" />
             Edit / Reschedule
           </DropdownMenuItem>
         )}
 
         {canComplete && (
-          <DropdownMenuItem onClick={() => onComplete(appointment)}>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              onComplete(appointment);
+            }}
+          >
             <CheckCircle className="mr-2 h-4 w-4" />
             Mark as Completed
           </DropdownMenuItem>
@@ -86,7 +96,10 @@ function ColumnActions({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
-              onClick={() => onCancel(appointment)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCancel(appointment);
+              }}
             >
               <XCircle className="mr-2 h-4 w-4" />
               Cancel

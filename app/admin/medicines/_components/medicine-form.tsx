@@ -57,7 +57,7 @@ export function MedicineForm({
   isLoading,
 }: MedicineFormProps) {
   const { data: categoriesData } = useCategories();
-  const categories = categoriesData?.data?.content || [];
+  const categories = categoriesData?.content || [];
   const form = useForm<MedicineFormValues>({
     resolver: zodResolver(medicineFormSchema),
     defaultValues: {
@@ -223,7 +223,7 @@ export function MedicineForm({
                       <MyDatePicker
                         value={field.value ? new Date(field.value) : undefined}
                         onChange={(date) =>
-                          field.onChange(date?.toISOString().split("T")[0])
+                          field.onChange(date?.toISOString())
                         }
                       />
                     </FormControl>

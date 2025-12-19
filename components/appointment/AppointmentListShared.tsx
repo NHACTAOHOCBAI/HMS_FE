@@ -37,6 +37,7 @@ import {
 } from "@/hooks/queries/useAppointment";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useEmployees } from "@/hooks/queries/useHr";
+import { Employee } from "@/interfaces/hr";
 import { useAuth } from "@/contexts/AuthContext";
 import { CancelAppointmentDialog } from "@/app/admin/appointments/_components/cancel-appointment-dialog";
 import { getAppointmentColumnsByRole } from "@/components/appointment/AppointmentColumnsShared";
@@ -170,9 +171,9 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
   const totalElements = data?.totalElements || 0;
 
   // Calculate stats
-  const scheduledCount = useMemo(() => appointments.filter(a => a.status === "SCHEDULED").length, [appointments]);
-  const completedCount = useMemo(() => appointments.filter(a => a.status === "COMPLETED").length, [appointments]);
-  const cancelledCount = useMemo(() => appointments.filter(a => a.status === "CANCELLED").length, [appointments]);
+  const scheduledCount = useMemo(() => appointments.filter((a: Appointment) => a.status === "SCHEDULED").length, [appointments]);
+  const completedCount = useMemo(() => appointments.filter((a: Appointment) => a.status === "COMPLETED").length, [appointments]);
+  const cancelledCount = useMemo(() => appointments.filter((a: Appointment) => a.status === "CANCELLED").length, [appointments]);
 
   return (
     <div className="w-full space-y-6">
@@ -280,7 +281,7 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Doctors</SelectItem>
-              {doctors.map((doctor) => (
+              {doctors.map((doctor: Employee) => (
                 <SelectItem key={doctor.id} value={doctor.id}>
                   {doctor.fullName}
                 </SelectItem>

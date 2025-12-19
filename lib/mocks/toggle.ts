@@ -1,1 +1,2 @@
-export const USE_MOCK = true; //process.env.NEXT_PUBLIC_USE_MOCK === "1";
+export const USE_MOCK = false; //process.env.NEXT_PUBLIC_USE_MOCK === "1";
+

@@ -26,6 +26,7 @@ import {
 import { useMedicalExamList } from "@/hooks/queries/useMedicalExam";
 import { useDebounce } from "@/hooks/useDebounce";
 import { MedicalExamListItem } from "@/interfaces/medical-exam";
+import { Employee } from "@/interfaces/hr";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { useEmployees } from "@/hooks/queries/useHr";
 import { Spinner } from "@/components/ui/spinner";
@@ -61,27 +62,27 @@ export default function MedicalExamListPage() {
     doctorId: doctorId !== "ALL" ? doctorId : undefined,
   });
 
-  const exams = data?.data?.content || [];
-  const totalPages = data?.data?.totalPages || 1;
-  const totalElements = data?.data?.totalElements || 0;
+  const exams = data?.content || [];
+  const totalPages = data?.totalPages || 1;
+  const totalElements = data?.totalElements || 0;
 
   // Count exams with and without prescriptions
   const withPrescription = useMemo(
-    () => exams.filter((e) => e.hasPrescription).length,
+    () => exams.filter((e: MedicalExamListItem) => e.hasPrescription).length,
     [exams]
   );
   const withoutPrescription = useMemo(
-    () => exams.filter((e) => !e.hasPrescription).length,
+    () => exams.filter((e: MedicalExamListItem) => !e.hasPrescription).length,
     [exams]
   );
 
   // Filtered exams based on quick filter
   const filteredExams = useMemo(() => {
     if (quickFilter === "with_rx") {
-      return exams.filter((e) => e.hasPrescription);
+      return exams.filter((e: MedicalExamListItem) => e.hasPrescription);
     }
     if (quickFilter === "without_rx") {
-      return exams.filter((e) => !e.hasPrescription);
+      return exams.filter((e: MedicalExamListItem) => !e.hasPrescription);
     }
     return exams;
   }, [exams, quickFilter]);
@@ -172,7 +173,7 @@ export default function MedicalExamListPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">All Doctors</SelectItem>
-              {doctorsData?.content?.map((doctor) => (
+              {doctorsData?.content?.map((doctor: Employee) => (
                 <SelectItem key={doctor.id} value={doctor.id}>
                   {doctor.fullName}
                 </SelectItem>

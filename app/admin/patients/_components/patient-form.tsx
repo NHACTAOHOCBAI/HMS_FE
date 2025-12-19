@@ -183,7 +183,7 @@ export function PatientForm({
                 name="gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="form-label">Gender</FormLabel>
+                    <FormLabel className="form-label form-label-required">Gender</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

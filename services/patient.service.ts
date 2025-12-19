@@ -9,6 +9,8 @@ import {
   PatientFormValues,
 } from "@/interfaces/patient";
 import { mockPatients } from "@/lib/mocks";
+import axiosInstance from "@/config/axios";
+import { USE_MOCK } from "@/lib/mocks/toggle";
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -43,6 +45,54 @@ let patientData: Patient[] = loadPatientData();
 export const getPatients = async (
   params: PatientListParams,
 ): Promise<PatientListResponse> => {
+  if (!USE_MOCK) {
+    // Build RSQL filter string from params
+    const filterParts: string[] = [];
+    
+    // Search filter - search across fullName, phoneNumber, email
+    if (params.search) {
+      const searchTerm = params.search.trim();
+      if (searchTerm) {
+        // RSQL pattern matching with wildcard
+        filterParts.push(`fullName==*${searchTerm}*,phoneNumber==*${searchTerm}*,email==*${searchTerm}*`);
+      }
+    }
+    
+    // Gender filter
+    if (params.gender) {
+      filterParts.push(`gender==${params.gender}`);
+    }
+    
+    // Blood type filter
+    if (params.bloodType) {
+      filterParts.push(`bloodType==${params.bloodType}`);
+    }
+    
+    // Combine filters with AND (;) - use parentheses for OR (,) groups
+    const filterString = filterParts.length > 0 
+      ? filterParts.map(f => f.includes(',') ? `(${f})` : f).join(';')
+      : undefined;
+    
+    // Build API params with 0-based pagination
+    const apiParams: Record<string, unknown> = {
+      page: params.page ?? 0,
+      size: params.size ?? 10,
+    };
+    
+    if (filterString) {
+      apiParams.filter = filterString;
+    }
+    
+    if (params.sort) {
+      apiParams.sort = params.sort;
+    }
+    
+    const response = await axiosInstance.get<{ data: PatientListResponse }>("/patients/all", {
+      params: apiParams,
+    });
+    return response.data.data; // Extract from ApiResponse wrapper
+  }
+
   await delay(300);
 
   let filtered = [...patientData];
@@ -102,6 +152,12 @@ export const getPatients = async (
 
 // GET /api/patients/:id - Get patient by ID
 export const getPatient = async (id: string): Promise<Patient> => {
+  if (!USE_MOCK) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await axiosInstance.get<{ data: Patient }>(`/patients/${id}`);
+    return response.data.data; // Extract from ApiResponse wrapper
+  }
+
   await delay(200);
   const patient = patientData.find((p) => p.id === id);
   if (!patient) {
@@ -117,6 +173,12 @@ export const getPatient = async (id: string): Promise<Patient> => {
 
 // GET /api/patients/me - Get current user's patient profile
 export const getMyProfile = async (): Promise<Patient> => {
+  if (!USE_MOCK) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await axiosInstance.get<{ data: Patient }>("/patients/me");
+    return response.data.data; // Extract from ApiResponse wrapper
+  }
+
   await delay(200);
   // Return first patient as mock "my profile"
   return patientData[0];
@@ -126,6 +188,12 @@ export const getMyProfile = async (): Promise<Patient> => {
 export const createPatient = async (
   data: CreatePatientRequest,
 ): Promise<Patient> => {
+  if (!USE_MOCK) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await axiosInstance.post<{ data: Patient }>("/patients", data);
+    return response.data.data; // Extract from ApiResponse wrapper
+  }
+
   await delay(300);
 
   // Check for duplicate phone
@@ -185,6 +253,17 @@ export const updatePatient = async (
   id: string,
   data: UpdatePatientRequest,
 ): Promise<Patient> => {
+  if (!USE_MOCK) {
+    // Backend uses PATCH for partial updates typically, or PUT for full. 
+    // GenericController update logic usually maps to PUT or PATCH depending on implementation.
+    // Given updateMyProfile uses PATCH, let's assume PATCH for consistency if partial.
+    // However, GenericController in backend usually provides PUT for full update and PATCH for partial.
+    // UpdatePatientRequest implies partial? It imports definitions. 
+    // GenericController uses @PutMapping("/{id}") for updates
+    const response = await axiosInstance.put<{ data: Patient }>(`/patients/${id}`, data);
+    return response.data.data; // Extract from ApiResponse wrapper
+  }
+
   await delay(300);
 
   const index = patientData.findIndex((p) => p.id === id);
@@ -226,10 +305,15 @@ export const updatePatient = async (
   return updated;
 };
 
-// PUT /api/patients/me - Update own profile (patient self-service)
+// PATCH /api/patients/me - Update own profile (patient self-service)
 export const updateMyProfile = async (
   data: UpdateMyProfileRequest,
 ): Promise<Patient> => {
+  if (!USE_MOCK) {
+    const response = await axiosInstance.patch<{ data: Patient }>("/patients/me", data);
+    return response.data.data; // Extract from ApiResponse wrapper
+  }
+
   await delay(300);
   // Update first patient as mock "my profile"
   const updated: Patient = {
@@ -246,6 +330,13 @@ export const updateMyProfile = async (
 export const deletePatient = async (
   id: string,
 ): Promise<DeletePatientResponse> => {
+  if (!USE_MOCK) {
+    const response = await axiosInstance.delete<DeletePatientResponse>(
+      `/patients/${id}`,
+    );
+    return response.data;
+  }
+
   await delay(300);
 
   const index = patientData.findIndex((p) => p.id === id);

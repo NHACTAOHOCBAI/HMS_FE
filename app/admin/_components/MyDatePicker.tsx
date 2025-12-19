@@ -38,6 +38,8 @@ const MyDatePicker = ({ value, onChange, disabled }: MyDatePickerProps) => {
             mode="single"
             selected={value}
             captionLayout="dropdown"
+            fromYear={1900}
+            toYear={new Date().getFullYear() + 10}
             onSelect={(date) => {
               onChange?.(date);
               setOpen(false);

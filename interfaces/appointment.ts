@@ -48,6 +48,8 @@ export interface AppointmentCreateRequest {
 }
 
 export interface AppointmentUpdateRequest {
+  patientId?: string;
+  doctorId?: string;
   appointmentTime?: string;
   type?: AppointmentType;
   reason?: string;

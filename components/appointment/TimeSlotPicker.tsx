@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useTimeSlots } from "@/hooks/queries/useAppointment"; // Import useTimeSlots
+import { useTimeSlots } from "@/hooks/queries/useAppointment";
 import { Spinner } from "@/components/ui/spinner";
 import { TimeSlot } from "@/interfaces/appointment";
 
@@ -24,7 +23,7 @@ export function TimeSlotPicker({
   excludeAppointmentId,
 }: TimeSlotPickerProps) {
   // Fetch slots using the hook
-  const { data: slots, isLoading } = useTimeSlots(
+  const { data: slots, isLoading, error } = useTimeSlots(
     doctorId,
     date,
     excludeAppointmentId
@@ -37,6 +36,10 @@ export function TimeSlotPicker({
         <span className="text-muted-foreground">Loading slots...</span>
       </div>
     );
+  }
+
+  if (error) {
+    console.error("❌ [TimeSlotPicker] Error fetching slots:", error);
   }
 
   if (!slots || slots.length === 0) {

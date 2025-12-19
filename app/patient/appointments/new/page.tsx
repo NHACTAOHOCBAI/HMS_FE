@@ -143,7 +143,7 @@ export default function PatientBookingPage() {
   });
   const availableDays = useMemo(() => {
     return (
-      monthlySchedule?.content.map((schedule) => parseISO(schedule.workDate)) ||
+      monthlySchedule?.content.map((schedule: any) => parseISO(schedule.workDate)) ||
       []
     );
   }, [monthlySchedule]);
@@ -184,7 +184,7 @@ export default function PatientBookingPage() {
   };
 
   const selectedDoctor = useMemo(
-    () => doctors.find((d) => d.id === doctorId),
+    () => doctors.find((d: Employee) => d.id === doctorId),
     [doctors, doctorId],
   );
 
@@ -259,7 +259,7 @@ export default function PatientBookingPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {doctors.map((doctor) => (
+                  {doctors.map((doctor: Employee) => (
                     <DoctorCard
                       key={doctor.id}
                       doctor={doctor}
@@ -361,7 +361,7 @@ export default function PatientBookingPage() {
               </p>
               <p>
                 <strong>Chuyên khoa:</strong>{" "}
-                {departments.find((d) => d.id === selectedDoctor?.departmentId)
+                {departments.find((d: Department) => d.id === selectedDoctor?.departmentId)
                   ?.name || "N/A"}
               </p>
               <p>

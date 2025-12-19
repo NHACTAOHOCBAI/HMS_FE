@@ -37,6 +37,7 @@ import {
   useDeleteEmployee,
   useDepartments,
 } from "@/hooks/queries/useHr";
+import { Employee, Department } from "@/interfaces/hr";
 import { RoleBadge } from "../_components/role-badge";
 import { EmployeeStatusBadge } from "../_components/employee-status-badge";
 import { useAuth } from "@/contexts/AuthContext";
@@ -85,9 +86,9 @@ export default function EmployeesPage() {
   const totalElements = data?.totalElements ?? 0;
 
   // Calculate stats
-  const doctorCount = useMemo(() => employees.filter(e => e.role === "DOCTOR").length, [employees]);
-  const nurseCount = useMemo(() => employees.filter(e => e.role === "NURSE").length, [employees]);
-  const activeCount = useMemo(() => employees.filter(e => e.status === "ACTIVE").length, [employees]);
+  const doctorCount = useMemo(() => employees.filter((e: Employee) => e.role === "DOCTOR").length, [employees]);
+  const nurseCount = useMemo(() => employees.filter((e: Employee) => e.role === "NURSE").length, [employees]);
+  const activeCount = useMemo(() => employees.filter((e: Employee) => e.status === "ACTIVE").length, [employees]);
 
   const handleDelete = (id: string, fullName: string) => {
     deleteEmployee.mutate(id, {
@@ -183,7 +184,7 @@ export default function EmployeesPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">All Departments</SelectItem>
-            {departments.map((dept) => (
+            {departments.map((dept: Department) => (
               <SelectItem key={dept.id} value={dept.id}>
                 {dept.name}
               </SelectItem>
@@ -263,7 +264,6 @@ export default function EmployeesPage() {
                   <TableHead>Role</TableHead>
                   <TableHead>Department</TableHead>
                   <TableHead>Specialization</TableHead>
-                  <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -272,12 +272,12 @@ export default function EmployeesPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="py-10 text-center">
+                    <TableCell colSpan={7} className="py-10 text-center">
                       <Spinner className="mx-auto text-muted-foreground" />
                     </TableCell>
                   </TableRow>
                 ) : employees.length ? (
-                  employees.map((row) => (
+                  employees.map((row: Employee) => (
                     <TableRow
                       key={row.id}
                       accent="violet"
@@ -295,9 +295,6 @@ export default function EmployeesPage() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {row.specialization || "N/A"}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {row.email}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {row.phoneNumber || "N/A"}
@@ -341,7 +338,7 @@ export default function EmployeesPage() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={7}
                       className="py-10 text-center text-muted-foreground"
                     >
                       No employees found.

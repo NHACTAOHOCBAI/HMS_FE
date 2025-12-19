@@ -131,7 +131,7 @@ export function PrescriptionForm({
                             >
                               {field.value
                                 ? medicines.find(
-                                    (m) => m.id.toString() === field.value,
+                                    (m: Medicine) => m.id.toString() === field.value,
                                   )?.name
                                 : "Select medicine"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -144,7 +144,7 @@ export function PrescriptionForm({
                             <CommandList>
                               <CommandEmpty>No medicine found.</CommandEmpty>
                               <CommandGroup>
-                                {medicines.map((medicine) => (
+                                {medicines.map((medicine: Medicine) => (
                                   <CommandItem
                                     value={medicine.name}
                                     key={medicine.id}

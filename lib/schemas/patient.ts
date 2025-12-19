@@ -1,57 +1,68 @@
 import { z } from "zod";
 
-// Patient form validation schema
+// Patient form validation schema - matches backend PatientRequest DTO
 export const patientFormSchema = z.object({
   fullName: z
     .string()
     .min(1, "Full name is required")
-    .max(255, "Full name must be less than 255 characters"),
-  email: z.string().email("Invalid email format").optional().or(z.literal("")),
+    .max(100, "Full name cannot exceed 100 characters"), // Backend: @NotBlank, @Size(max = 100)
+  email: z
+    .string()
+    .email("Invalid email format")
+    .optional()
+    .or(z.literal("")), // Backend: @Email (optional)
   phoneNumber: z
     .string()
-    .regex(/^0[0-9]{9}$/, "Phone number must be 10 digits starting with 0"),
+    .min(1, "Phone number is required")
+    .regex(
+      /^(0|\+84)\d{9}$/,
+      "Phone must start with 0 or +84 followed by 9 digits"
+    ),
   dateOfBirth: z
     .string()
-    .min(1, "Date of birth is required")
+    .min(1, "Date of birth is required") // Backend: @NotNull
     .refine(
       (val) => {
         if (!val) return false;
         const d = new Date(val);
         return d < new Date();
       },
-      { message: "Date of birth cannot be in the future" },
+      { message: "Date of birth must be in the past" } // Backend: @Past
     ),
-  gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"]), // Backend: @NotNull - REQUIRED
   address: z
     .string()
-    .max(500, "Address must be less than 500 characters")
+    .max(255, "Address cannot exceed 255 characters")
     .optional(),
   identificationNumber: z
     .string()
-    .max(50, "ID number must be less than 50 characters")
-    .optional(),
+    .regex(/^\d{12}$/, "ID number must be exactly 12 digits")
+    .optional()
+    .or(z.literal("")), // Backend: @Pattern(regexp = "^\\d{12}$")
   healthInsuranceNumber: z
     .string()
-    .max(50, "Insurance number must be less than 50 characters")
-    .optional(),
+    .max(20, "Health insurance number cannot exceed 20 characters")
+    .optional(), // Backend: @Size(max = 20)
   bloodType: z
     .enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"])
     .optional(),
-  allergies: z.array(z.string()).optional(),
+  allergies: z.array(z.string()).optional(), // Backend: @Size(max = 100)
   relativeFullName: z
     .string()
-    .max(100, "Contact name must be less than 100 characters")
-    .optional(),
+    .max(100, "Contact name cannot exceed 100 characters")
+    .optional(), // Backend: @Size(max = 100)
   relativePhoneNumber: z
     .string()
-    .max(15, "Contact phone must be less than 15 digits")
-    .regex(/^[0-9+\-\s]*$/, "Invalid phone number format")
+    .regex(
+      /^(0|\+84)\d{9}$/,
+      "Contact phone must start with 0 or +84 followed by 9 digits"
+    )
     .optional()
-    .or(z.literal("")),
+    .or(z.literal("")), // Backend: @Pattern(regexp = "^(0|\\+84)(\\d{9})$")
   relativeRelationship: z
     .enum(["SPOUSE", "PARENT", "CHILD", "SIBLING", "FRIEND", "OTHER"])
     .optional(),
-  accountId: z.string().max(100).optional(),
+  accountId: z.string().optional(),
 });
 
 export type PatientFormValues = z.infer<typeof patientFormSchema>;

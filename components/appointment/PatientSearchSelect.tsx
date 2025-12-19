@@ -68,7 +68,7 @@ export function PatientSearchSelect({
           <CommandList>
             <CommandEmpty>Không tìm thấy</CommandEmpty>
             <CommandGroup>
-              {patients.map((patient) => (
+              {patients.map((patient: Patient) => (
                 <CommandItem
                   key={patient.id}
                   value={patient.id}

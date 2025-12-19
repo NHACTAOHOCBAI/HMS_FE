@@ -15,7 +15,6 @@ import {
   User,
   Briefcase,
   Phone,
-  Mail,
   MapPin,
   Building2,
   Award,
@@ -91,14 +90,12 @@ export default function EmployeeViewPage() {
       {/* Hero Header */}
       <DetailPageHeader
         title={employee.fullName}
-        subtitle={`ID: ${employee.id}`}
         backHref="/admin/hr/employees"
         theme="violet"
         avatar={{
           initials: employee.fullName.charAt(0).toUpperCase(),
         }}
         metaItems={[
-          { icon: <Mail className="h-4 w-4" />, text: employee.email || "No email" },
           { icon: <Phone className="h-4 w-4" />, text: employee.phoneNumber || "No phone" },
         ]}
         statusBadge={getRoleBadge(employee.role)}
@@ -173,12 +170,6 @@ export default function EmployeeViewPage() {
                 color="violet"
               />
               <InfoItem
-                icon={<Mail className="h-4 w-4" />}
-                label="Email"
-                value={employee.email}
-                color="sky"
-              />
-              <InfoItem
                 icon={<Phone className="h-4 w-4" />}
                 label="Phone"
                 value={employee.phoneNumber}
@@ -209,11 +200,6 @@ export default function EmployeeViewPage() {
                   employee.departmentName ? (
                     <span className="flex items-center gap-2">
                       {employee.departmentName}
-                      {employee.departmentId && (
-                        <Badge variant="outline" className="text-xs">
-                          {employee.departmentId}
-                        </Badge>
-                      )}
                     </span>
                   ) : null
                 }

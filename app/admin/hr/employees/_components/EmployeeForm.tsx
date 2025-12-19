@@ -36,9 +36,8 @@ import { User, Briefcase, Link2 } from "lucide-react";
 const formSchema = z
   .object({
     fullName: z.string().trim().min(1, "Full name is required"),
-    email: z.string().email("Invalid email address"),
     role: z.enum(["DOCTOR", "NURSE", "RECEPTIONIST", "ADMIN"]),
-    departmentId: z.string().optional(),
+    departmentId: z.string().min(1, "Department is required"),
     specialization: z.string().optional(),
     licenseNumber: z.string().optional(),
     phoneNumber: z.string().optional(),
@@ -50,16 +49,6 @@ const formSchema = z
   .superRefine((values, ctx) => {
     if (
       (values.role === "DOCTOR" || values.role === "NURSE") &&
-      !values.departmentId
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["departmentId"],
-        message: "Department is required for doctors and nurses",
-      });
-    }
-    if (
-      (values.role === "DOCTOR" || values.role === "NURSE") &&
       !values.licenseNumber
     ) {
       ctx.addIssue({
@@ -67,6 +56,17 @@ const formSchema = z
         path: ["licenseNumber"],
         message: "License number required for doctors/nurses",
       });
+    }
+    // Validate license number format if provided: XX-12345
+    if (values.licenseNumber) {
+      const licenseOk = /^[A-Z]{2}-[0-9]{5}$/.test(values.licenseNumber);
+      if (!licenseOk) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["licenseNumber"],
+          message: "License number must be format XX-12345 (e.g., AB-12345)",
+        });
+      }
     }
     if (values.phoneNumber) {
       const phoneOk = /^\d{10,15}$/.test(values.phoneNumber);
@@ -98,7 +98,6 @@ export default function EmployeeForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
-      email: initialData?.email || "",
       role: initialData?.role || "DOCTOR",
       departmentId: initialData?.departmentId || "",
       specialization: initialData?.specialization || "",
@@ -119,11 +118,14 @@ export default function EmployeeForm({
 
   const handleSubmit = (values: EmployeeFormValues) => {
     const submitData: EmployeeRequest = {
-      ...values,
-      departmentId:
-        values.departmentId === "none" || !values.departmentId
-          ? undefined
-          : values.departmentId,
+      fullName: values.fullName,
+      role: values.role,
+      departmentId: values.departmentId, // Always required by backend
+      status: values.status,
+      specialization: values.specialization || undefined,
+      licenseNumber: values.licenseNumber || undefined,
+      phoneNumber: values.phoneNumber || undefined,
+      address: values.address || undefined,
       accountId:
         values.accountId === "none" || !values.accountId
           ? undefined
@@ -161,23 +163,7 @@ export default function EmployeeForm({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="form-label form-label-required">Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="john.doe@example.com"
-                      type="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
 
             <FormField
               control={form.control}
@@ -250,13 +236,12 @@ export default function EmployeeForm({
               name="departmentId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="form-label">
-                    Department{" "}
-                    {role === "DOCTOR" || role === "NURSE" ? "*" : ""}
+                  <FormLabel className="form-label form-label-required">
+                    Department
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    value={field.value || "none"}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -264,7 +249,6 @@ export default function EmployeeForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
                       {departmentsData?.content?.map((dept: any) => (
                         <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
@@ -299,7 +283,7 @@ export default function EmployeeForm({
                   <FormItem>
                     <FormLabel className="form-label form-label-required">License Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="LIC-12345" {...field} />
+                      <Input placeholder="AB-12345" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

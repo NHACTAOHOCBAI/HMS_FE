@@ -44,8 +44,8 @@ export const useCreateDepartment = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: hrService.createDepartment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["departments"] });
     },
   });
 };
@@ -59,9 +59,9 @@ export const useUpdateDepartment = () => {
     }: {
       id: string;
     } & Partial<DepartmentRequest>) => hrService.updateDepartment(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
-      queryClient.invalidateQueries({ queryKey: ["department", id] });
+    onSuccess: async (_, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ["departments"] });
+      await queryClient.invalidateQueries({ queryKey: ["department", id] });
     },
   });
 };
@@ -70,8 +70,8 @@ export const useDeleteDepartment = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: hrService.deleteDepartment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["departments"] });
     },
   });
 };
@@ -123,8 +123,9 @@ export const useCreateEmployee = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: hrService.createEmployee,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    onSuccess: async () => {
+      // Wait for cache invalidation to complete before redirect
+      await queryClient.invalidateQueries({ queryKey: ["employees"] });
     },
   });
 };
@@ -138,9 +139,9 @@ export const useUpdateEmployee = () => {
     }: {
       id: string;
     } & Partial<EmployeeRequest>) => hrService.updateEmployee(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] });
-      queryClient.invalidateQueries({ queryKey: ["employee", id] });
+    onSuccess: async (_, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ["employees"] });
+      await queryClient.invalidateQueries({ queryKey: ["employee", id] });
     },
   });
 };
@@ -149,8 +150,8 @@ export const useDeleteEmployee = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: hrService.deleteEmployee,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["employees"] });
     },
   });
 };

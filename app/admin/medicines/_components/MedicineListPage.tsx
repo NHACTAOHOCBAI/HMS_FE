@@ -77,7 +77,7 @@ export function MedicineListPage() {
     search: debouncedSearch,
   });
   const { data: categoriesData } = useCategories(); // Fetch list of categories
-  const categories = categoriesData?.data?.content || [];
+  const categories = categoriesData?.content || [];
   const { mutate: deleteMedicine, isPending: isDeleting } = useDeleteMedicine();
 
   const medicines = data?.content ?? [];
@@ -125,14 +125,14 @@ export function MedicineListPage() {
   };
 
   // Calculate stats
-  const lowStockCount = useMemo(() => medicines.filter(m => m.quantity <= 10).length, [medicines]);
-  const expiredCount = useMemo(() => medicines.filter(m => isExpired(m.expiresAt)).length, [medicines]);
+  const lowStockCount = useMemo(() => medicines.filter((m: Medicine) => m.quantity <= 10).length, [medicines]);
+  const expiredCount = useMemo(() => medicines.filter((m: Medicine) => isExpired(m.expiresAt)).length, [medicines]);
 
   // Apply quick filter
   const filteredMedicines = useMemo(() => {
     if (quickFilter === "all") return medicines;
-    if (quickFilter === "low-stock") return medicines.filter(m => m.quantity <= 10);
-    if (quickFilter === "expired") return medicines.filter(m => isExpired(m.expiresAt));
+    if (quickFilter === "low-stock") return medicines.filter((m: Medicine) => m.quantity <= 10);
+    if (quickFilter === "expired") return medicines.filter((m: Medicine) => isExpired(m.expiresAt));
     return medicines;
   }, [medicines, quickFilter]);
 
@@ -270,7 +270,7 @@ export function MedicineListPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredMedicines.map((medicine) => (
+                  {filteredMedicines.map((medicine: Medicine) => (
                     <TableRow
                       key={medicine.id}
                       accent="teal"
@@ -360,7 +360,7 @@ export function MedicineListPage() {
             </div>
           ) : (
             <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredMedicines.map((medicine) => (
+              {filteredMedicines.map((medicine: Medicine) => (
                 <MedicineCard
                   key={medicine.id}
                   medicine={medicine}

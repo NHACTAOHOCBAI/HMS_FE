@@ -87,11 +87,11 @@ export default function NewAppointmentPage() {
   }, [watchedDoctorId, watchedDate, form]);
 
   const onSubmit = async (data: FormValues) => {
-    const appointmentTime =
-      format(data.appointmentDate, "yyyy-MM-dd") +
-      "T" +
-      data.appointmentTime +
-      ":00";
+    // Construct Date object to get ISO string (UTC) for backend Instant
+    const [hours, minutes] = data.appointmentTime.split(":").map(Number);
+    const date = new Date(data.appointmentDate);
+    date.setHours(hours, minutes, 0, 0);
+    const appointmentTime = date.toISOString();
 
     createMutation.mutate(
       {

@@ -70,7 +70,11 @@ export function DataTableRowActions({
     <div className={className}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
+          <Button 
+            variant="ghost" 
+            className="h-8 w-8 p-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             <MoreHorizontal className="h-4 w-4" />
             <span className="sr-only">Open menu</span>
           </Button>
@@ -85,7 +89,10 @@ export function DataTableRowActions({
             const menuItem = (
               <DropdownMenuItem
                 key={`${rowId}-${index}`}
-                onClick={() => handleAction(action)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAction(action);
+                }}
                 className={
                   isDestructive ? "text-destructive focus:text-destructive" : ""
                 }

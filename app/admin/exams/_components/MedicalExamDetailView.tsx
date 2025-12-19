@@ -83,10 +83,12 @@ export function MedicalExamDetailView({
     userRole === "DOCTOR" &&
     user?.employeeId === medicalExam.doctor.id &&
     isEditable;
+  // Allow ADMIN and DOCTOR roles to add prescriptions
+  // DOCTOR can only add to their own exams, ADMIN can add to any exam
   const canAddPrescription =
-    userRole === "DOCTOR" &&
-    user?.employeeId === medicalExam.doctor.id &&
-    !medicalExam.hasPrescription;
+    !medicalExam.hasPrescription &&
+    (userRole === "ADMIN" ||
+      (userRole === "DOCTOR" && user?.employeeId === medicalExam.doctor.id));
 
   return (
     <div className="space-y-6">
@@ -169,7 +171,7 @@ export function MedicalExamDetailView({
                 asChild
                 className="bg-white text-sky-600 hover:bg-white/90"
               >
-                <Link href={`/doctor/exams/${medicalExam.id}/prescription`}>
+                <Link href={`/admin/exams/${medicalExam.id}/prescription`}>
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Add Prescription
                 </Link>
@@ -343,7 +345,7 @@ export function MedicalExamDetailView({
                   {canAddPrescription && (
                     <Button asChild>
                       <Link
-                        href={`/doctor/exams/${medicalExam.id}/prescription`}
+                        href={`/admin/exams/${medicalExam.id}/prescription`}
                       >
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add Prescription

@@ -56,7 +56,7 @@ export function CategoryListPage() {
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
 
-  const categories = categoriesData?.data.content ?? [];
+  const categories = categoriesData?.content ?? [];
 
   const handleFormSubmit = (values: CategoryRequest) => {
     if (selectedCategory) {
@@ -140,7 +140,7 @@ export function CategoryListPage() {
                 </TableCell>
               </TableRow>
             ) : categories.length ? (
-              categories.map((category) => (
+              categories.map((category: Category) => (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
                   <TableCell className="text-muted-foreground">

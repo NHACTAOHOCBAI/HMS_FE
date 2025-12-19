@@ -7,9 +7,17 @@ import {
   ScheduleRequest,
 } from "@/interfaces/hr";
 import { mockDepartments, mockEmployees, mockSchedules } from "@/lib/mocks";
+import axiosInstance from "@/config/axios";
 import { USE_MOCK } from "@/lib/mocks/toggle";
 
-const BASE_URL = "/api/hr";
+const BASE_URL = "/hr"; // Gateway path prefix (gateway rewrites /api/hr -> /hr-service which maps to /hr/...)
+// Wait, my previous plan said "Base URL is http://localhost:8080/api". 
+// Gateway maps /api/hr/** -> hr-service. 
+// HR Service Controller RequestMapping is "/hr/departments".
+// So full path via Gateway is /api/hr/departments...
+// If axios baseURL is /api, then I need axiosInstance.get('/hr/departments').
+// Yes.
+
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Local mutable copies for mocks
@@ -50,10 +58,36 @@ export const hrService = {
   getDepartments: async (params?: {
     page?: number;
     size?: number;
-    sort?: string;
-    status?: string;
     search?: string;
+    status?: string;
+    sort?: string;
   }) => {
+    if (!USE_MOCK) {
+      const apiParams: any = {
+        ...params,
+        page: params?.page && params.page > 0 ? params.page - 1 : 0,
+      };
+
+      const filters: string[] = [];
+      if (params?.search) {
+        filters.push(`(name==*${params.search}*,code==*${params.search}*)`);
+      }
+      if (params?.status && params.status !== "ALL") {
+        filters.push(`status==${params.status}`);
+      }
+
+      if (filters.length > 0) {
+        apiParams.filter = filters.join(";");
+      }
+      delete apiParams.search; // Remove processed params
+      delete apiParams.status;
+
+      const response = await axiosInstance.get("/hr/departments/all", {
+        params: apiParams
+      });
+      return response.data.data;
+    }
+
     await delay(500);
     let filtered = [...deptData];
     if (params?.search) {
@@ -98,11 +132,21 @@ export const hrService = {
   },
 
   getDepartment: async (id: string) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.get(`/hr/departments/${id}`);
+      return response.data.data; // Extract from ApiResponse wrapper
+    }
+
     await delay(300);
     return deptData.find((d) => d.id === id);
   },
 
   createDepartment: async (data: DepartmentRequest) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.post("/hr/departments", data);
+      return response.data.data; // Extract from ApiResponse wrapper
+    }
+
     await delay(500);
     const newDept: Department = {
       id: Math.random().toString(36).substr(2, 9),
@@ -116,6 +160,19 @@ export const hrService = {
   },
 
   updateDepartment: async (id: string, data: Partial<DepartmentRequest>) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.put(`/hr/departments/${id}`, data);
+      return response.data; // Extract from ApiResponse wrapper, if generic controller returns ApiResponse
+      // Wait, getDepartments returns response.data
+      // Let's check generic controller return type. It returns ApiResponse<O>.
+      // So response.data is the ApiResponse. response.data.data is the O.
+      // But here I'm keeping existing logic pattern if getDepartments uses response.data.
+      // Actually previous edit fixed getDepartments to return response.data.data.
+      // So here I should also return response.data.data.
+      // But let's first fix the PUT.
+      // And I will fix return type to be safe.
+    }
+
     await delay(500);
     const index = deptData.findIndex((d) => d.id === id);
     if (index !== -1) {
@@ -138,6 +195,11 @@ export const hrService = {
   },
 
   deleteDepartment: async (id: string) => {
+    if (!USE_MOCK) {
+      await axiosInstance.delete(`/hr/departments/${id}`);
+      return;
+    }
+
     await delay(500);
     const index = deptData.findIndex((d) => d.id === id);
     if (index !== -1) {
@@ -147,6 +209,7 @@ export const hrService = {
   },
 
   // --- Employees ---
+
   getEmployees: async (params?: {
     page?: number;
     size?: number;
@@ -156,14 +219,60 @@ export const hrService = {
     status?: string;
     search?: string;
   }) => {
+    if (!USE_MOCK) {
+      // 1. Convert page to 0-based index for Spring Boot
+      const apiParams: any = {
+        ...params,
+        page: params?.page && params.page > 0 ? params.page - 1 : 0,
+      };
+
+      // 2. Construct RSQL filter string
+      const filters: string[] = [];
+      
+      if (params?.search) {
+        // Simple search on fullName or email using RSQL (==*value*)
+        // RSQL OR operator is comma (,), AND is semicolon (;)
+        // check GenericController implementation for details. 
+        // usually: (fullName==*val*,email==*val*)
+        filters.push(`(fullName==*${params.search}*)`);
+      }
+      
+      if (params?.departmentId && params.departmentId !== "ALL") {
+        filters.push(`departmentId==${params.departmentId}`);
+      }
+      
+      if (params?.role && params.role !== "ALL") {
+        filters.push(`role==${params.role}`);
+      }
+      
+      if (params?.status && params.status !== "ALL") {
+        filters.push(`status==${params.status}`);
+      }
+
+      if (filters.length > 0) {
+        apiParams.filter = filters.join(";"); // AND operator
+      }
+
+      // Remove individual params now that they are in filter
+      delete apiParams.departmentId;
+      delete apiParams.role;
+      delete apiParams.status;
+      delete apiParams.search;
+
+      const response = await axiosInstance.get("/hr/employees/all", { 
+        params: apiParams 
+      });
+      return response.data.data; // Extract from ApiResponse wrapper
+    }
+
     await delay(500);
+    // Mock logic remains same...
     let filtered = [...employeeData];
     if (params?.search) {
       const lowerSearch = params.search.toLowerCase();
       filtered = filtered.filter(
         (e) =>
-          e.fullName.toLowerCase().includes(lowerSearch) ||
-          e.email.toLowerCase().includes(lowerSearch),
+          e.fullName.toLowerCase().includes(lowerSearch),
       );
     }
     if (params?.departmentId) {
@@ -192,6 +301,32 @@ export const hrService = {
     page?: number;
     size?: number;
   }) => {
+    // Re-use getEmployees with role=DOCTOR
+    // Re-use getEmployees with role=DOCTOR
+    if (!USE_MOCK) {
+      const apiParams: any = {
+        ...params,
+        page: params?.page && params.page > 0 ? params.page - 1 : 0,
+      };
+
+      const filters: string[] = ["role==DOCTOR"];
+      
+      if (params?.departmentId) filters.push(`departmentId==${params.departmentId}`);
+      if (params?.status) filters.push(`status==${params.status}`);
+      if (params?.specialization) filters.push(`specialization==${params.specialization}`);
+
+      apiParams.filter = filters.join(";");
+      
+      delete apiParams.departmentId;
+      delete apiParams.status;
+      delete apiParams.specialization;
+
+      const response = await axiosInstance.get("/hr/employees/all", { 
+        params: apiParams 
+      });
+      return response.data.data;
+    }
+
     await delay(500);
     let filtered = employeeData.filter((e) => e.role === "DOCTOR");
     if (params?.departmentId) {
@@ -205,11 +340,21 @@ export const hrService = {
   },
 
   getEmployee: async (id: string) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.get(`/hr/employees/${id}`);
+      return response.data.data; // Extract from ApiResponse wrapper
+    }
+
     await delay(300);
     return employeeData.find((e) => e.id === id);
   },
 
   createEmployee: async (data: EmployeeRequest) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.post("/hr/employees", data);
+      return response.data.data; // Extract from ApiResponse wrapper
+    }
+
     await delay(500);
     const newEmp: Employee = {
       id: Math.random().toString(36).substr(2, 9),
@@ -222,6 +367,11 @@ export const hrService = {
   },
 
   updateEmployee: async (id: string, data: Partial<EmployeeRequest>) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.put(`/hr/employees/${id}`, data);
+      return response.data.data;
+    }
+
     await delay(500);
     const index = employeeData.findIndex((e) => e.id === id);
     if (index !== -1) {
@@ -232,6 +382,11 @@ export const hrService = {
   },
 
   deleteEmployee: async (id: string) => {
+    if (!USE_MOCK) {
+      await axiosInstance.delete(`/hr/employees/${id}`);
+      return;
+    }
+
     await delay(500);
     const index = employeeData.findIndex((e) => e.id === id);
     if (index !== -1) {
@@ -249,6 +404,18 @@ export const hrService = {
     page?: number;
     size?: number;
   }) => {
+    if (!USE_MOCK) {
+      const apiParams = {
+        ...params,
+        page: params.page && params.page > 0 ? params.page - 1 : 0,
+      };
+      
+      const response = await axiosInstance.get("/hr/schedules/doctors", { 
+        params: apiParams 
+      });
+      return response.data.data;
+    }
+
     await delay(500);
     let filtered = [...scheduleData];
     const { startDate, endDate } = params;
@@ -285,6 +452,11 @@ export const hrService = {
     status?: string;
     doctorId?: string;
   }) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.get("/hr/schedules/me", { params });
+      return response.data.data;
+    }
+
     await delay(500);
     // Mocking "me" as employee 101 (override with doctorId if provided)
     const myId = params.doctorId || "emp-101";
@@ -301,6 +473,11 @@ export const hrService = {
   },
 
   createSchedule: async (data: ScheduleRequest) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.post("/hr/schedules", data);
+      return response.data.data;
+    }
+
     await delay(500);
     const employee = employeeData.find((e) => e.id === data.employeeId);
     const newSchedule: EmployeeSchedule & { departmentId?: string } = {
@@ -315,10 +492,12 @@ export const hrService = {
     return newSchedule;
   },
 
-  // Note: Edit/Delete schedule endpoints were not explicitly detailed in the snippet I read,
-  // but usually exist. I'll add them if needed later or assume standard REST.
-  // Assuming standard REST for now based on pattern:
   updateSchedule: async (id: string, data: Partial<ScheduleRequest>) => {
+    if (!USE_MOCK) {
+      const response = await axiosInstance.put(`/hr/schedules/${id}`, data);
+      return response.data.data;
+    }
+
     await delay(500);
     const index = scheduleData.findIndex((s) => s.id === id);
     if (index !== -1) {
@@ -329,6 +508,11 @@ export const hrService = {
   },
 
   deleteSchedule: async (id: string) => {
+    if (!USE_MOCK) {
+      await axiosInstance.delete(`/hr/schedules/${id}`);
+      return;
+    }
+
     await delay(500);
     const index = scheduleData.findIndex((s) => s.id === id);
     if (index !== -1) {

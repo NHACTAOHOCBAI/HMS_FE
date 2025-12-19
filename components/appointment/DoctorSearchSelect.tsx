@@ -94,7 +94,7 @@ export function DoctorSearchSelect({
                 />
                 <div className="text-sm text-muted-foreground">None</div>
               </CommandItem>
-              {doctors.map((doc) => (
+              {doctors.map((doc: Employee) => (
                 <CommandItem
                   key={doc.id}
                   value={doc.id}

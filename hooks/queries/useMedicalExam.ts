@@ -67,6 +67,9 @@ function mapPrescriptionPayloadToRequest(
   };
 }
 
+import { PaginatedResponse } from "@/interfaces/pagination";
+import { MedicalExamListItem } from "@/interfaces/medical-exam";
+
 export function useMedicalExamList(params: {
   patientId?: string;
   doctorId?: string;
@@ -78,7 +81,9 @@ export function useMedicalExamList(params: {
   size?: number;
   sort?: string;
 }) {
-  return useQuery({
+  // getMedicalExams already returns PaginatedResponse<MedicalExamListItem> directly
+  // (service extracts response.data.data from ApiResponse<PageResponse>)
+  return useQuery<PaginatedResponse<MedicalExamListItem>, Error>({
     queryKey: ["medical-exams", params],
     queryFn: () => getMedicalExams(params),
   });

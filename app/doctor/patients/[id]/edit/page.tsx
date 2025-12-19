@@ -21,54 +21,30 @@ export default function EditPatientPage() {
 
   const handleSubmit = (data: PatientFormValues) => {
     if (!patient) return;
-    const payload: any = {};
+    
     const allergyString =
       data.allergies && data.allergies.length
         ? data.allergies.join(", ")
         : null;
 
-    const fields: Array<[keyof PatientFormValues | string, any, any]> = [
-      ["fullName", patient.fullName, data.fullName],
-      ["email", patient.email, data.email || null],
-      ["phoneNumber", patient.phoneNumber, data.phoneNumber],
-      ["dateOfBirth", patient.dateOfBirth, data.dateOfBirth || null],
-      ["gender", patient.gender, data.gender || null],
-      ["address", patient.address, data.address || null],
-      [
-        "identificationNumber",
-        patient.identificationNumber,
-        data.identificationNumber || null,
-      ],
-      [
-        "healthInsuranceNumber",
-        patient.healthInsuranceNumber,
-        data.healthInsuranceNumber || null,
-      ],
-      ["bloodType", patient.bloodType, data.bloodType || null],
-      ["allergies", patient.allergies, allergyString],
-      [
-        "relativeFullName",
-        patient.relativeFullName,
-        data.relativeFullName || null,
-      ],
-      [
-        "relativePhoneNumber",
-        patient.relativePhoneNumber,
-        data.relativePhoneNumber || null,
-      ],
-      [
-        "relativeRelationship",
-        patient.relativeRelationship,
-        data.relativeRelationship || null,
-      ],
-      ["accountId", patient.accountId, data.accountId || null],
-    ];
-
-    fields.forEach(([key, original, current]) => {
-      if (original !== current) {
-        payload[key] = current;
-      }
-    });
+    // PUT requires full object with all required fields (fullName, dateOfBirth, gender)
+    // For @Pattern validated optional fields, use undefined to exclude from request when empty
+    const payload = {
+      fullName: data.fullName,
+      email: data.email || undefined, // @Email - undefined excludes it from JSON if empty
+      phoneNumber: data.phoneNumber || undefined, // @Pattern - undefined if empty
+      dateOfBirth: data.dateOfBirth, // @NotNull - required, don't send null
+      gender: data.gender, // @NotNull - required, don't send null
+      address: data.address || undefined,
+      identificationNumber: data.identificationNumber || undefined, // @Pattern - undefined if empty
+      healthInsuranceNumber: data.healthInsuranceNumber || undefined,
+      bloodType: data.bloodType || undefined,
+      allergies: allergyString || undefined,
+      relativeFullName: data.relativeFullName || undefined,
+      relativePhoneNumber: data.relativePhoneNumber || undefined, // @Pattern - undefined if empty
+      relativeRelationship: data.relativeRelationship || undefined,
+      accountId: data.accountId || patient.accountId || undefined,
+    };
 
     updatePatient(payload, {
       onSuccess: () => {

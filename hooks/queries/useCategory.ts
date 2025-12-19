@@ -12,10 +12,18 @@ export const categoryKeys = {
 };
 
 // Get category list
+import { PaginatedResponse } from "@/interfaces/pagination";
+import { Category } from "@/interfaces/category";
+
 export const useCategories = (params?: any) => {
-  return useQuery({
+  return useQuery<
+    { data: PaginatedResponse<Category> },
+    Error,
+    PaginatedResponse<Category>
+  >({
     queryKey: categoryKeys.list(params),
     queryFn: () => categoryService.getList(params),
+    select: (response) => response.data,
   });
 };
 

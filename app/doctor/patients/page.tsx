@@ -257,7 +257,7 @@ export default function DoctorPatientsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {patients.map((patient) => (
+                {patients.map((patient: Patient) => (
                   <TableRow key={patient.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -350,7 +350,7 @@ export default function DoctorPatientsPage() {
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {patients.map((patient) => (
+          {patients.map((patient: Patient) => (
             <Link
               key={patient.id}
               href={`/doctor/patients/${patient.id}`}
