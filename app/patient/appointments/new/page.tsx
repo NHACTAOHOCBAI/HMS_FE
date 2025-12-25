@@ -169,7 +169,7 @@ export default function PatientBookingPage() {
     const payload: AppointmentCreateRequest = {
       patientId,
       doctorId,
-      appointmentTime: `${isoDate}T${slot}`,
+      appointmentTime: `${isoDate}T${slot}:00Z`, // Full ISO-8601 format with seconds and UTC timezone
       type,
       reason,
     };
@@ -413,19 +413,19 @@ export default function PatientBookingPage() {
             <AlertDialogTitle>Xác nhận đặt lịch?</AlertDialogTitle>
             <AlertDialogDescription>
               Vui lòng kiểm tra lại thông tin trước khi xác nhận.
-              <div className="p-4 border rounded-lg bg-muted/50 text-sm space-y-1 my-4">
-                <p>
-                  <strong>Bác sĩ:</strong> {selectedDoctor?.fullName}
-                </p>
-                <p>
-                  <strong>Thời gian:</strong> {slot} -{" "}
-                  {date ? format(date, "dd/MM/yyyy") : ""}
-                </p>
-                <p>
-                  <strong>Lý do:</strong> {reason || "Chưa nhập"}
-                </p>
-              </div>
             </AlertDialogDescription>
+            <div className="p-4 border rounded-lg bg-muted/50 text-sm space-y-1 my-4">
+              <p>
+                <strong>Bác sĩ:</strong> {selectedDoctor?.fullName}
+              </p>
+              <p>
+                <strong>Thời gian:</strong> {slot} -{" "}
+                {date ? format(date, "dd/MM/yyyy") : ""}
+              </p>
+              <p>
+                <strong>Lý do:</strong> {reason || "Chưa nhập"}
+              </p>
+            </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy</AlertDialogCancel>
