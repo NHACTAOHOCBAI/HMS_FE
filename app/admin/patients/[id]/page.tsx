@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePatient, useDeletePatient } from "@/hooks/queries/usePatient";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { uploadProfileImage, deleteProfileImage } from "@/services/patient.service";
 import { appointmentService } from "@/services/appointment.service";
 import { getMedicalExams } from "@/services/medical-exam.service";
 import { getPatientInvoices } from "@/services/billing.service";
@@ -20,6 +21,8 @@ import { AlertBanner } from "@/components/ui/alert-banner";
 import { GenderBadge } from "@/components/patients/GenderBadge";
 import { BloodTypeBadge } from "@/components/patients/BloodTypeBadge";
 import { AllergyTags } from "@/components/patients/AllergyTags";
+import { ProfileImageUpload } from "@/components/ui/profile-image-upload";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,6 +71,30 @@ export default function PatientDetailPage() {
 
   const { data: patient, isLoading, error } = usePatient(patientId);
   const { mutate: deletePatient, isPending: isDeleting } = useDeletePatient();
+  const queryClient = useQueryClient();
+
+  // Profile image mutations
+  const uploadImageMutation = useMutation({
+    mutationFn: (file: File) => uploadProfileImage(patientId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patient", patientId] });
+      toast.success("Cập nhật ảnh đại diện thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Không thể tải ảnh lên");
+    },
+  });
+
+  const deleteImageMutation = useMutation({
+    mutationFn: () => deleteProfileImage(patientId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["patient", patientId] });
+      toast.success("Đã xóa ảnh đại diện");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Không thể xóa ảnh");
+    },
+  });
 
   // Fetch appointments for this patient using the dedicated endpoint
   const { data: appointmentsData, isLoading: loadingAppointments } = useQuery({
@@ -242,6 +269,8 @@ export default function PatientDetailPage() {
         theme="sky"
         avatar={{
           initials: patient.fullName.charAt(0).toUpperCase(),
+          src: patient.profileImageUrl || undefined,
+          alt: patient.fullName,
         }}
         metaItems={[
           { icon: <Phone className="h-4 w-4" />, text: patient.phoneNumber || "No phone" },
@@ -416,6 +445,27 @@ export default function PatientDetailPage() {
         {/* Tab: Thông tin cá nhân */}
         <TabsContent value="info" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Ảnh đại diện */}
+            <div className="detail-section-card">
+              <div className="detail-section-card-header">
+                <User className="h-4 w-4" />
+                <h3>Ảnh đại diện</h3>
+              </div>
+              <div className="detail-section-card-content flex justify-center">
+                <ProfileImageUpload
+                  currentImageUrl={patient.profileImageUrl}
+                  name={patient.fullName}
+                  onUpload={async (file) => {
+                    await uploadImageMutation.mutateAsync(file);
+                  }}
+                  onDelete={async () => {
+                    await deleteImageMutation.mutateAsync();
+                  }}
+                  disabled={uploadImageMutation.isPending || deleteImageMutation.isPending}
+                />
+              </div>
+            </div>
+
             {/* Thông tin cá nhân */}
             <div className="detail-section-card">
               <div className="detail-section-card-header">

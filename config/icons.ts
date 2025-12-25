@@ -18,6 +18,8 @@ import {
   User,
   UserCog,
   XCircle,
+  FlaskConical,
+  FileText,
 } from "lucide-react";
 
 // Centralized Lucide icon mapping to keep visual language consistent
@@ -32,6 +34,8 @@ export const NAV_ICONS = {
   reports: BarChart3,
   profile: User,
   accounts: UserCog,
+  labTests: FlaskConical,
+  labResults: FileText,
 };
 
 export const ACTION_ICONS = {

@@ -29,7 +29,7 @@ function CreateMedicalExamPageClient() {
   const [createdExamId, setCreatedExamId] = useState<string | null>(null);
 
   // Fetch appointment details if appointmentId exists
-  const { data: appointment } = useAppointment(appointmentId || "");
+  const { data: appointment, isLoading: isLoadingAppointment } = useAppointment(appointmentId || "");
 
   useEffect(() => {
     // Only doctors can create exams
@@ -38,8 +38,36 @@ function CreateMedicalExamPageClient() {
     }
   }, [user, router]);
 
+  // Check if appointment already has a medical exam - redirect to it
+  useEffect(() => {
+    if (appointment && appointment.medicalExamId) {
+      toast.info("Appointment đã có phiếu khám. Đang chuyển đến trang chi tiết...");
+      router.push(`/doctor/exams/${appointment.medicalExamId}`);
+    }
+  }, [appointment, router]);
+
   if (!user || user.role !== "DOCTOR") {
     return null;
+  }
+
+  // Show loading while checking if appointment has exam
+  if (isLoadingAppointment && appointmentId) {
+    return (
+      <div className="container mx-auto py-6 flex items-center justify-center min-h-[400px]">
+        <div className="text-muted-foreground">Đang kiểm tra...</div>
+      </div>
+    );
+  }
+
+  // If appointment already has exam, show redirect message while useEffect handles redirect
+  if (appointment?.medicalExamId) {
+    return (
+      <div className="container mx-auto py-6 flex items-center justify-center min-h-[400px]">
+        <div className="text-muted-foreground">
+          Appointment đã có phiếu khám. Đang chuyển hướng...
+        </div>
+      </div>
+    );
   }
 
   const handleSubmit = async (

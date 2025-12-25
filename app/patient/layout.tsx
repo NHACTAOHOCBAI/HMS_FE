@@ -30,7 +30,7 @@ import { usePathname } from "next/navigation";
 import React, { useMemo } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { CalendarDays, FileText, CreditCard, User, LogOut, Bell, Search } from "lucide-react";
+import { CalendarDays, FileText, CreditCard, User, LogOut, Bell, Search, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -40,6 +40,7 @@ const navItems = [
     href: "/patient/medical-records",
     icon: FileText,
   },
+  { title: "Lab Results", href: "/patient/lab-results", icon: FlaskConical },
   { title: "Billing", href: "/patient/billing", icon: CreditCard },
   { title: "Profile", href: "/patient/profile", icon: User },
 ];

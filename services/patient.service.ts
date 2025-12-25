@@ -435,3 +435,31 @@ export const calculateAge = (dateOfBirth: string | null): number => {
   }
   return age;
 };
+
+// POST /api/patients/:id/profile-image - Upload profile image
+export const uploadProfileImage = async (
+  patientId: string,
+  file: File
+): Promise<Patient> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await axiosInstance.post<{ data: Patient }>(
+    `/patients/${patientId}/profile-image`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data.data;
+};
+
+// DELETE /api/patients/:id/profile-image - Delete profile image
+export const deleteProfileImage = async (patientId: string): Promise<Patient> => {
+  const response = await axiosInstance.delete<{ data: Patient }>(
+    `/patients/${patientId}/profile-image`
+  );
+  return response.data.data;
+};

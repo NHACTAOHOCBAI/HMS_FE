@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useInvoice, useCancelInvoice } from "@/hooks/queries/useBilling";
+import { useInvoice, useCancelInvoice, usePaymentsByInvoice } from "@/hooks/queries/useBilling";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +40,7 @@ export default function InvoiceDetailPage() {
   const { data: invoice, isLoading } = useInvoice(id);
   const { mutateAsync: cancelInvoice, isPending: isCancelling } =
     useCancelInvoice();
+  const { data: paymentsData } = usePaymentsByInvoice(id);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   if (isLoading) {
@@ -326,13 +327,13 @@ export default function InvoiceDetailPage() {
           {/* Payment History */}
           <Card>
             <CardHeader>
-              <CardTitle>Payment History ({invoice.payments?.length ?? 0})</CardTitle>
+              <CardTitle>Payment History ({paymentsData?.payments?.length ?? 0})</CardTitle>
             </CardHeader>
             <CardContent>
               <PaymentHistoryTable
-                payments={invoice.payments ?? []}
-                totalPaid={invoice.paidAmount}
-                remainingBalance={invoice.balance ?? invoice.balanceDue ?? 0}
+                payments={paymentsData?.payments ?? []}
+                totalPaid={paymentsData?.totalPaid ?? invoice.paidAmount ?? 0}
+                remainingBalance={paymentsData?.remainingBalance ?? invoice.balanceDue ?? 0}
               />
             </CardContent>
           </Card>
@@ -349,32 +350,22 @@ export default function InvoiceDetailPage() {
               <InfoGrid columns={1}>
                 <InfoItem
                   icon={<User className="h-4 w-4" />}
-                  label="Patient Name"
-                  value={invoice.patientName}
-                  color="emerald"
-                />
-                <InfoItem
-                  icon={<Receipt className="h-4 w-4" />}
-                  label="Patient ID"
-                  value={invoice.patientId}
-                  color="slate"
-                />
-                {invoice.appointmentId && (
-                  <InfoItem
-                    icon={<Calendar className="h-4 w-4" />}
-                    label="Appointment"
-                    value={
+                  label="Patient"
+                  value={
+                    invoice.patient?.id ? (
                       <Link
-                        href={`/admin/appointments/${invoice.appointmentId}`}
+                        href={`/admin/patients/${invoice.patient.id}`}
                         className="text-primary hover:underline flex items-center gap-1"
                       >
-                        {invoice.appointmentId}
+                        {invoice.patient.fullName || "View Patient"}
                         <ExternalLink className="h-3 w-3" />
                       </Link>
-                    }
-                    color="sky"
-                  />
-                )}
+                    ) : (
+                      invoice.patient?.fullName || "Not available"
+                    )
+                  }
+                  color="emerald"
+                />
               </InfoGrid>
             </div>
           </div>

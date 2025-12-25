@@ -598,4 +598,29 @@ export const hrService = {
       scheduleData.splice(index, 1);
     }
   },
+
+  // --- Profile Image ---
+
+  uploadEmployeeProfileImage: async (employeeId: string, file: File): Promise<Employee> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await axiosInstance.post<{ data: Employee }>(
+      `/hr/employees/${employeeId}/profile-image`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data.data;
+  },
+
+  deleteEmployeeProfileImage: async (employeeId: string): Promise<Employee> => {
+    const response = await axiosInstance.delete<{ data: Employee }>(
+      `/hr/employees/${employeeId}/profile-image`
+    );
+    return response.data.data;
+  },
 };

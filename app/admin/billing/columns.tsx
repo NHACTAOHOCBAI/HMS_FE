@@ -30,8 +30,13 @@ export const getInvoiceColumns = ({
     label: "Invoice #",
   },
   {
-    key: "patientName",
+    key: "patient",
     label: "Patient",
+    render: (row) => {
+      // Backend returns nested patient: { id, fullName }
+      // Also support legacy flat patientName field
+      return row.patient?.fullName || row.patientName || "N/A";
+    },
   },
   {
     key: "invoiceDate",

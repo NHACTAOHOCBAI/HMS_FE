@@ -56,6 +56,7 @@ interface MedicalExamFormProps {
   userRole?: UserRole;
   currentExamStatus?: ExamStatus;
   defaultAppointmentId?: string;
+  isEditMode?: boolean; // Hide appointment search when editing
 }
 
 export function MedicalExamForm({
@@ -67,6 +68,7 @@ export function MedicalExamForm({
   userRole,
   currentExamStatus,
   defaultAppointmentId,
+  isEditMode = false,
 }: MedicalExamFormProps) {
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(appointment || null);
@@ -107,52 +109,55 @@ export function MedicalExamForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {selectedAppointment ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <InfoCard title="Patient" icon={<User className="h-5 w-5" />}>
-              <p className="font-semibold">
-                {selectedAppointment.patient.fullName}
-              </p>
-              <p className="text-muted-foreground">
-                {selectedAppointment.patient.phoneNumber}
-              </p>
-            </InfoCard>
-            <InfoCard title="Doctor" icon={<Briefcase className="h-5 w-5" />}>
-              <p className="font-semibold">
-                {selectedAppointment.doctor.fullName}
-              </p>
-              <p className="text-muted-foreground">
-                {selectedAppointment.doctor.department}
-              </p>
-            </InfoCard>
-            <InfoCard
-              title="Appointment"
-              icon={<CalendarClock className="h-5 w-5" />}
-            >
-              <p className="font-semibold">ID: {selectedAppointment.id}</p>
-              <p className="text-muted-foreground">
-                Time:{" "}
-                {new Date(selectedAppointment.appointmentTime).toLocaleString()}
-              </p>
-            </InfoCard>
-          </div>
-        ) : (
-          <FormField
-            control={form.control}
-            name="appointmentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Find Appointment</FormLabel>
-                <FormControl>
-                  <AppointmentSearchSelect
-                    onSelect={handleAppointmentSelect}
-                    mode="completedWithoutExam"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        {/* Hide appointment section in edit mode - info is shown in page header */}
+        {!isEditMode && (
+          selectedAppointment ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <InfoCard title="Patient" icon={<User className="h-5 w-5" />}>
+                <p className="font-semibold">
+                  {selectedAppointment.patient.fullName}
+                </p>
+                <p className="text-muted-foreground">
+                  {selectedAppointment.patient.phoneNumber}
+                </p>
+              </InfoCard>
+              <InfoCard title="Doctor" icon={<Briefcase className="h-5 w-5" />}>
+                <p className="font-semibold">
+                  {selectedAppointment.doctor.fullName}
+                </p>
+                <p className="text-muted-foreground">
+                  {selectedAppointment.doctor.department}
+                </p>
+              </InfoCard>
+              <InfoCard
+                title="Appointment"
+                icon={<CalendarClock className="h-5 w-5" />}
+              >
+                <p className="font-semibold">ID: {selectedAppointment.id}</p>
+                <p className="text-muted-foreground">
+                  Time:{" "}
+                  {new Date(selectedAppointment.appointmentTime).toLocaleString()}
+                </p>
+              </InfoCard>
+            </div>
+          ) : (
+            <FormField
+              control={form.control}
+              name="appointmentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Find Appointment</FormLabel>
+                  <FormControl>
+                    <AppointmentSearchSelect
+                      onSelect={handleAppointmentSelect}
+                      mode="completedWithoutExam"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )
         )}
 
         <div className="form-section-card">

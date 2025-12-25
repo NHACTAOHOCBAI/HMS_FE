@@ -168,7 +168,7 @@ export function useCreatePrescription(examId?: string) {
         mapPrescriptionPayloadToRequest(payload)
       );
     },
-    onSuccess: (_, variables) => {
+    onSuccess: async (prescription, variables) => {
       const resolvedExamId =
         typeof examId === "string"
           ? examId
@@ -181,9 +181,13 @@ export function useCreatePrescription(examId?: string) {
         queryClient.invalidateQueries({
           queryKey: ["medical-exam", resolvedExamId],
         });
+        
+        // NOTE: Invoice generation is handled by backend after prescription DISPENSE
+        // to ensure all prescription items are included.
+        // Do NOT generate invoice here on prescription creation.
       }
       queryClient.invalidateQueries({ queryKey: ["medical-exams"] });
-      // Invalidate billing queries since invoice is auto-generated
+      // Invalidate billing queries since invoice may be updated
       queryClient.invalidateQueries({ queryKey: ["billing"] });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },

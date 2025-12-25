@@ -53,6 +53,18 @@ const allNavItems = [
     roles: ["ADMIN", "DOCTOR", "NURSE"],
   },
   {
+    title: "Lab Tests",
+    href: "/admin/lab-tests",
+    icon: NAV_ICONS.labTests,
+    roles: ["ADMIN"],
+  },
+  {
+    title: "Lab Results",
+    href: "/admin/lab-results",
+    icon: NAV_ICONS.labResults,
+    roles: ["ADMIN", "DOCTOR", "NURSE"],
+  },
+  {
     title: "Patients",
     href: "/admin/patients",
     icon: NAV_ICONS.patients,

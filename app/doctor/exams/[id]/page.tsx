@@ -11,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
 import { useMyEmployeeProfile } from "@/hooks/queries/useHr";
+import { OrderLabTestDialog } from "@/components/lab/OrderLabTestDialog";
+import { LabResultsSection } from "@/components/lab/LabResultsSection";
 
 export default function DoctorMedicalExamDetailPage({
   params,
@@ -20,7 +22,7 @@ export default function DoctorMedicalExamDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const { user } = useAuth();
-  const { data: medicalExam, isLoading, error } = useMedicalExam(id);
+  const { data: medicalExam, isLoading, error, refetch } = useMedicalExam(id);
   
   // Get current doctor's employee profile for proper isCreator check
   const { data: myProfile } = useMyEmployeeProfile();
@@ -57,17 +59,14 @@ export default function DoctorMedicalExamDetailPage({
   // Check if doctor is the creator using fetched employeeId
   const isCreator = medicalExam.doctor?.id === myEmployeeId;
 
-  // Check if exam is editable (within 24 hours)
-  const examDate = new Date(medicalExam.examDate);
-  const now = new Date();
-  const hoursSinceExam =
-    (now.getTime() - examDate.getTime()) / (1000 * 60 * 60);
-  const isEditable = isCreator && hoursSinceExam < 24;
+  // Doctor can edit their own exams anytime (removed 24-hour restriction)
+  // This allows updating diagnosis after receiving lab test results
+  const isEditable = isCreator;
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header with Actions */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <Button
           variant="ghost"
           onClick={() => router.push("/doctor/exams")}
@@ -77,12 +76,22 @@ export default function DoctorMedicalExamDetailPage({
           Back to My Exams
         </Button>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {/* Order Lab Test Button */}
+          {isCreator && medicalExam.patient && (
+            <OrderLabTestDialog
+              medicalExamId={id}
+              patientId={medicalExam.patient.id}
+              patientName={medicalExam.patient.fullName || "Bệnh nhân"}
+              onSuccess={() => refetch()}
+            />
+          )}
+
           {isEditable && (
             <Button asChild variant="outline">
               <Link href={`/doctor/exams/${id}/edit`}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit Exam
+                Cập nhật Phiếu khám
               </Link>
             </Button>
           )}
@@ -110,6 +119,13 @@ export default function DoctorMedicalExamDetailPage({
         patientProfileBaseHref="/doctor/patients"
         examBaseHref="/doctor/exams"
       />
+
+      {/* Lab Test Results Section */}
+      <LabResultsSection
+        medicalExamId={id}
+        patientName={medicalExam.patient?.fullName}
+      />
     </div>
   );
 }
+

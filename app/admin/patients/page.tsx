@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -375,6 +375,7 @@ export default function PatientsPage() {
                         >
                           <TableCell>
                             <Avatar className="h-9 w-9">
+                              <AvatarImage src={patient.profileImageUrl || undefined} alt={patient.fullName} />
                               <AvatarFallback className="bg-gradient-to-br from-sky-400 to-teal-400 text-white font-semibold">
                                 {patient.fullName.charAt(0).toUpperCase()}
                               </AvatarFallback>

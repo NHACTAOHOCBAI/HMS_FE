@@ -5,7 +5,11 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useEmployee } from "@/hooks/queries/useHr";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { hrService } from "@/services/hr.service";
 import { Spinner } from "@/components/ui/spinner";
+import { ProfileImageUpload } from "@/components/ui/profile-image-upload";
+import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DetailPageHeader } from "@/components/ui/detail-page-header";
 import { StatsSummaryBar } from "@/components/ui/stats-summary-bar";
@@ -31,6 +35,30 @@ export default function EmployeeViewPage() {
   const id = params?.id as string;
 
   const { data: employee, isLoading, error } = useEmployee(id);
+  const queryClient = useQueryClient();
+
+  // Profile image mutations
+  const uploadImageMutation = useMutation({
+    mutationFn: (file: File) => hrService.uploadEmployeeProfileImage(id, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employee", id] });
+      toast.success("Cập nhật ảnh đại diện thành công");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Không thể tải ảnh lên");
+    },
+  });
+
+  const deleteImageMutation = useMutation({
+    mutationFn: () => hrService.deleteEmployeeProfileImage(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employee", id] });
+      toast.success("Đã xóa ảnh đại diện");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Không thể xóa ảnh");
+    },
+  });
 
   if (isLoading) {
     return (
@@ -94,6 +122,8 @@ export default function EmployeeViewPage() {
         theme="violet"
         avatar={{
           initials: employee.fullName.charAt(0).toUpperCase(),
+          src: employee.profileImageUrl || undefined,
+          alt: employee.fullName,
         }}
         metaItems={[
           { icon: <Phone className="h-4 w-4" />, text: employee.phoneNumber || "No phone" },
@@ -154,7 +184,28 @@ export default function EmployeeViewPage() {
       )}
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Profile Image */}
+        <div className="detail-section-card">
+          <div className="detail-section-card-header">
+            <User className="h-4 w-4" />
+            <h3>Ảnh đại diện</h3>
+          </div>
+          <div className="detail-section-card-content flex justify-center">
+            <ProfileImageUpload
+              currentImageUrl={employee.profileImageUrl}
+              name={employee.fullName}
+              onUpload={async (file) => {
+                await uploadImageMutation.mutateAsync(file);
+              }}
+              onDelete={async () => {
+                await deleteImageMutation.mutateAsync();
+              }}
+              disabled={uploadImageMutation.isPending || deleteImageMutation.isPending}
+            />
+          </div>
+        </div>
+
         {/* Personal Information */}
         <div className="detail-section-card">
           <div className="detail-section-card-header">

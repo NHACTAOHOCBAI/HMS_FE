@@ -191,7 +191,8 @@ export const updateMedicalExam = async (
   data: MedicalExamUpdateRequest
 ) => {
   if (!USE_MOCK) {
-    const response = await axiosInstance.patch(`${BASE_URL_EXAMS}/${id}`, data);
+    // Use custom update endpoint that doesn't require appointmentId
+    const response = await axiosInstance.put(`${BASE_URL_EXAMS}/update/${id}`, data);
     return response.data.data;
   }
 

@@ -6,6 +6,7 @@ import { Plus, Search, Loader2, Users, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -260,6 +261,7 @@ export default function EmployeesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[50px]"></TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Department</TableHead>
@@ -272,7 +274,7 @@ export default function EmployeesPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="py-10 text-center">
+                    <TableCell colSpan={8} className="py-10 text-center">
                       <Spinner className="mx-auto text-muted-foreground" />
                     </TableCell>
                   </TableRow>
@@ -284,6 +286,14 @@ export default function EmployeesPage() {
                       className="cursor-pointer"
                       onClick={() => router.push(`/admin/hr/employees/${row.id}`)}
                     >
+                      <TableCell>
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={row.profileImageUrl || undefined} alt={row.fullName} />
+                          <AvatarFallback className="bg-gradient-to-br from-violet-400 to-purple-500 text-white font-semibold">
+                            {row.fullName.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </TableCell>
                       <TableCell className="font-medium">
                         {row.fullName}
                       </TableCell>
@@ -338,7 +348,7 @@ export default function EmployeesPage() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={8}
                       className="py-10 text-center text-muted-foreground"
                     >
                       No employees found.

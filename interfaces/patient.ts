@@ -12,6 +12,7 @@ export interface Patient {
   healthInsuranceNumber: string | null;
   bloodType: BloodType | null;
   allergies: string | null; // Comma-separated
+  profileImageUrl?: string | null;
   relativeFullName: string | null;
   relativePhoneNumber: string | null;
   relativeRelationship: RelationshipType | null;

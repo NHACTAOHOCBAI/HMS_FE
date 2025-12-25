@@ -39,6 +39,7 @@ export interface Employee {
   address?: string;
   status: EmployeeStatus;
   hiredAt?: string;
+  profileImageUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 }
