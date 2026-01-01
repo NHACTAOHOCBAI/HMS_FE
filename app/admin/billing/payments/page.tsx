@@ -46,7 +46,7 @@ const formatCurrency = (amount: number) => {
 };
 
 const methodConfig: Record<
-  PaymentMethod,
+  string, // Use string to handle any method/gateway type
   { label: string; className: string }
 > = {
   CASH: {
@@ -64,6 +64,14 @@ const methodConfig: Record<
   INSURANCE: {
     label: "Insurance",
     className: "bg-cyan-100 text-cyan-800",
+  },
+  VNPAY: {
+    label: "VNPay",
+    className: "bg-orange-100 text-orange-800",
+  },
+  MOMO: {
+    label: "MoMo",
+    className: "bg-pink-100 text-pink-800",
   },
 };
 
@@ -100,7 +108,7 @@ const paymentColumns: Column<PaymentWithInvoice>[] = [
     label: "Method",
     render: (row) => {
       const method = row.method ?? "CASH";
-      const config = methodConfig[method];
+      const config = methodConfig[method] || { label: method, className: "bg-gray-100 text-gray-800" };
       return (
         <Badge variant="outline" className={cn("border-0", config.className)}>
           {config.label}

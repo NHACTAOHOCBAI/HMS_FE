@@ -240,7 +240,7 @@ export const usePaymentSummaryCards = () => {
   });
 };
 
-// Get payments list - Returns mock data until BE endpoint is implemented
+// Get payments list - Workaround: Fetch payments from paid invoices
 export const usePayments = (
   page: number,
   limit: number,
@@ -251,15 +251,119 @@ export const usePayments = (
   sort?: string,
 ) => {
   const params = { page, limit, search, method, startDate, endDate, sort };
+  
   return useQuery({
     queryKey: billingKeys.paymentsList(params),
-    // Mock data until BE endpoint is ready
-    queryFn: async () => ({
-      data: [],
-      page: 0,
-      total: 0,
-      totalPages: 0,
-    }),
+    queryFn: async () => {
+      // Step 1: Fetch invoices that have payments (paidAmount > 0)
+      const invoicesResponse = await billingService.getInvoiceList({
+        page: 0,
+        size: 200, // Limit to avoid too many requests
+        sort: "invoiceDate,desc",
+      });
+      
+      const invoices = invoicesResponse.data.data.content || [];
+      
+      // Filter invoices that have been paid
+      const paidInvoices = invoices.filter((inv) => inv.paidAmount > 0);
+      
+      // Step 2: Fetch payments for each paid invoice
+      const allPayments: Array<{
+        id: string;
+        invoiceId: string;
+        invoiceNumber: string;
+        patientName: string;
+        amount: number;
+        method: string;
+        paymentDate: string | null;
+        status: string;
+        notes: string | null;
+        txnRef: string;
+      }> = [];
+      
+      // Fetch payments in parallel (limit concurrency)
+      const paymentPromises = paidInvoices.slice(0, 50).map(async (invoice) => {
+        try {
+          const res = await billingService.getPaymentsByInvoice(invoice.id);
+          const paymentsData = res.data.data.payments || [];
+          return paymentsData.map((payment) => ({
+            id: payment.id,
+            invoiceId: invoice.id,
+            invoiceNumber: invoice.invoiceNumber,
+            patientName: invoice.patient?.fullName || invoice.patientName || "Unknown",
+            amount: payment.amount,
+            method: payment.gateway || payment.method || "CASH",
+            paymentDate: payment.paymentDate || payment.createdAt || null,
+            status: payment.status,
+            notes: payment.notes || null,
+            txnRef: payment.txnRef || "",
+          }));
+        } catch {
+          return [];
+        }
+      });
+      
+      const paymentArrays = await Promise.all(paymentPromises);
+      for (const arr of paymentArrays) {
+        allPayments.push(...arr);
+      }
+      
+      // Apply search filter
+      let filtered = allPayments;
+      if (search) {
+        const searchLower = search.toLowerCase();
+        filtered = filtered.filter(
+          (p) =>
+            p.invoiceNumber.toLowerCase().includes(searchLower) ||
+            p.patientName.toLowerCase().includes(searchLower) ||
+            (p.txnRef && p.txnRef.toLowerCase().includes(searchLower))
+        );
+      }
+      
+      // Apply method filter
+      if (method && method !== "ALL") {
+        filtered = filtered.filter((p) => p.method === method);
+      }
+      
+      // Apply date filter
+      if (startDate) {
+        const start = new Date(startDate);
+        filtered = filtered.filter((p) => p.paymentDate && new Date(p.paymentDate) >= start);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        filtered = filtered.filter((p) => p.paymentDate && new Date(p.paymentDate) <= end);
+      }
+      
+      // Apply sorting
+      if (sort) {
+        const [field, order] = sort.split(",");
+        filtered.sort((a, b) => {
+          let valA = a[field as keyof typeof a] as string | number;
+          let valB = b[field as keyof typeof b] as string | number;
+          if (field === "paymentDate" && valA && valB) {
+            valA = new Date(valA as string).getTime();
+            valB = new Date(valB as string).getTime();
+          }
+          if (order === "desc") {
+            return valA > valB ? -1 : 1;
+          }
+          return valA > valB ? 1 : -1;
+        });
+      }
+      
+      // Apply pagination
+      const startIdx = page * limit;
+      const paginated = filtered.slice(startIdx, startIdx + limit);
+      
+      return {
+        data: paginated,
+        page,
+        total: filtered.length,
+        totalPages: Math.ceil(filtered.length / limit),
+      };
+    },
+    staleTime: 30000, // Cache for 30 seconds to reduce API calls
   });
 };
 
