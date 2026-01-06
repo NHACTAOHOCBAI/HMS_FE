@@ -98,6 +98,8 @@ export function PatientForm({
 
   const form = useForm<PatientFormValues>({
     resolver: zodResolver(patientFormSchema),
+    mode: "onBlur", // Validate on blur to show errors immediately
+    reValidateMode: "onChange", // Re-validate on change after first error
     defaultValues: {
       fullName: initialData?.fullName ?? "",
       email: initialData?.email || "",

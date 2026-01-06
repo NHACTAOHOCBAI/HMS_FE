@@ -46,12 +46,16 @@ function ColumnActions({
   onEdit,
   onVitalSigns,
 }: ColumnActionsProps) {
+  // Walk-in appointments cannot be rescheduled - they are for immediate examination
   const canEdit =
     (role === "ADMIN" || role === "NURSE") &&
-    appointment.status === "SCHEDULED";
+    appointment.status === "SCHEDULED" &&
+    appointment.type !== "WALK_IN";
   const canCancel = appointment.status === "SCHEDULED"; // All roles can cancel their own appointments
+  
+  // Only DOCTOR or actual ADMIN can complete - RECEPTIONIST cannot
   const canComplete =
-    (role === "ADMIN" || role === "DOCTOR") &&
+    (userRole === "DOCTOR" || userRole === "ADMIN") &&
     appointment.status === "SCHEDULED";
   
   // Check if user is actually a NURSE (for vital signs)

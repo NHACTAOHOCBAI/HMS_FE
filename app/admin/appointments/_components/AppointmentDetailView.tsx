@@ -80,14 +80,17 @@ export function AppointmentDetailView({
   const completeMutation = useCompleteAppointment(user?.employeeId, user?.role);
 
   const isScheduled = appointment.status === "SCHEDULED";
+  // Walk-in appointments cannot be rescheduled - they are for immediate examination
   const canEdit =
     isScheduled &&
+    appointment.type !== "WALK_IN" &&
     ["ADMIN", "NURSE", "RECEPTIONIST", "DOCTOR"].includes(user?.role || "");
   const canCancel =
     isScheduled &&
     ["ADMIN", "NURSE", "RECEPTIONIST", "DOCTOR", "PATIENT"].includes(
       user?.role || ""
     );
+  // Only DOCTOR or ADMIN can complete - RECEPTIONIST cannot
   const canComplete =
     isScheduled &&
     (user?.role === "ADMIN" ||

@@ -241,7 +241,6 @@ export default function PatientProfilePage() {
   }
 
   const exams = examsData || [];
-  const age = calculateAge(patient.dateOfBirth);
   // Use prescriptions from dedicated endpoint
   const prescriptions = prescriptionsData || [];
   const allergyList = patient.allergies?.split(",").map((s: string) => s.trim()).filter(Boolean) || [];
@@ -324,7 +323,6 @@ export default function PatientProfilePage() {
       {/* Stats Summary */}
       <StatsSummaryBar
         stats={[
-          { label: "Tuổi", value: age ? `${age}` : "N/A", icon: <User className="h-5 w-5" />, color: "sky" },
           { label: "Lịch hẹn", value: appointments.length, icon: <Calendar className="h-5 w-5" />, color: "violet" },
           { label: "Lần khám", value: exams.length, icon: <Stethoscope className="h-5 w-5" />, color: "teal" },
           { label: "Còn nợ", value: totalBalance > 0 ? formatCurrency(totalBalance) : "0₫", icon: <CreditCard className="h-5 w-5" />, color: totalBalance > 0 ? "rose" : "emerald" },

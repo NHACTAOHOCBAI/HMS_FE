@@ -242,7 +242,9 @@ export default function PatientDetailPage() {
 
   const appointments = appointmentsData?.content || [];
   const exams = examsData?.content || [];
-  const invoices = invoicesData?.data?.data || [];
+  // Ensure invoices is always an array
+  const invoicesRaw = invoicesData?.data?.data;
+  const invoices = Array.isArray(invoicesRaw) ? invoicesRaw : [];
   const age = calculateAge(patient.dateOfBirth);
 
   // Extract prescriptions from exams

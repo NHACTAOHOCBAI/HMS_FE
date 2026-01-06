@@ -28,7 +28,7 @@ export const patientFormSchema = z.object({
       { message: "Date of birth must be valid and in the past" } // Backend: @Past
     ),
   gender: z.enum(["MALE", "FEMALE", "OTHER"], {
-    error: "Gender is required",
+    message: "Gender is required",
   }), // Backend: @NotNull - REQUIRED
   address: z
     .string()

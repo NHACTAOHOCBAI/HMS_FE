@@ -96,9 +96,14 @@ export default function WalkInRegistrationPage() {
       });
 
       toast.success(
-        `Registration successful! Queue number: ${result.queueNumber}`,
+        `Walk-in registered! Queue #${result.queueNumber}`,
         {
-          description: `Patient: ${selectedPatient?.fullName || result.patientName || "N/A"}`,
+          description: (
+            <span>
+              <strong className="text-slate-900">{selectedPatient?.fullName || result.patientName || "Patient"}</strong>
+              {" "}has been added to the queue
+            </span>
+          ),
           duration: 5000,
         }
       );

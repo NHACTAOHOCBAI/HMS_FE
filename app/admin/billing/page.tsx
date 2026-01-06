@@ -65,17 +65,63 @@ export default function InvoiceListPage() {
   const debouncedSearch = useDebounce(search, 300);
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useInvoiceList({
-    page,
-    size: limit,
-    search: debouncedSearch || undefined,
-    status: status === "ALL" ? undefined : status,
-    startDate: startDate?.toISOString(),
-    endDate: endDate?.toISOString(),
+  const { data: rawData, isLoading } = useInvoiceList({
+    page: 0,
+    size: 200, // Fetch all for client-side filtering
     sort,
   });
 
   const { data: summary, isLoading: summaryLoading } = usePaymentSummaryCards();
+
+  // Client-side filtering since backend doesn't support search/date params
+  const filteredData = useMemo(() => {
+    if (!rawData?.content) return { content: [], totalElements: 0, totalPages: 1, page: 0 };
+    
+    let filtered = rawData.content;
+    
+    // Apply status filter (client-side since backend may not support it)
+    if (status && status !== "ALL") {
+      filtered = filtered.filter((inv) => inv.status === status);
+    }
+    
+    // Apply search filter
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(
+        (inv) =>
+          inv.invoiceNumber?.toLowerCase().includes(searchLower) ||
+          inv.patient?.fullName?.toLowerCase().includes(searchLower) ||
+          inv.patientName?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Apply date filters
+    if (startDate) {
+      filtered = filtered.filter(
+        (inv) => new Date(inv.invoiceDate) >= startDate
+      );
+    }
+    if (endDate) {
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(
+        (inv) => new Date(inv.invoiceDate) <= endOfDay
+      );
+    }
+    
+    // Paginate client-side
+    const startIdx = page * limit;
+    const paginated = filtered.slice(startIdx, startIdx + limit);
+    
+    return {
+      content: paginated,
+      totalElements: filtered.length,
+      totalPages: Math.ceil(filtered.length / limit),
+      page,
+    };
+  }, [rawData, status, debouncedSearch, startDate, endDate, page, limit]);
+
+  const data = filteredData;
 
   const clearFilters = () => {
     setSearch("");
@@ -152,7 +198,7 @@ export default function InvoiceListPage() {
       {/* Quick Filter Pills */}
       <FilterPills
         filters={[
-          { id: "ALL", label: "All Invoices", count: data?.totalElements || 0 },
+          { id: "ALL", label: "All Invoices", count: rawData?.totalElements || 0 },
           { id: "UNPAID", label: "Unpaid", countColor: "warning" },
           { id: "PAID", label: "Paid", countColor: "success" },
           { id: "OVERDUE", label: "Overdue", countColor: "danger" },

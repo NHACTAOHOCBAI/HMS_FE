@@ -85,7 +85,7 @@ export function PaymentForm({
           </div>
           <div className="space-y-4">
             <input type="hidden" {...form.register("idempotencyKey")} />
-            <div className="form-grid">
+            <div className="form-grid items-start">
               <FormField
                 control={form.control}
                 name="amount"
@@ -100,22 +100,6 @@ export function PaymentForm({
                       />
                     </FormControl>
                     <FormMessage />
-                    {maxAmount !== undefined && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="mt-2 text-emerald-600 hover:text-emerald-700"
-                        onClick={() =>
-                          form.setValue("amount", maxAmount, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          })
-                        }
-                      >
-                        Pay full balance
-                      </Button>
-                    )}
                   </FormItem>
                 )}
               />
@@ -148,6 +132,22 @@ export function PaymentForm({
                 )}
               />
             </div>
+            {maxAmount !== undefined && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-emerald-600 hover:text-emerald-700"
+                onClick={() =>
+                  form.setValue("amount", maxAmount, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+              >
+                Pay full balance
+              </Button>
+            )}
             <FormField
               control={form.control}
               name="notes"
