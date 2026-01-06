@@ -33,90 +33,120 @@ import { LogOut, Bell, Search } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { cn } from "@/lib/utils";
 
-const allNavItems = [
+const navigationGroups = [
   {
-    title: "Dashboard",
-    href: "/admin",
-    icon: NAV_ICONS.dashboard,
-    roles: ["ADMIN", "DOCTOR", "NURSE"],
+    label: "Overview",
+    items: [
+      {
+        title: "Dashboard",
+        href: "/admin",
+        icon: NAV_ICONS.dashboard,
+        roles: ["ADMIN", "DOCTOR", "NURSE"],
+      },
+    ],
   },
   {
-    title: "Queue",
-    href: "/admin/queue",
-    icon: NAV_ICONS.appointments,
-    roles: ["ADMIN", "DOCTOR", "NURSE", "RECEPTIONIST"],
+    label: "Patient Management",
+    items: [
+      {
+        title: "Queue",
+        href: "/admin/queue",
+        icon: NAV_ICONS.appointments,
+        roles: ["ADMIN", "DOCTOR", "NURSE", "RECEPTIONIST"],
+      },
+      {
+        title: "Patient reception",
+        href: "/admin/walk-in",
+        icon: NAV_ICONS.patients,
+        roles: ["ADMIN", "RECEPTIONIST"],
+      },
+      {
+        title: "Appointments",
+        href: "/admin/appointments",
+        icon: NAV_ICONS.appointments,
+        roles: ["ADMIN", "NURSE", "RECEPTIONIST"],
+      },
+      {
+        title: "Patients",
+        href: "/admin/patients",
+        icon: NAV_ICONS.patients,
+        roles: ["ADMIN", "DOCTOR", "NURSE", "RECEPTIONIST"],
+      },
+    ],
   },
   {
-    title: "Patient reception",
-    href: "/admin/walk-in",
-    icon: NAV_ICONS.patients,
-    roles: ["ADMIN", "RECEPTIONIST"],
+    label: "Clinical Services",
+    items: [
+      {
+        title: "Examinations",
+        href: "/admin/exams",
+        icon: NAV_ICONS.exams,
+        roles: ["ADMIN", "DOCTOR", "NURSE"],
+      },
+    ],
   },
   {
-    title: "Appointments",
-    href: "/admin/appointments",
-    icon: NAV_ICONS.appointments,
-    roles: ["ADMIN", "NURSE", "RECEPTIONIST"],
+    label: "Laboratory",
+    items: [
+      {
+        title: "Lab Tests",
+        href: "/admin/lab-tests",
+        icon: NAV_ICONS.labTests,
+        roles: ["ADMIN"],
+      },
+      {
+        title: "Lab Results",
+        href: "/admin/lab-results",
+        icon: NAV_ICONS.labResults,
+        roles: ["ADMIN", "DOCTOR", "NURSE"],
+      },
+      {
+        title: "Lab orders",
+        href: "/admin/lab-orders",
+        icon: NAV_ICONS.labTests,
+        roles: ["ADMIN", "DOCTOR", "NURSE"],
+      },
+    ],
   },
   {
-    title: "Examinations",
-    href: "/admin/exams",
-    icon: NAV_ICONS.exams,
-    roles: ["ADMIN", "DOCTOR", "NURSE"],
+    label: "Pharmacy",
+    items: [
+      {
+        title: "Medicines",
+        href: "/admin/medicines",
+        icon: NAV_ICONS.medicines,
+        roles: ["ADMIN"],
+      },
+    ],
   },
   {
-    title: "Lab Tests",
-    href: "/admin/lab-tests",
-    icon: NAV_ICONS.labTests,
-    roles: ["ADMIN"],
-  },
-  {
-    title: "Lab Results",
-    href: "/admin/lab-results",
-    icon: NAV_ICONS.labResults,
-    roles: ["ADMIN", "DOCTOR", "NURSE"],
-  },
-  {
-    title: "Lab orders",
-    href: "/admin/lab-orders",
-    icon: NAV_ICONS.labTests,
-    roles: ["ADMIN", "DOCTOR", "NURSE"],
-  },
-  {
-    title: "Patients",
-    href: "/admin/patients",
-    icon: NAV_ICONS.patients,
-    roles: ["ADMIN", "DOCTOR", "NURSE", "RECEPTIONIST"],
-  },
-  {
-    title: "Medicines",
-    href: "/admin/medicines",
-    icon: NAV_ICONS.medicines,
-    roles: ["ADMIN"],
-  },
-  {
-    title: "HR Management",
-    href: "/admin/hr",
-    icon: NAV_ICONS.hr,
-    roles: ["ADMIN"],
-  },
-  {
-    title: "Accounts",
-    href: "/admin/accounts",
-    icon: NAV_ICONS.accounts,
-    roles: ["ADMIN"],
-  },
-  {
-    title: "Billing",
-    href: "/admin/billing",
-    icon: NAV_ICONS.billing,
-    roles: ["ADMIN", "RECEPTIONIST"],
-  },
-  {
-    title: "Reports",
-    href: "/admin/reports",
-    icon: NAV_ICONS.reports,
-    roles: ["ADMIN", "DOCTOR"],
+    label: "Administrative",
+    items: [
+      {
+        title: "HR Management",
+        href: "/admin/hr",
+        icon: NAV_ICONS.hr,
+        roles: ["ADMIN"],
+      },
+      {
+        title: "Accounts",
+        href: "/admin/accounts",
+        icon: NAV_ICONS.accounts,
+        roles: ["ADMIN"],
+      },
+      {
+        title: "Billing",
+        href: "/admin/billing",
+        icon: NAV_ICONS.billing,
+        roles: ["ADMIN", "RECEPTIONIST"],
+      },
+      {
+        title: "Reports",
+        href: "/admin/reports",
+        icon: NAV_ICONS.reports,
+        roles: ["ADMIN", "DOCTOR"],
+      },
+    ],
   },
 ];
 
@@ -146,10 +176,15 @@ export default function AdminLayout({
   const breadcrumbs = buildBreadcrumbs(pathname);
   const { user, logout } = useAuth();
 
-  // Filter navigation items based on user role
-  const navItems = allNavItems.filter(
-    (item) => user && item.roles.includes(user.role)
-  );
+  // Filter navigation groups and items based on user role
+  const filteredGroups = navigationGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) => user && item.roles.includes(user.role)
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
 
   return (
     <RoleGuard allowedRoles={["ADMIN", "DOCTOR", "NURSE", "RECEPTIONIST"]}>
@@ -174,47 +209,49 @@ export default function AdminLayout({
             </SidebarHeader>
 
             <SidebarContent className="relative z-10">
-              <SidebarGroup>
-                <SidebarGroupLabel className="text-slate-400 text-xs uppercase tracking-wider px-4 mb-2">
-                  Navigation
-                </SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu className="px-2 space-y-1">
-                    {navItems.map((item) => {
-                      const Icon = item.icon;
-                      // Fix active logic: exact match for Dashboard, startsWith for others
-                      const isActive =
-                        item.href === "/admin"
-                          ? pathname === "/admin"
-                          : pathname.startsWith(item.href);
-                      return (
-                        <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={isActive}
-                            className={cn(
-                              "h-10 rounded-lg px-3 py-2.5 font-medium transition-all duration-200",
-                              isActive
-                                ? "bg-gradient-to-r from-sky-500/20 to-teal-500/10 text-white border-l-2 border-sky-400 shadow-sm"
-                                : "text-slate-300 hover:bg-white/5 hover:text-white"
-                            )}
-                          >
-                            <Link href={item.href}>
-                              <Icon
-                                className={cn(
-                                  "size-4 transition-colors",
-                                  isActive ? "text-sky-400" : "text-slate-400"
-                                )}
-                              />
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      );
-                    })}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
+              {filteredGroups.map((group, groupIndex) => (
+                <SidebarGroup key={group.label}>
+                  <SidebarGroupLabel className="text-slate-400 text-xs uppercase tracking-wider px-4 mb-2">
+                    {group.label}
+                  </SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu className="px-2 space-y-1">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        // Fix active logic: exact match for Dashboard, startsWith for others
+                        const isActive =
+                          item.href === "/admin"
+                            ? pathname === "/admin"
+                            : pathname.startsWith(item.href);
+                        return (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                              asChild
+                              isActive={isActive}
+                              className={cn(
+                                "h-10 rounded-lg px-3 py-2.5 font-medium transition-all duration-200",
+                                isActive
+                                  ? "bg-gradient-to-r from-sky-500/20 to-teal-500/10 text-white border-l-2 border-sky-400 shadow-sm"
+                                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+                              )}
+                            >
+                              <Link href={item.href}>
+                                <Icon
+                                  className={cn(
+                                    "size-4 transition-colors",
+                                    isActive ? "text-sky-400" : "text-slate-400"
+                                  )}
+                                />
+                                <span>{item.title}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              ))}
             </SidebarContent>
 
             <SidebarFooter className="relative z-10 px-3 pb-4 border-t border-white/10 pt-4">
