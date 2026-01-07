@@ -28,6 +28,7 @@ import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { ListPageHeader } from "@/components/ui/list-page-header";
 import { FilterPills } from "@/components/ui/filter-pills";
 import { ListEmptyState } from "@/components/ui/list-empty-state";
+import { DateRangeFilter, DateRange } from "@/components/ui/date-range-filter";
 
 import { AppointmentStatus, Appointment } from "@/interfaces/appointment";
 import {
@@ -65,11 +66,8 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<AppointmentStatus | "ALL">("ALL");
   const [doctorId, setDoctorId] = useState<string>(paramDoctorId || "ALL");
-  const [startDate, setStartDate] = useState<Date | undefined>(
-    paramDate ? new Date(paramDate) : undefined
-  );
-  const [endDate, setEndDate] = useState<Date | undefined>(
-    paramDate ? new Date(paramDate) : undefined
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    paramDate ? { from: new Date(paramDate), to: new Date(paramDate) } : undefined
   );
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -126,8 +124,8 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
       status: status === "ALL" ? undefined : status,
       doctorId: effectiveDoctorId,
       patientId: effectivePatientId,
-      startDate: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
-      endDate: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
+      startDate: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
+      endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
       sort: sortParams,
     }),
     [
@@ -137,8 +135,7 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
       status,
       effectiveDoctorId,
       effectivePatientId,
-      startDate,
-      endDate,
+      dateRange,
       sortParams,
     ]
   );
@@ -328,58 +325,16 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
           </Select>
         )}
 
-        {/* Date Range */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-[140px] justify-start">
-              <CalendarDays className="mr-2 h-4 w-4" />
-              {startDate ? format(startDate, "MMM dd") : "Start date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={startDate}
-              onSelect={(date) => {
-                setStartDate(date);
-                setPage(0);
-              }}
-            />
-          </PopoverContent>
-        </Popover>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-[140px] justify-start">
-              <CalendarDays className="mr-2 h-4 w-4" />
-              {endDate ? format(endDate, "MMM dd") : "End date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={endDate}
-              onSelect={(date) => {
-                setEndDate(date);
-                setPage(0);
-              }}
-            />
-          </PopoverContent>
-        </Popover>
-
-        {(startDate || endDate) && (
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setStartDate(undefined);
-              setEndDate(undefined);
-              setPage(0);
-            }}
-            className="h-8 px-2 lg:px-3"
-          >
-            Clear
-          </Button>
-        )}
+        {/* Date Range Filter */}
+        <DateRangeFilter
+          value={dateRange}
+          onChange={(range) => {
+            setDateRange(range);
+            setPage(0);
+          }}
+          theme="purple"
+          presetKeys={["all", "today", "7days", "30days", "thisMonth"]}
+        />
       </div>
 
       {/* Content based on view mode */}

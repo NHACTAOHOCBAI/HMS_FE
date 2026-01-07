@@ -40,6 +40,7 @@ import { LabTestResult, ResultStatus, LabTestCategory } from "@/services/lab.ser
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/useDebounce";
+import { DateRangeFilter, DateRange } from "@/components/ui/date-range-filter";
 
 const formatDateShort = (value: string) =>
   new Date(value).toLocaleString("vi-VN", {
@@ -551,6 +552,7 @@ export default function AdminLabResultsPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [viewMode, setViewMode] = useState<"table" | "timeline" | "cards">("timeline");
   const [abnormalOnly, setAbnormalOnly] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const debouncedSearch = useDebounce(search, 300);
   const { data, isLoading, refetch, isFetching } = useLabResults({ page, size });
@@ -580,9 +582,19 @@ export default function AdminLabResultsPage() {
           r.labTestCode?.toLowerCase().includes(searchLower)
       );
     }
+    // Date range filter
+    if (dateRange?.from) {
+      filtered = filtered.filter((r: LabTestResult) => {
+        const createdAt = r.createdAt ? new Date(r.createdAt) : null;
+        if (!createdAt) return true;
+        const from = dateRange.from;
+        const to = dateRange.to || dateRange.from;
+        return createdAt >= from! && createdAt <= to!;
+      });
+    }
 
     return filtered;
-  }, [results, statusFilter, abnormalOnly, debouncedSearch]);
+  }, [results, statusFilter, abnormalOnly, debouncedSearch, dateRange]);
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -680,62 +692,82 @@ export default function AdminLabResultsPage() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg bg-slate-50 p-3 border">
-        {/* View Toggle */}
-        <ViewToggle view={viewMode} onChange={setViewMode} />
+      <div className="space-y-3 rounded-xl bg-slate-50/80 p-4 border border-slate-200 shadow-sm">
+        {/* Row 1: View Toggle + Date Range Filter */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* View Toggle */}
+          <ViewToggle view={viewMode} onChange={setViewMode} />
 
-        {/* Status Pills */}
-        <div className="flex gap-2 flex-wrap">
-          {STATUS_OPTIONS.map((option) => {
-            const Icon = option.icon;
-            return (
-              <button
-                key={option.value}
-                onClick={() => {
-                  setStatusFilter(option.value);
-                  setPage(0);
-                }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  statusFilter === option.value
-                    ? "bg-teal-600 text-white shadow-md"
-                    : "bg-white text-slate-600 hover:bg-slate-100 border"
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
+          {/* Divider */}
+          <div className="h-8 w-px bg-slate-200 hidden lg:block" />
 
-        {/* Abnormal Filter */}
-        <button
-          onClick={() => {
-            setAbnormalOnly(!abnormalOnly);
-            setPage(0);
-          }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-            abnormalOnly
-              ? "bg-red-500 text-white shadow-md"
-              : "bg-white text-slate-600 hover:bg-red-50 border border-red-200"
-          }`}
-        >
-          <AlertTriangle className="h-3.5 w-3.5" />
-          Bất thường
-        </button>
-
-        {/* Search */}
-        <div className="relative flex-1 min-w-[200px] ml-auto">
-          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-          <Input
-            placeholder="Tìm theo tên BN, tên XN, mã XN..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+          {/* Date Range Filter */}
+          <DateRangeFilter
+            value={dateRange}
+            onChange={(range) => {
+              setDateRange(range);
               setPage(0);
             }}
-            className="h-9 rounded-lg pl-9 bg-white"
+            theme="teal"
+            presetKeys={["all", "today", "7days", "30days", "thisMonth"]}
           />
+        </div>
+
+        {/* Row 2: Status Pills + Abnormal + Search */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Status Pills */}
+          <div className="flex gap-2 flex-wrap">
+            {STATUS_OPTIONS.map((option) => {
+              const Icon = option.icon;
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setStatusFilter(option.value);
+                    setPage(0);
+                  }}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                    statusFilter === option.value
+                      ? "bg-teal-600 text-white shadow-md"
+                      : "bg-white text-slate-600 hover:bg-slate-100 border"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Abnormal Filter */}
+          <button
+            onClick={() => {
+              setAbnormalOnly(!abnormalOnly);
+              setPage(0);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+              abnormalOnly
+                ? "bg-red-500 text-white shadow-md"
+                : "bg-white text-slate-600 hover:bg-red-50 border border-red-200"
+            }`}
+          >
+            <AlertTriangle className="h-3.5 w-3.5" />
+            Bất thường
+          </button>
+
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px] ml-auto">
+            <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="Tìm theo tên BN, tên XN, mã XN..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(0);
+              }}
+              className="h-9 rounded-lg pl-9 bg-white"
+            />
+          </div>
         </div>
       </div>
 

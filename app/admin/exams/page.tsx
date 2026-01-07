@@ -35,6 +35,7 @@ import { DataTableRowActions } from "@/components/ui/data-table-row-actions";
 import { ListPageHeader } from "@/components/ui/list-page-header";
 import { FilterPills } from "@/components/ui/filter-pills";
 import { ListEmptyState } from "@/components/ui/list-empty-state";
+import { DateRangeFilter, DateRange } from "@/components/ui/date-range-filter";
 import { format } from "date-fns";
 
 const formatDate = (value: string) =>
@@ -44,8 +45,7 @@ export default function MedicalExamListPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [doctorId, setDoctorId] = useState("ALL");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [quickFilter, setQuickFilter] = useState<string>("all");
@@ -57,8 +57,8 @@ export default function MedicalExamListPage() {
   const { data, isLoading } = useMedicalExamList({
     page,
     size: pageSize,
-    startDate: startDate || undefined,
-    endDate: endDate || undefined,
+    startDate: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
+    endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
     doctorId: doctorId !== "ALL" ? doctorId : undefined,
   });
 
@@ -90,13 +90,12 @@ export default function MedicalExamListPage() {
   const clearFilters = () => {
     setSearch("");
     setDoctorId("ALL");
-    setStartDate("");
-    setEndDate("");
+    setDateRange(undefined);
     setQuickFilter("all");
     setPage(0);
   };
 
-  const hasFilters = search || doctorId !== "ALL" || startDate || endDate;
+  const hasFilters = search || doctorId !== "ALL" || dateRange?.from;
 
   return (
     <RoleGuard allowedRoles={["ADMIN", "NURSE"]}>
@@ -181,26 +180,15 @@ export default function MedicalExamListPage() {
             </SelectContent>
           </Select>
 
-          {/* Date Range */}
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => {
-              setStartDate(e.target.value);
+          {/* Date Range Filter */}
+          <DateRangeFilter
+            value={dateRange}
+            onChange={(range) => {
+              setDateRange(range);
               setPage(0);
             }}
-            className="w-[140px]"
-            aria-label="Start date"
-          />
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => {
-              setEndDate(e.target.value);
-              setPage(0);
-            }}
-            className="w-[140px]"
-            aria-label="End date"
+            theme="indigo"
+            presetKeys={["all", "today", "7days", "30days", "thisMonth"]}
           />
 
           {hasFilters && (

@@ -45,6 +45,7 @@ import { Invoice } from "@/interfaces/billing";
 import { ListPageHeader } from "@/components/ui/list-page-header";
 import { FilterPills } from "@/components/ui/filter-pills";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { DateRangeFilter, DateRange } from "@/components/ui/date-range-filter";
 import { useQueryClient } from "@tanstack/react-query";
 
 const formatCurrency = (amount: number) => {
@@ -59,8 +60,7 @@ export default function InvoiceListPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [sort, setSort] = useState("invoiceDate,desc");
   const debouncedSearch = useDebounce(search, 300);
   const queryClient = useQueryClient();
@@ -96,13 +96,13 @@ export default function InvoiceListPage() {
     }
     
     // Apply date filters
-    if (startDate) {
+    if (dateRange?.from) {
       filtered = filtered.filter(
-        (inv) => new Date(inv.invoiceDate) >= startDate
+        (inv) => new Date(inv.invoiceDate) >= dateRange.from!
       );
     }
-    if (endDate) {
-      const endOfDay = new Date(endDate);
+    if (dateRange?.to) {
+      const endOfDay = new Date(dateRange.to);
       endOfDay.setHours(23, 59, 59, 999);
       filtered = filtered.filter(
         (inv) => new Date(inv.invoiceDate) <= endOfDay
@@ -119,19 +119,18 @@ export default function InvoiceListPage() {
       totalPages: Math.ceil(filtered.length / limit),
       page,
     };
-  }, [rawData, status, debouncedSearch, startDate, endDate, page, limit]);
+  }, [rawData, status, debouncedSearch, dateRange, page, limit]);
 
   const data = filteredData;
 
   const clearFilters = () => {
     setSearch("");
     setStatus("ALL");
-    setStartDate(undefined);
-    setEndDate(undefined);
+    setDateRange(undefined);
     setPage(0);
   };
 
-  const hasFilters = search || status !== "ALL" || startDate || endDate;
+  const hasFilters = search || status !== "ALL" || dateRange?.from;
 
   const router = useRouter();
   const { mutateAsync: cancelInvoiceMutation, isPending: isCanceling } =
@@ -334,53 +333,16 @@ export default function InvoiceListPage() {
           </SelectContent>
         </Select>
 
-        {/* Start Date Picker */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[150px] justify-start text-left font-normal",
-                !startDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {startDate ? format(startDate, "MMM d, yyyy") : "Start Date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={startDate}
-              onSelect={setStartDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-
-        {/* End Date Picker */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[150px] justify-start text-left font-normal",
-                !endDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {endDate ? format(endDate, "MMM d, yyyy") : "End Date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={endDate}
-              onSelect={setEndDate}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        {/* Date Range Filter */}
+        <DateRangeFilter
+          value={dateRange}
+          onChange={(range) => {
+            setDateRange(range);
+            setPage(0);
+          }}
+          theme="default"
+          presetKeys={["all", "today", "7days", "30days", "thisMonth"]}
+        />
 
         {hasFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>

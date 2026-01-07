@@ -38,6 +38,8 @@ import { MedicalExamListItem } from "@/interfaces/medical-exam";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { useMyEmployeeProfile } from "@/hooks/queries/useHr";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DateRangeFilter, DateRange } from "@/components/ui/date-range-filter";
+import { format } from "date-fns";
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleString("vi-VN", {
@@ -273,8 +275,7 @@ export default function DoctorExamsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(20);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [status, setStatus] = useState("ALL");
   const [viewMode, setViewMode] = useState<"table" | "timeline">("table");
 
@@ -284,8 +285,8 @@ export default function DoctorExamsPage() {
     page,
     size,
     doctorId: doctorId || undefined,
-    startDate: startDate || undefined,
-    endDate: endDate || undefined,
+    startDate: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
+    endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
     status: status !== "ALL" ? (status as any) : undefined,
     search: debouncedSearch || undefined,
   });
@@ -393,31 +394,16 @@ export default function DoctorExamsPage() {
           />
         </div>
         
-        {/* Date Range */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-500 hidden sm:inline">Từ</span>
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => {
-              setStartDate(e.target.value);
-              setPage(0);
-            }}
-            className="h-9 w-[140px] bg-white"
-            aria-label="Start date"
-          />
-          <span className="text-sm text-slate-500">→</span>
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => {
-              setEndDate(e.target.value);
-              setPage(0);
-            }}
-            className="h-9 w-[140px] bg-white"
-            aria-label="End date"
-          />
-        </div>
+        {/* Date Range Filter */}
+        <DateRangeFilter
+          value={dateRange}
+          onChange={(range) => {
+            setDateRange(range);
+            setPage(0);
+          }}
+          theme="teal"
+          presetKeys={["all", "today", "7days", "30days", "thisMonth"]}
+        />
       </div>
 
       {/* Content Card */}

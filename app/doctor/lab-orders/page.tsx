@@ -41,6 +41,7 @@ import {
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDebounce } from "@/hooks/useDebounce";
+import { DateRangeFilter, DateRange } from "@/components/ui/date-range-filter";
 
 const formatDateShort = (value: string) =>
   new Date(value).toLocaleString("vi-VN", {
@@ -600,6 +601,7 @@ export default function DoctorLabOrdersPage() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<"table" | "timeline">("table");
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>("my-orders");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const debouncedSearch = useDebounce(search, 300);
   
@@ -638,8 +640,18 @@ export default function DoctorLabOrdersPage() {
           o.orderNumber?.toLowerCase().includes(searchLower)
       );
     }
+    // Date range filter
+    if (dateRange?.from) {
+      result = result.filter((o: LabOrderResponse) => {
+        const orderDate = o.orderDate ? new Date(o.orderDate) : null;
+        if (!orderDate) return true;
+        const from = dateRange.from;
+        const to = dateRange.to || dateRange.from;
+        return orderDate >= from! && orderDate <= to!;
+      });
+    }
     return result;
-  }, [orders, statusFilter, debouncedSearch]);
+  }, [orders, statusFilter, debouncedSearch, dateRange]);
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -756,42 +768,62 @@ export default function DoctorLabOrdersPage() {
       </Card>
 
       {/* Filter Toolbar with View Toggle */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg bg-slate-50 p-3 border">
-        {/* View Toggle */}
-        <ViewToggle view={viewMode} onChange={setViewMode} />
+      <div className="space-y-3 rounded-xl bg-slate-50/80 p-4 border border-slate-200 shadow-sm">
+        {/* Row 1: View Toggle + Date Range */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* View Toggle */}
+          <ViewToggle view={viewMode} onChange={setViewMode} />
 
-        {/* Status Pills */}
-        <div className="flex gap-2">
-          {STATUS_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => {
-                setStatusFilter(option.value);
-                setPage(0);
-              }}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                statusFilter === option.value
-                  ? "bg-indigo-600 text-white shadow-md"
-                  : "bg-white text-slate-600 hover:bg-slate-100 border"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+          {/* Divider */}
+          <div className="h-8 w-px bg-slate-200 hidden lg:block" />
 
-        {/* Search */}
-        <div className="relative flex-1 min-w-[200px] ml-auto">
-          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-          <Input
-            placeholder="Tìm theo tên bệnh nhân hoặc mã phiếu..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+          {/* Date Range Filter */}
+          <DateRangeFilter
+            value={dateRange}
+            onChange={(range) => {
+              setDateRange(range);
               setPage(0);
             }}
-            className="h-9 rounded-lg pl-9 bg-white"
+            theme="indigo"
+            presetKeys={["all", "today", "7days", "30days", "thisMonth"]}
           />
+        </div>
+
+        {/* Row 2: Status Pills + Search */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Status Pills */}
+          <div className="flex gap-2">
+            {STATUS_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => {
+                  setStatusFilter(option.value);
+                  setPage(0);
+                }}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  statusFilter === option.value
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "bg-white text-slate-600 hover:bg-slate-100 border"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px] ml-auto">
+            <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="Tìm theo tên bệnh nhân hoặc mã phiếu..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(0);
+              }}
+              className="h-9 rounded-lg pl-9 bg-white"
+            />
+          </div>
         </div>
       </div>
 
