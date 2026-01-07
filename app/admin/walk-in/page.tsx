@@ -53,10 +53,11 @@ export default function WalkInRegistrationPage() {
   const [reason, setReason] = useState("");
   const [priorityReason, setPriorityReason] = useState("");
 
-  // Fetch patients
+  // Fetch patients - sort by newest first so recently created patients show first
   const { data: patientsData, isLoading: isLoadingPatients } = usePatients({
     search: patientSearch,
     size: 10,
+    sort: "createdAt,desc",
   });
   const patients = patientsData?.content || [];
 

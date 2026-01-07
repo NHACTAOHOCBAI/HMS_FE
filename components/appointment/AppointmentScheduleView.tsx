@@ -1,27 +1,36 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { format, addDays, startOfWeek, isSameDay, isToday } from "date-fns";
-import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { format, addDays, startOfWeek, isSameDay, isToday, isWithinInterval, endOfDay, startOfDay } from "date-fns";
+import { ChevronLeft, ChevronRight, Clock, CheckCircle2, User, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Appointment, AppointmentStatus } from "@/interfaces/appointment";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AppointmentScheduleViewProps {
   appointments: Appointment[];
   onAppointmentClick: (appointment: Appointment) => void;
   onEmptySlotClick?: (date: Date) => void;
+  onMarkComplete?: (appointment: Appointment) => void;
+  onViewPatient?: (patientId: string) => void;
   isLoading: boolean;
   weekStart?: Date;
   onWeekChange?: (newWeekStart: Date) => void;
+  showQuickActions?: boolean;
 }
 
-// Time slots from 7 AM to 7 PM (30-minute intervals)
-const TIME_SLOTS = Array.from({ length: 25 }, (_, i) => {
-  const hour = Math.floor(i / 2) + 7;
+// Time slots from 6 AM to 9 PM (30-minute intervals)
+const TIME_SLOTS = Array.from({ length: 31 }, (_, i) => {
+  const hour = Math.floor(i / 2) + 6;
   const minute = i % 2 === 0 ? "00" : "30";
   return `${hour.toString().padStart(2, "0")}:${minute}`;
 });
@@ -38,9 +47,12 @@ export function AppointmentScheduleView({
   appointments,
   onAppointmentClick,
   onEmptySlotClick,
+  onMarkComplete,
+  onViewPatient,
   isLoading,
   weekStart: externalWeekStart,
   onWeekChange,
+  showQuickActions = false,
 }: AppointmentScheduleViewProps) {
   const [internalWeekStart, setInternalWeekStart] = useState(() =>
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -72,6 +84,28 @@ export function AppointmentScheduleView({
 
     return map;
   }, [appointments]);
+
+  // Count appointments within the displayed week AND visible time range (6AM-9PM)
+  const weekAppointmentsCount = useMemo(() => {
+    const weekEnd = addDays(weekStart, 6);
+    return appointments.filter((apt) => {
+      const aptDate = new Date(apt.appointmentTime);
+      const hours = aptDate.getHours();
+      const minutes = aptDate.getMinutes();
+      const timeInMinutes = hours * 60 + minutes;
+      
+      // Check if within visible time range (6:00 = 360 min, 21:00 = 1260 min)
+      const isInTimeRange = timeInMinutes >= 360 && timeInMinutes < 1260;
+      
+      // Check if within week range
+      const isInWeekRange = isWithinInterval(aptDate, { 
+        start: startOfDay(weekStart), 
+        end: endOfDay(weekEnd) 
+      });
+      
+      return isInTimeRange && isInWeekRange;
+    }).length;
+  }, [appointments, weekStart]);
 
   const handlePrevWeek = () => {
     const newStart = addDays(weekStart, -7);
@@ -130,7 +164,7 @@ export function AppointmentScheduleView({
         </h3>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
-          <span>{appointments.length} appointments this week</span>
+          <span>{weekAppointmentsCount} appointments this week</span>
         </div>
       </div>
 
@@ -201,26 +235,73 @@ export function AppointmentScheduleView({
                     >
                       {slotAppointments.map((apt) => {
                         const colors = STATUS_COLORS[apt.status];
+                        const canComplete = apt.status === "SCHEDULED" || apt.status === "IN_PROGRESS";
                         return (
-                          <div
-                            key={apt.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onAppointmentClick(apt);
-                            }}
-                            className={cn(
-                              "rounded-md p-1.5 mb-1 cursor-pointer border text-xs transition-all hover:shadow-md",
-                              colors.bg,
-                              colors.border
-                            )}
-                          >
-                            <div className={cn("font-medium truncate", colors.text)}>
-                              {apt.patient?.fullName}
-                            </div>
-                            <div className="text-slate-500 truncate text-[10px]">
-                              Dr. {apt.doctor?.fullName?.split(" ").pop()}
-                            </div>
-                          </div>
+                          <TooltipProvider key={apt.id} delayDuration={200}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAppointmentClick(apt);
+                                  }}
+                                  className={cn(
+                                    "rounded-md p-1.5 mb-1 cursor-pointer border text-xs transition-all hover:shadow-md group relative",
+                                    colors.bg,
+                                    colors.border
+                                  )}
+                                >
+                                  <div className={cn("font-medium truncate", colors.text)}>
+                                    {apt.patient?.fullName}
+                                  </div>
+                                  <div className="text-slate-500 truncate text-[10px]">
+                                    {format(new Date(apt.appointmentTime), "HH:mm")}
+                                  </div>
+                                  
+                                  {/* Quick Actions - shown on hover */}
+                                  {showQuickActions && (
+                                    <div className="absolute -right-1 -top-1 hidden group-hover:flex gap-0.5">
+                                      {canComplete && onMarkComplete && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            onMarkComplete(apt);
+                                          }}
+                                          className="p-1 bg-emerald-500 rounded-full text-white shadow-sm hover:bg-emerald-600 transition-colors"
+                                          title="Mark Complete"
+                                        >
+                                          <CheckCircle2 className="h-3 w-3" />
+                                        </button>
+                                      )}
+                                      {apt.patient?.id && onViewPatient && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            onViewPatient(apt.patient!.id);
+                                          }}
+                                          className="p-1 bg-sky-500 rounded-full text-white shadow-sm hover:bg-sky-600 transition-colors"
+                                          title="View Patient"
+                                        >
+                                          <User className="h-3 w-3" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-xs bg-slate-800 text-white border-slate-700">
+                                <div className="space-y-1">
+                                  <p className="font-medium text-white">{apt.patient?.fullName}</p>
+                                  <p className="text-xs text-sky-200">
+                                    {format(new Date(apt.appointmentTime), "HH:mm")} - {apt.reason || 'General checkup'}
+                                  </p>
+                                  <Badge variant="outline" className="text-[10px]">
+                                    {apt.status}
+                                  </Badge>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         );
                       })}
                     </div>

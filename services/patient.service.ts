@@ -53,10 +53,18 @@ export const getPatients = async (
     if (params.search) {
       const searchTerm = params.search.trim();
       if (searchTerm) {
-        // RSQL pattern matching with wildcard
-        filterParts.push(
-          `fullName==*${searchTerm}*,phoneNumber==*${searchTerm}*,email==*${searchTerm}*`
-        );
+        // Escape RSQL special characters: * ( ) ' " ; , = ! ~ < > 
+        // and encode the search term to avoid parse errors with Vietnamese characters
+        const escapedTerm = searchTerm
+          .replace(/[*()'"=!~<>;,\\]/g, '') // Remove special chars that break RSQL
+          .trim();
+        
+        if (escapedTerm) {
+          // RSQL pattern matching with wildcard
+          filterParts.push(
+            `fullName==*${escapedTerm}*,phoneNumber==*${escapedTerm}*,email==*${escapedTerm}*`
+          );
+        }
       }
     }
 

@@ -144,6 +144,20 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
   );
 
   const { data, isLoading, isFetching } = useAppointmentList(queryParams);
+  
+  // Separate query for global stats (ignores status filter)
+  const statsQueryParams = useMemo(
+    () => ({
+      page: 0,
+      size: 200, // Fetch enough for accurate stats
+      doctorId: effectiveDoctorId,
+      patientId: effectivePatientId,
+      // No status filter - get all statuses for accurate counts
+    }),
+    [effectiveDoctorId, effectivePatientId]
+  );
+  const { data: statsData } = useAppointmentList(statsQueryParams);
+  
   // Only fetch doctors for admin/nurse - patients don't have access to HR API
   const canFilterByDoctor = role === "ADMIN" || role === "NURSE";
   const { data: doctorsData } = useEmployees({ role: "DOCTOR", size: 999, enabled: canFilterByDoctor });
@@ -194,10 +208,12 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
   const totalPages = data?.totalPages || 0;
   const totalElements = data?.totalElements || 0;
 
-  // Calculate stats
-  const scheduledCount = useMemo(() => appointments.filter((a: Appointment) => a.status === "SCHEDULED").length, [appointments]);
-  const completedCount = useMemo(() => appointments.filter((a: Appointment) => a.status === "COMPLETED").length, [appointments]);
-  const cancelledCount = useMemo(() => appointments.filter((a: Appointment) => a.status === "CANCELLED").length, [appointments]);
+  // Calculate stats from global data (not filtered by status)
+  const allAppointments = statsData?.content || [];
+  const globalTotalElements = statsData?.totalElements || totalElements;
+  const scheduledCount = useMemo(() => allAppointments.filter((a: Appointment) => a.status === "SCHEDULED").length, [allAppointments]);
+  const completedCount = useMemo(() => allAppointments.filter((a: Appointment) => a.status === "COMPLETED").length, [allAppointments]);
+  const cancelledCount = useMemo(() => allAppointments.filter((a: Appointment) => a.status === "CANCELLED").length, [allAppointments]);
 
   return (
     <div className="w-full space-y-6">
@@ -214,7 +230,7 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
         theme="violet"
         icon={<Calendar className="h-6 w-6 text-white" />}
         stats={[
-          { label: "Total", value: totalElements },
+          { label: "Total", value: globalTotalElements },
           { label: "Scheduled", value: scheduledCount },
           { label: "Completed", value: completedCount },
         ]}
