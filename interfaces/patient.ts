@@ -45,6 +45,11 @@ export interface PatientListParams {
   search?: string;
   gender?: Gender;
   bloodType?: BloodType;
+  hasInsurance?: boolean;
+  ageMin?: number;
+  ageMax?: number;
+  createdAfter?: string; // ISO date string
+  createdBefore?: string; // ISO date string
 }
 
 // Paginated response
@@ -144,4 +149,16 @@ export interface PatientHistoryParams {
   startDate?: string;
   endDate?: string;
   eventType?: "APPOINTMENT" | "EXAM" | "INVOICE" | "ALL";
+}
+
+// Patient statistics response from /patients/stats
+export interface PatientStats {
+  totalPatients: number;
+  newPatientsThisMonth: number;
+  newPatientsThisYear: number;
+  patientsByGender: Record<string, number>;
+  patientsByBloodType: Record<string, number>;
+  averageAge: number;
+  registrationTrend: { date: string; newPatients: number }[];
+  generatedAt: string;
 }

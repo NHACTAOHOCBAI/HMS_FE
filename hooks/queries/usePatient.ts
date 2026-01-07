@@ -6,12 +6,14 @@ import {
   updatePatient,
   updateMyProfile,
   deletePatient,
+  getPatientStats,
 } from "@/services/patient.service";
 import {
   PatientListParams,
   CreatePatientRequest,
   UpdatePatientRequest,
   UpdateMyProfileRequest,
+  PatientStats,
 } from "@/interfaces/patient";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -158,5 +160,14 @@ export const useDeletePatient = () => {
         toast.error("Failed to delete patient");
       }
     },
+  });
+};
+
+// Get patient statistics
+export const usePatientStats = () => {
+  return useQuery({
+    queryKey: [...patientKeys.all, "stats"],
+    queryFn: () => getPatientStats(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

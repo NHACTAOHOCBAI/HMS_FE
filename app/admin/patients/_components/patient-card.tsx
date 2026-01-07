@@ -3,7 +3,7 @@
 import { Patient } from "@/interfaces/patient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,8 +35,10 @@ import {
   Trash2,
   CreditCard,
   Shield,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -66,13 +68,16 @@ export function PatientCard({
 
   const getGenderLabel = (gender: string | null) => {
     if (!gender) return "N/A";
+    const g = gender.toUpperCase();
+    if (g === "MALE") return "Nam";
+    if (g === "FEMALE") return "Nữ";
     return gender.charAt(0) + gender.slice(1).toLowerCase();
   };
 
   const formatDate = (date: string | null) => {
     if (!date) return "N/A";
     try {
-      return format(new Date(date), "dd/MM/yyyy");
+      return format(new Date(date), "dd/MM/yyyy", { locale: vi });
     } catch {
       return date;
     }
@@ -95,37 +100,43 @@ export function PatientCard({
   };
 
   const age = calculateAge(patient.dateOfBirth);
+  const isMale = patient.gender?.toUpperCase() === "MALE";
+  const isFemale = patient.gender?.toUpperCase() === "FEMALE";
 
   if (variant === "detail") {
     return (
       <div className="space-y-6">
         {/* Header Card */}
-        <Card>
+        <Card className="border-2 border-slate-200 shadow-md">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarFallback className="bg-primary/10 text-primary text-xl">
+                <Avatar className="h-20 w-20 ring-4 ring-white shadow-lg">
+                  <AvatarImage src={patient.profileImageUrl || undefined} alt={patient.fullName} />
+                  <AvatarFallback className={`text-xl font-bold text-white ${
+                    isFemale 
+                      ? "bg-gradient-to-br from-pink-400 to-rose-500" 
+                      : "bg-gradient-to-br from-sky-400 to-cyan-500"
+                  }`}>
                     {getInitials(patient.fullName)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <h1 className="text-2xl font-semibold">{patient.fullName}</h1>
                   <p className="text-muted-foreground">
-                    Patient ID: {patient.id.slice(0, 8)}
+                    Mã BN: {patient.id.slice(0, 8)}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     {patient.gender && (
-                      <Badge variant="secondary">
+                      <Badge variant="secondary" className={
+                        isFemale ? "bg-pink-100 text-pink-700" : "bg-sky-100 text-sky-700"
+                      }>
                         {getGenderLabel(patient.gender)}
                       </Badge>
                     )}
-                    {age && <Badge variant="outline">{age} years old</Badge>}
+                    {age && <Badge variant="outline">{age} tuổi</Badge>}
                     {patient.bloodType && (
-                      <Badge
-                        variant="destructive"
-                        className="bg-red-100 text-red-700"
-                      >
+                      <Badge className="bg-red-100 text-red-700 border-red-200">
                         <Heart className="h-3 w-3 mr-1" />
                         {patient.bloodType}
                       </Badge>
@@ -137,7 +148,7 @@ export function PatientCard({
                 <Button variant="outline" asChild>
                   <Link href={`/admin/patients/${patient.id}/edit`}>
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit
+                    Sửa
                   </Link>
                 </Button>
                 {onDelete && (
@@ -146,7 +157,7 @@ export function PatientCard({
                     onClick={() => setShowDeleteDialog(true)}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    Xóa
                   </Button>
                 )}
               </div>
@@ -156,55 +167,53 @@ export function PatientCard({
 
         {/* Contact Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
+          <Card className="border-2 border-slate-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Contact Information
+                <User className="h-5 w-5 text-sky-500" />
+                Thông tin liên hệ
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{patient.phoneNumber || "N/A"}</span>
+                <span>{patient.phoneNumber || "Chưa cập nhật"}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{patient.email || "N/A"}</span>
+                <span>{patient.email || "Chưa cập nhật"}</span>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-muted-foreground mt-1" />
-                <span>{patient.address || "N/A"}</span>
+                <span>{patient.address || "Chưa cập nhật"}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>DOB: {formatDate(patient.dateOfBirth)}</span>
+                <span>Ngày sinh: {formatDate(patient.dateOfBirth)}</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-2 border-slate-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Identification
+                <Shield className="h-5 w-5 text-emerald-500" />
+                Thông tin bảo hiểm
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">ID Number</p>
-                  <p>{patient.identificationNumber || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground">Số CMND/CCCD</p>
+                  <p>{patient.identificationNumber || "Chưa cập nhật"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Shield className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">
-                    Health Insurance
-                  </p>
-                  <p>{patient.healthInsuranceNumber || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground">Số BHYT</p>
+                  <p>{patient.healthInsuranceNumber || "Chưa cập nhật"}</p>
                 </div>
               </div>
             </CardContent>
@@ -213,49 +222,47 @@ export function PatientCard({
 
         {/* Health & Emergency */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
+          <Card className="border-2 border-slate-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Heart className="h-5 w-5" />
-                Health Information
+                <Heart className="h-5 w-5 text-red-500" />
+                Thông tin sức khỏe
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-muted-foreground">Blood Type</p>
-                <p className="font-medium">{patient.bloodType || "Unknown"}</p>
+                <p className="text-sm text-muted-foreground">Nhóm máu</p>
+                <p className="font-medium">{patient.bloodType || "Chưa xác định"}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" />
-                  Allergies
+                  Dị ứng
                 </p>
-                <p>{patient.allergies || "None recorded"}</p>
+                <p>{patient.allergies || "Không có"}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-2 border-slate-200">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Phone className="h-5 w-5" />
-                Emergency Contact
+                <Phone className="h-5 w-5 text-amber-500" />
+                Liên hệ khẩn cấp
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-muted-foreground">Contact Name</p>
-                <p className="font-medium">
-                  {patient.relativeFullName || "N/A"}
-                </p>
+                <p className="text-sm text-muted-foreground">Họ tên</p>
+                <p className="font-medium">{patient.relativeFullName || "Chưa cập nhật"}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Relationship</p>
-                <p>{patient.relativeRelationship || "N/A"}</p>
+                <p className="text-sm text-muted-foreground">Quan hệ</p>
+                <p>{patient.relativeRelationship || "Chưa cập nhật"}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Phone</p>
-                <p>{patient.relativePhoneNumber || "N/A"}</p>
+                <p className="text-sm text-muted-foreground">Điện thoại</p>
+                <p>{patient.relativePhoneNumber || "Chưa cập nhật"}</p>
               </div>
             </CardContent>
           </Card>
@@ -265,21 +272,20 @@ export function PatientCard({
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Patient</AlertDialogTitle>
+              <AlertDialogTitle>Xóa bệnh nhân</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete{" "}
-                <strong>{patient.fullName}</strong>? This action cannot be
-                undone.
+                Bạn có chắc chắn muốn xóa{" "}
+                <strong>{patient.fullName}</strong>? Hành động này không thể hoàn tác.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Hủy</AlertDialogCancel>
               <AlertDialogAction
                 className="bg-destructive hover:bg-destructive/90"
                 onClick={() => onDelete?.(patient.id)}
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? "Đang xóa..." : "Xóa"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -288,45 +294,67 @@ export function PatientCard({
     );
   }
 
-  // Grid variant (compact card for list view)
+  // Grid variant - ENHANCED BEAUTIFUL CARD
   return (
     <>
-      <Card className="hover:shadow-md transition-shadow">
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between">
+      <Card className="group relative overflow-hidden border-2 border-slate-200 hover:border-sky-300 hover:shadow-lg transition-all duration-300 bg-white">
+        {/* Gradient top border */}
+        <div className={`absolute top-0 left-0 right-0 h-1 ${
+          isFemale 
+            ? "bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500" 
+            : "bg-gradient-to-r from-sky-400 via-cyan-400 to-teal-500"
+        }`} />
+        
+        <CardContent className="p-5">
+          {/* Header with Avatar and Actions */}
+          <div className="flex items-start justify-between mb-4">
             <Link
               href={`/admin/patients/${patient.id}`}
-              className="flex items-center gap-3 flex-1"
+              className="flex items-center gap-3 flex-1 group/link"
             >
-              <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {getInitials(patient.fullName)}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className={`h-14 w-14 ring-2 ring-offset-2 shadow-md transition-transform group-hover/link:scale-105 ${
+                  isFemale ? "ring-pink-300" : "ring-sky-300"
+                }`}>
+                  <AvatarImage src={patient.profileImageUrl || undefined} alt={patient.fullName} />
+                  <AvatarFallback className={`font-bold text-lg text-white ${
+                    isFemale 
+                      ? "bg-gradient-to-br from-pink-400 to-rose-500" 
+                      : "bg-gradient-to-br from-sky-400 to-cyan-500"
+                  }`}>
+                    {getInitials(patient.fullName)}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Online indicator */}
+                <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-emerald-500 border-2 border-white" />
+              </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium truncate">{patient.fullName}</p>
-                <p className="text-sm text-muted-foreground truncate">
-                  {patient.phoneNumber}
+                <p className="font-semibold text-slate-800 truncate group-hover/link:text-sky-600 transition-colors">
+                  {patient.fullName}
+                </p>
+                <p className="text-sm text-slate-500 truncate flex items-center gap-1">
+                  <Phone className="h-3 w-3" />
+                  {patient.phoneNumber || "Chưa có SĐT"}
                 </p>
               </div>
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <Link href={`/admin/patients/${patient.id}`}>
-                    <User className="h-4 w-4 mr-2" />
-                    View Details
+                    <Eye className="h-4 w-4 mr-2" />
+                    Xem chi tiết
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={`/admin/patients/${patient.id}/edit`}>
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit
+                    Chỉnh sửa
                   </Link>
                 </DropdownMenuItem>
                 {onDelete && (
@@ -337,7 +365,7 @@ export function PatientCard({
                       onClick={() => setShowDeleteDialog(true)}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
+                      Xóa
                     </DropdownMenuItem>
                   </>
                 )}
@@ -345,23 +373,50 @@ export function PatientCard({
             </DropdownMenu>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-2">
+          {/* Info Section */}
+          <div className="space-y-2 mb-4">
+            {patient.email && (
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Mail className="h-3.5 w-3.5 text-slate-400" />
+                <span className="truncate">{patient.email}</span>
+              </div>
+            )}
+            {patient.dateOfBirth && (
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                <span>{formatDate(patient.dateOfBirth)}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1.5">
             {patient.gender && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge 
+                variant="secondary" 
+                className={`text-xs font-medium ${
+                  isFemale 
+                    ? "bg-pink-100 text-pink-700 border border-pink-200" 
+                    : "bg-sky-100 text-sky-700 border border-sky-200"
+                }`}
+              >
                 {getGenderLabel(patient.gender)}
               </Badge>
             )}
             {age && (
-              <Badge variant="outline" className="text-xs">
-                {age} yrs
+              <Badge variant="outline" className="text-xs font-medium">
+                {age} tuổi
               </Badge>
             )}
             {patient.bloodType && (
-              <Badge
-                variant="destructive"
-                className="text-xs bg-red-100 text-red-700"
-              >
+              <Badge className="text-xs font-medium bg-red-100 text-red-700 border border-red-200">
                 {patient.bloodType}
+              </Badge>
+            )}
+            {patient.healthInsuranceNumber && (
+              <Badge className="text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200">
+                <Shield className="h-3 w-3 mr-1" />
+                BHYT
               </Badge>
             )}
           </div>
@@ -372,20 +427,20 @@ export function PatientCard({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Patient</AlertDialogTitle>
+            <AlertDialogTitle>Xóa bệnh nhân</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete{" "}
-              <strong>{patient.fullName}</strong>? This action cannot be undone.
+              Bạn có chắc chắn muốn xóa{" "}
+              <strong>{patient.fullName}</strong>? Hành động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90"
               onClick={() => onDelete?.(patient.id)}
               disabled={isDeleting}
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? "Đang xóa..." : "Xóa"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

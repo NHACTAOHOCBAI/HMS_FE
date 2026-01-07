@@ -7,6 +7,7 @@ import {
   UpdateMyProfileRequest,
   DeletePatientResponse,
   PatientFormValues,
+  PatientStats,
 } from "@/interfaces/patient";
 import { mockPatients } from "@/lib/mocks";
 import axiosInstance from "@/config/axios";
@@ -56,7 +57,7 @@ export const getPatients = async (
         // Escape RSQL special characters: * ( ) ' " ; , = ! ~ < > 
         // and encode the search term to avoid parse errors with Vietnamese characters
         const escapedTerm = searchTerm
-          .replace(/[*()'"=!~<>;,\\]/g, '') // Remove special chars that break RSQL
+          .replace(/[*()'\"=!~<>;,\\]/g, '') // Remove special chars that break RSQL
           .trim();
         
         if (escapedTerm) {
@@ -78,6 +79,34 @@ export const getPatients = async (
       filterParts.push(`bloodType==${params.bloodType}`);
     }
 
+    // Has insurance filter
+    if (params.hasInsurance === true) {
+      filterParts.push(`healthInsuranceNumber!=null`);
+    } else if (params.hasInsurance === false) {
+      filterParts.push(`healthInsuranceNumber==null`);
+    }
+
+    // Age range filter (convert to date of birth range)
+    const today = new Date();
+    if (params.ageMin !== undefined && params.ageMin > 0) {
+      // Max DOB = today - ageMin years
+      const maxDob = new Date(today.getFullYear() - params.ageMin, today.getMonth(), today.getDate());
+      filterParts.push(`dateOfBirth<=${maxDob.toISOString().split('T')[0]}`);
+    }
+    if (params.ageMax !== undefined && params.ageMax < 100) {
+      // Min DOB = today - ageMax years
+      const minDob = new Date(today.getFullYear() - params.ageMax - 1, today.getMonth(), today.getDate());
+      filterParts.push(`dateOfBirth>=${minDob.toISOString().split('T')[0]}`);
+    }
+
+    // Created date range filter
+    if (params.createdAfter) {
+      filterParts.push(`createdAt>=${params.createdAfter}`);
+    }
+    if (params.createdBefore) {
+      filterParts.push(`createdAt<=${params.createdBefore}`);
+    }
+
     // Combine filters with AND (;) - use parentheses for OR (,) groups
     const filterString =
       filterParts.length > 0
@@ -97,6 +126,8 @@ export const getPatients = async (
     if (params.sort) {
       apiParams.sort = params.sort;
     }
+
+    console.log("[PatientService] API params:", apiParams);
 
     const response = await axiosInstance.get<{ data: PatientListResponse }>(
       "/patients/all",
@@ -521,6 +552,14 @@ export const uploadMyProfileImage = async (file: File): Promise<Patient> => {
 export const deleteMyProfileImage = async (): Promise<Patient> => {
   const response = await axiosInstance.delete<{ data: Patient }>(
     "/patients/me/profile-image"
+  );
+  return response.data.data;
+};
+
+// GET /api/patients/stats - Get patient statistics
+export const getPatientStats = async (): Promise<PatientStats> => {
+  const response = await axiosInstance.get<{ data: PatientStats }>(
+    "/patients/stats"
   );
   return response.data.data;
 };
