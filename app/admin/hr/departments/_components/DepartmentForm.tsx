@@ -11,6 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,30 +25,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { Department, DepartmentRequest } from "@/interfaces/hr";
 import { useRouter } from "next/navigation";
 import { DoctorSearchSelect } from "@/components/appointment/DoctorSearchSelect";
-import { Spinner } from "@/components/ui/spinner";
-import { Building2 } from "lucide-react";
+import { Building2, MapPin, Phone, User, FileText, CheckCircle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Department name is required")
-    .max(255, "Name must be less than 255 characters"),
+    .min(1, "Tên khoa là bắt buộc")
+    .max(255, "Tên khoa không được quá 255 ký tự"),
   description: z
     .string()
-    .max(1000, "Description must be less than 1000 characters")
+    .max(1000, "Mô tả không được quá 1000 ký tự")
     .optional()
     .or(z.literal("")),
   headDoctorId: z.string().optional(),
   location: z
     .string()
-    .max(255, "Location must be less than 255 characters")
+    .max(255, "Vị trí không được quá 255 ký tự")
     .optional()
     .or(z.literal("")),
   phoneExtension: z
     .string()
-    .regex(/^\d*$/, "Phone extension must be numeric")
-    .max(20, "Phone extension must be less than 20 characters")
+    .regex(/^\d*$/, "Số máy nội bộ phải là số")
+    .max(20, "Số máy nội bộ không được quá 20 ký tự")
     .optional()
     .or(z.literal("")),
   status: z.enum(["ACTIVE", "INACTIVE"]),
@@ -80,7 +81,6 @@ export default function DepartmentForm({
   });
 
   const handleSubmit = (values: DepartmentFormValues) => {
-    // If headDoctorId is "none" or empty, set it to undefined
     const submitData: DepartmentRequest = {
       ...values,
       headDoctorId:
@@ -91,110 +91,32 @@ export default function DepartmentForm({
     onSubmit(submitData);
   };
 
+  const watchedStatus = form.watch("status");
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="form-section-card">
-          <div className="form-section-card-title">
-            <Building2 className="h-5 w-5 text-violet-500" />
-            Department Information
+        {/* Basic Info Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-200">
+            <Building2 className="h-5 w-5 text-teal-600" />
+            <h3 className="font-semibold text-slate-800">Thông tin cơ bản</h3>
           </div>
-          <div className="space-y-4">
-            <div className="form-grid">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="form-label form-label-required">Department Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Cardiology" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="form-label">Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="INACTIVE">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="headDoctorId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="form-label">Head Doctor</FormLabel>
-                    <DoctorSearchSelect
-                      value={field.value || ""}
-                      onChange={field.onChange}
-                      placeholder="Search active doctor"
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="form-label">Location</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Building A, Floor 2" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phoneExtension"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="form-label">Phone Extension</FormLabel>
-                    <FormControl>
-                      <Input placeholder="1234" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="description"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="form-label">Description</FormLabel>
+                  <FormLabel className="flex items-center gap-1">
+                    <Building2 className="h-4 w-4 text-teal-500" />
+                    Tên khoa <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Department description..."
-                      className="resize-none"
+                    <Input
+                      placeholder="Ví dụ: Khoa Tim mạch"
+                      className="h-11 border-2"
                       {...field}
                     />
                   </FormControl>
@@ -202,20 +124,168 @@ export default function DepartmentForm({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Trạng thái</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="h-11 border-2">
+                        <SelectValue placeholder="Chọn trạng thái" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="ACTIVE">
+                        <span className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                          Đang hoạt động
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="INACTIVE">
+                        <span className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-slate-400" />
+                          Ngừng hoạt động
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1">
+                  <FileText className="h-4 w-4 text-slate-500" />
+                  Mô tả
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Mô tả về khoa phòng..."
+                    className="resize-none border-2"
+                    rows={3}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Contact Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-200">
+            <MapPin className="h-5 w-5 text-sky-600" />
+            <h3 className="font-semibold text-slate-800">Thông tin liên hệ</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4 text-sky-500" />
+                    Vị trí
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Ví dụ: Tòa A, Tầng 2"
+                      className="h-11 border-2"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Vị trí cụ thể của khoa trong bệnh viện
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phoneExtension"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1">
+                    <Phone className="h-4 w-4 text-sky-500" />
+                    Số máy nội bộ
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Ví dụ: 1234"
+                      className="h-11 border-2"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Chỉ nhập số
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 pt-4 border-t border-slate-200">
-          <Button type="button" variant="outline" onClick={() => router.back()} className="px-6">
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            disabled={isLoading}
-            className="px-6 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white border-0"
+        {/* Head Doctor Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-200">
+            <User className="h-5 w-5 text-violet-600" />
+            <h3 className="font-semibold text-slate-800">Trưởng khoa</h3>
+          </div>
+
+          <FormField
+            control={form.control}
+            name="headDoctorId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1">
+                  <User className="h-4 w-4 text-violet-500" />
+                  Chọn trưởng khoa
+                </FormLabel>
+                <DoctorSearchSelect
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  placeholder="Tìm kiếm bác sĩ..."
+                />
+                <FormDescription className="text-xs">
+                  Để trống nếu chưa có trưởng khoa
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            className="px-6"
           >
-            {isLoading && <Spinner size="sm" className="mr-2" />}
-            {initialData ? "Update Department" : "Create Department"}
+            Hủy
+          </Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="px-6 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700"
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {initialData ? "Cập nhật khoa" : "Tạo khoa"}
           </Button>
         </div>
       </form>

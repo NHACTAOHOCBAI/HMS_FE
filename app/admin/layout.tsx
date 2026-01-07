@@ -135,6 +135,24 @@ const navigationGroups = [
         roles: ["ADMIN"],
       },
       {
+        title: "Schedules",
+        href: "/admin/schedules",
+        icon: NAV_ICONS.appointments,
+        roles: ["ADMIN"],
+      },
+      {
+        title: "Departments",
+        href: "/admin/departments",
+        icon: NAV_ICONS.hr,
+        roles: ["ADMIN"],
+      },
+      {
+        title: "Employees",
+        href: "/admin/employees",
+        icon: NAV_ICONS.accounts,
+        roles: ["ADMIN"],
+      },
+      {
         title: "Accounts",
         href: "/admin/accounts",
         icon: NAV_ICONS.accounts,

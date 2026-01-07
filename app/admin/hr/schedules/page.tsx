@@ -11,7 +11,20 @@ import {
   differenceInCalendarDays,
   isToday,
 } from "date-fns";
-import { CalendarDays, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { vi } from "date-fns/locale";
+import {
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Clock,
+  Users,
+  Building2,
+  Sparkles,
+  Filter,
+  Info,
+  CheckCircle,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +34,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Drawer,
   DrawerContent,
@@ -70,21 +84,27 @@ import { Spinner } from "@/components/ui/spinner";
 const shiftPresets = [
   {
     key: "MORNING" as const,
-    label: "Morning Shift",
+    label: "Ca sáng",
     time: "07:00 - 12:00",
-    bg: "bg-amber-50",
+    bg: "bg-amber-50 border-amber-200",
+    headerBg: "bg-amber-100",
+    textColor: "text-amber-700",
   },
   {
     key: "AFTERNOON" as const,
-    label: "Afternoon Shift",
+    label: "Ca chiều",
     time: "13:00 - 18:00",
-    bg: "bg-sky-50",
+    bg: "bg-sky-50 border-sky-200",
+    headerBg: "bg-sky-100",
+    textColor: "text-sky-700",
   },
   {
     key: "EVENING" as const,
-    label: "Evening Shift",
+    label: "Ca tối",
     time: "18:00 - 23:00",
-    bg: "bg-purple-50",
+    bg: "bg-violet-50 border-violet-200",
+    headerBg: "bg-violet-100",
+    textColor: "text-violet-700",
   },
 ];
 
@@ -169,9 +189,7 @@ export default function SchedulesPage() {
       },
       onError: (error) => {
         console.error("Failed to create schedule:", error);
-        alert(
-          "Failed to create schedule. Employee may already have a schedule for this date."
-        );
+        alert("Không thể tạo lịch. Nhân viên có thể đã có lịch trong ngày này.");
       },
     });
   };
@@ -184,7 +202,7 @@ export default function SchedulesPage() {
       },
       onError: (error) => {
         console.error("Failed to delete schedule:", error);
-        alert("Failed to delete schedule.");
+        alert("Không thể xóa lịch.");
       },
     });
   };
@@ -213,7 +231,7 @@ export default function SchedulesPage() {
         },
         onError: (error) => {
           console.error("Failed to update schedule:", error);
-          alert("Failed to update schedule.");
+          alert("Không thể cập nhật lịch.");
         },
       }
     );
@@ -222,116 +240,139 @@ export default function SchedulesPage() {
   if (error) {
     return (
       <div className="w-full space-y-6">
-        <div className="flex items-center justify-center py-10">
-          <p className="text-destructive">
-            Error loading schedules. Please try again.
-          </p>
-        </div>
+        <Card className="border-2 border-red-200 bg-red-50">
+          <CardContent className="flex items-center gap-3 pt-6">
+            <Info className="h-5 w-5 text-red-600" />
+            <div>
+              <p className="font-medium text-red-800">Lỗi tải dữ liệu</p>
+              <p className="text-sm text-red-700">Vui lòng thử lại sau.</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="w-full space-y-6">
-      <Card className="shadow-sm">
-        <CardHeader className="flex flex-wrap items-center justify-between gap-4">
+      {/* Schedule Header Card */}
+      <Card className="border-2 border-slate-200 shadow-sm overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-500" />
+        <CardHeader className="flex flex-wrap items-center justify-between gap-4 pb-4">
           <div>
-            <CardTitle className="text-2xl">Work Schedules</CardTitle>
-            <p className="text-muted-foreground">
-              Manage doctor and staff work schedules.
-            </p>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-violet-600" />
+              Lịch làm việc
+            </CardTitle>
+            <CardDescription>
+              Quản lý lịch làm việc của nhân viên
+            </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              onClick={() =>
-                setDate(
-                  addDays(date || new Date(), viewMode === "week" ? -7 : -30)
-                )
-              }
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="rounded-full"
-              onClick={() => setDate(new Date())}
-            >
-              Today
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full"
-              onClick={() =>
-                setDate(
-                  addDays(date || new Date(), viewMode === "week" ? 7 : 30)
-                )
-              }
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-2 rounded-full border px-4 py-2 text-sm text-muted-foreground">
-              <CalendarDays className="h-4 w-4" />
-              <span>
-                {viewMode === "week"
-                  ? `${format(weekStart, "MMM dd")} - ${format(
-                      weekEnd,
-                      "MMM dd, yyyy"
-                    )}`
-                  : format(monthStart, "MMMM yyyy")}
-              </span>
-            </div>
-            <div className="ml-auto flex items-center gap-2">
+          
+          {/* Navigation Controls */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 bg-slate-100 rounded-xl p-1">
               <Button
-                variant={viewMode === "week" ? "default" : "outline"}
+                variant="ghost"
+                size="icon"
+                className="rounded-lg h-8 w-8"
+                onClick={() =>
+                  setDate(
+                    addDays(date || new Date(), viewMode === "week" ? -7 : -30)
+                  )
+                }
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-lg px-3"
+                onClick={() => setDate(new Date())}
+              >
+                Hôm nay
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-lg h-8 w-8"
+                onClick={() =>
+                  setDate(
+                    addDays(date || new Date(), viewMode === "week" ? 7 : 30)
+                  )
+                }
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <Badge variant="outline" className="px-3 py-1.5 bg-white">
+              <CalendarDays className="h-3.5 w-3.5 mr-1.5" />
+              {viewMode === "week"
+                ? `${format(weekStart, "dd/MM")} - ${format(weekEnd, "dd/MM/yyyy")}`
+                : format(monthStart, "MMMM yyyy", { locale: vi })}
+            </Badge>
+
+            <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+              <Button
+                variant={viewMode === "week" ? "default" : "ghost"}
+                size="sm"
                 onClick={() => setViewMode("week")}
-                className="rounded-full"
+                className={cn(
+                  "rounded-lg px-3",
+                  viewMode === "week" && "bg-violet-600 hover:bg-violet-700"
+                )}
               >
-                Week
+                Tuần
               </Button>
               <Button
-                variant={viewMode === "month" ? "default" : "outline"}
+                variant={viewMode === "month" ? "default" : "ghost"}
+                size="sm"
                 onClick={() => setViewMode("month")}
-                className="rounded-full"
+                className={cn(
+                  "rounded-lg px-3",
+                  viewMode === "month" && "bg-violet-600 hover:bg-violet-700"
+                )}
               >
-                Month
+                Tháng
               </Button>
-              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogTrigger asChild>
-                  <Button className="rounded-lg">
-                    <Plus className="mr-2 h-4 w-4" /> Create Schedule
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle>Create Schedule</DialogTitle>
-                  </DialogHeader>
-                  <ScheduleForm
-                    onSubmit={handleCreate}
-                    isLoading={createSchedule.isPending}
-                    onCancel={() => setIsCreateOpen(false)}
-                    initialData={{
-                      workDate: format(date || weekStart, "yyyy-MM-dd"),
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
             </div>
+
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 rounded-xl">
+                  <Plus className="mr-2 h-4 w-4" /> Tạo lịch mới
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Tạo lịch làm việc</DialogTitle>
+                </DialogHeader>
+                <ScheduleForm
+                  onSubmit={handleCreate}
+                  isLoading={createSchedule.isPending}
+                  onCancel={() => setIsCreateOpen(false)}
+                  initialData={{
+                    workDate: format(date || weekStart, "yyyy-MM-dd"),
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm text-muted-foreground">Filter by:</span>
+          {/* Filters */}
+          <div className="flex flex-wrap items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <Filter className="h-4 w-4 text-slate-500" />
+            <span className="text-sm font-medium text-slate-600">Lọc theo:</span>
             <Select value={activeDept} onValueChange={(v) => setActiveDept(v)}>
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Department" />
+              <SelectTrigger className="w-56 bg-white border-2">
+                <Building2 className="h-4 w-4 mr-2 text-slate-400" />
+                <SelectValue placeholder="Khoa phòng" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Departments</SelectItem>
+                <SelectItem value="ALL">Tất cả khoa phòng</SelectItem>
                 {departments.map((dept: Department) => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
@@ -343,11 +384,12 @@ export default function SchedulesPage() {
               value={activeEmployee}
               onValueChange={(v) => setActiveEmployee(v)}
             >
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Employee" />
+              <SelectTrigger className="w-56 bg-white border-2">
+                <Users className="h-4 w-4 mr-2 text-slate-400" />
+                <SelectValue placeholder="Nhân viên" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">All Employees</SelectItem>
+                <SelectItem value="ALL">Tất cả nhân viên</SelectItem>
                 {employees.map((emp: Employee) => (
                   <SelectItem key={emp.id} value={emp.id}>
                     {emp.fullName}
@@ -355,41 +397,64 @@ export default function SchedulesPage() {
                 ))}
               </SelectContent>
             </Select>
+            <Badge variant="secondary" className="ml-auto">
+              {filtered.length} lịch
+            </Badge>
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <Spinner className="text-muted-foreground" />
+            <div className="flex items-center justify-center py-16">
+              <Spinner className="text-violet-600" />
             </div>
           ) : viewMode === "week" ? (
             <div className="overflow-auto">
-              <div className="min-w-[900px] rounded-xl border bg-white shadow-sm">
-                <div className="grid grid-cols-[140px_repeat(7,minmax(120px,1fr))] border-b bg-slate-50 text-sm font-medium">
-                  <div className="px-4 py-3 text-slate-500">Shift</div>
+              <div className="min-w-[900px] rounded-xl border-2 border-slate-200 bg-white shadow-sm overflow-hidden">
+                {/* Header Row */}
+                <div className="grid grid-cols-[140px_repeat(7,minmax(120px,1fr))] bg-gradient-to-r from-violet-50 to-purple-50 text-sm font-medium">
+                  <div className="px-4 py-4 text-slate-600 border-r border-slate-200">
+                    <Clock className="h-4 w-4 mb-1" />
+                    Ca làm việc
+                  </div>
                   {weekDays.map((day) => (
                     <div
                       key={day.toISOString()}
-                      className={cn("px-4 py-3 text-center", {
-                        "bg-blue-50 text-blue-700": isToday(day),
-                      })}
+                      className={cn(
+                        "px-4 py-3 text-center border-r border-slate-200 last:border-r-0",
+                        isToday(day) && "bg-violet-100"
+                      )}
                     >
-                      <div className="font-semibold">{format(day, "eee")}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className={cn(
+                        "font-semibold",
+                        isToday(day) && "text-violet-700"
+                      )}>
+                        {format(day, "EEEE", { locale: vi })}
+                      </div>
+                      <div className={cn(
+                        "text-xs",
+                        isToday(day) ? "text-violet-600 font-medium" : "text-muted-foreground"
+                      )}>
                         {format(day, "dd/MM")}
+                        {isToday(day) && (
+                          <Badge className="ml-1 text-[10px] px-1 py-0 bg-violet-600">Hôm nay</Badge>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
 
+                {/* Shift Rows */}
                 {shiftPresets.map((shift) => (
                   <div
                     key={shift.key}
-                    className="grid grid-cols-[140px_repeat(7,minmax(120px,1fr))] border-b last:border-0"
+                    className="grid grid-cols-[140px_repeat(7,minmax(120px,1fr))] border-t border-slate-200"
                   >
                     <div
-                      className={`flex flex-col gap-1 border-r px-4 py-4 text-sm ${shift.bg}`}
+                      className={cn(
+                        "flex flex-col gap-1 border-r border-slate-200 px-4 py-4 text-sm",
+                        shift.headerBg
+                      )}
                     >
-                      <span className="font-semibold text-slate-700">
+                      <span className={cn("font-semibold", shift.textColor)}>
                         {shift.label}
                       </span>
                       <span className="text-xs text-muted-foreground">
@@ -400,20 +465,24 @@ export default function SchedulesPage() {
                     {weekDays.map((day) => {
                       const dateStr = format(day, "yyyy-MM-dd");
                       const dayItems = filtered.filter(
-                        (s: EmployeeSchedule & { shift: string }) => s.workDate === dateStr && s.shift === shift.key
+                        (s: EmployeeSchedule & { shift: string }) =>
+                          s.workDate === dateStr && s.shift === shift.key
                       );
                       return (
                         <div
                           key={`${shift.key}-${dateStr}`}
-                          className="border-r px-2 py-3 hover:bg-slate-50 cursor-pointer"
+                          className={cn(
+                            "border-r border-slate-200 last:border-r-0 px-2 py-3 hover:bg-slate-50 cursor-pointer min-h-[100px] transition-colors",
+                            isToday(day) && "bg-violet-50/30"
+                          )}
                           onClick={() => {
                             setDate(day);
                             setIsCreateOpen(true);
                           }}
                         >
                           {dayItems.length === 0 ? (
-                            <div className="flex h-16 items-center justify-center text-muted-foreground">
-                              +
+                            <div className="flex h-full items-center justify-center text-slate-300 hover:text-violet-400 transition-colors">
+                              <Plus className="h-5 w-5" />
                             </div>
                           ) : (
                             <div
@@ -423,11 +492,14 @@ export default function SchedulesPage() {
                               {dayItems.map((item: EmployeeSchedule) => (
                                 <div
                                   key={item.id}
-                                  className="rounded-lg border bg-slate-50 px-3 py-2 text-sm shadow-sm"
+                                  className={cn(
+                                    "rounded-xl border-2 px-3 py-2.5 text-sm shadow-sm",
+                                    shift.bg
+                                  )}
                                 >
                                   <div className="flex items-center justify-between gap-2">
-                                    <div>
-                                      <div className="font-semibold text-slate-800">
+                                    <div className="min-w-0">
+                                      <div className="font-semibold text-slate-800 truncate">
                                         {item.employeeName}
                                       </div>
                                       <div className="text-xs text-muted-foreground">
@@ -439,15 +511,18 @@ export default function SchedulesPage() {
                                       size="sm"
                                     />
                                   </div>
-                                  <div className="mt-1 flex gap-2 text-xs text-primary">
-                                    <button onClick={() => setEditId(item.id)}>
-                                      Edit
+                                  <div className="mt-2 flex gap-3 text-xs">
+                                    <button
+                                      className="text-violet-600 hover:text-violet-800 font-medium"
+                                      onClick={() => setEditId(item.id)}
+                                    >
+                                      Sửa
                                     </button>
                                     <button
-                                      className="text-destructive"
+                                      className="text-red-500 hover:text-red-700 font-medium"
                                       onClick={() => setDeleteId(item.id)}
                                     >
-                                      Delete
+                                      Xóa
                                     </button>
                                   </div>
                                 </div>
@@ -462,18 +537,30 @@ export default function SchedulesPage() {
               </div>
             </div>
           ) : (
+            /* Month View */
             <div className="space-y-3">
               {monthDays.map((day) => {
                 const dateStr = format(day, "yyyy-MM-dd");
-                const dayItems = filtered.filter((s: EmployeeSchedule & { shift: string }) => s.workDate === dateStr);
+                const dayItems = filtered.filter(
+                  (s: EmployeeSchedule & { shift: string }) => s.workDate === dateStr
+                );
                 return (
                   <div
                     key={dateStr}
-                    className="rounded-lg border bg-white p-4 shadow-sm"
+                    className={cn(
+                      "rounded-xl border-2 p-4 shadow-sm transition-colors",
+                      isToday(day) ? "border-violet-300 bg-violet-50" : "border-slate-200 bg-white"
+                    )}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-slate-800">
-                        {format(day, "dd-MM-yyyy")}
+                      <div className={cn(
+                        "font-semibold",
+                        isToday(day) ? "text-violet-700" : "text-slate-800"
+                      )}>
+                        {format(day, "EEEE, dd/MM/yyyy", { locale: vi })}
+                        {isToday(day) && (
+                          <Badge className="ml-2 text-xs bg-violet-600">Hôm nay</Badge>
+                        )}
                       </div>
                       <Button
                         variant="ghost"
@@ -482,48 +569,61 @@ export default function SchedulesPage() {
                           setDate(day);
                           setIsCreateOpen(true);
                         }}
+                        className="text-violet-600 hover:text-violet-700"
                       >
-                        Add Schedule
+                        <Plus className="h-4 w-4 mr-1" />
+                        Thêm lịch
                       </Button>
                     </div>
                     {dayItems.length ? (
-                      <div className="mt-2 grid gap-2 md:grid-cols-2">
-                        {dayItems.map((item: EmployeeSchedule) => (
-                          <div
-                            key={item.id}
-                            className="rounded-md border bg-slate-50 px-3 py-2 text-sm"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <div className="font-semibold">
-                                  {item.employeeName}
+                      <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                        {dayItems.map((item: EmployeeSchedule) => {
+                          const shiftInfo = shiftPresets.find(
+                            (s) => s.key === inferShift(item.startTime)
+                          );
+                          return (
+                            <div
+                              key={item.id}
+                              className={cn(
+                                "rounded-xl border-2 px-3 py-2.5 text-sm",
+                                shiftInfo?.bg || "bg-slate-50 border-slate-200"
+                              )}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="min-w-0">
+                                  <div className="font-semibold truncate">
+                                    {item.employeeName}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {item.startTime} - {item.endTime}
+                                  </div>
                                 </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {item.startTime} - {item.endTime}
-                                </div>
+                                <ScheduleStatusBadge
+                                  status={item.status}
+                                  size="sm"
+                                />
                               </div>
-                              <ScheduleStatusBadge
-                                status={item.status}
-                                size="sm"
-                              />
+                              <div className="mt-2 flex gap-3 text-xs">
+                                <button
+                                  className="text-violet-600 hover:text-violet-800 font-medium"
+                                  onClick={() => setEditId(item.id)}
+                                >
+                                  Sửa
+                                </button>
+                                <button
+                                  className="text-red-500 hover:text-red-700 font-medium"
+                                  onClick={() => setDeleteId(item.id)}
+                                >
+                                  Xóa
+                                </button>
+                              </div>
                             </div>
-                            <div className="mt-1 flex gap-2 text-xs text-primary">
-                              <button onClick={() => setEditId(item.id)}>
-                                Edit
-                              </button>
-                              <button
-                                className="text-destructive"
-                                onClick={() => setDeleteId(item.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className="mt-2 text-sm text-muted-foreground">
-                        No schedules for this day.
+                        Không có lịch làm việc.
                       </p>
                     )}
                   </div>
@@ -534,11 +634,12 @@ export default function SchedulesPage() {
         </CardContent>
       </Card>
 
+      {/* Edit Drawer */}
       <Drawer open={!!editId} onOpenChange={(open) => !open && setEditId(null)}>
         <DrawerContent className="max-h-[85vh]">
           <DrawerHeader>
-            <DrawerTitle>Edit Schedule</DrawerTitle>
-            <DrawerDescription>Update slot details.</DrawerDescription>
+            <DrawerTitle>Chỉnh sửa lịch</DrawerTitle>
+            <DrawerDescription>Cập nhật thông tin ca làm việc.</DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-6 overflow-y-auto">
             <ScheduleForm
@@ -551,26 +652,26 @@ export default function SchedulesPage() {
         </DrawerContent>
       </Drawer>
 
+      {/* Delete Dialog */}
       <AlertDialog
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Schedule</AlertDialogTitle>
+            <AlertDialogTitle>Xóa lịch làm việc</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this schedule? This action cannot
-              be undone.
+              Bạn có chắc chắn muốn xóa lịch này? Hành động này không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={deleteSchedule.isPending}
             >
-              {deleteSchedule.isPending ? "Deleting..." : "Delete"}
+              {deleteSchedule.isPending ? "Đang xóa..." : "Xóa"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
