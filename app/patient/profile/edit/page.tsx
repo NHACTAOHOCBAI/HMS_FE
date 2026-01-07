@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -17,6 +18,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -24,27 +28,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { TagInput } from "@/components/ui/tag-input";
 import { useMyProfile, useUpdateMyProfile } from "@/hooks/queries/usePatient";
+import { uploadMyProfileImage, deleteMyProfileImage } from "@/services/patient.service";
 import { RelationshipType } from "@/interfaces/patient";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 import {
   User,
   Heart,
   Phone,
   Lock,
-  ChevronDown,
-  ChevronUp,
   ArrowLeft,
   Save,
   AlertCircle,
+  MapPin,
+  Users,
+  AlertTriangle,
+  Sparkles,
+  CheckCircle,
+  Info,
+  Camera,
+  Trash2,
+  Loader2,
+  Edit,
+  Mail,
+  Calendar,
+  Shield,
+  CreditCard,
 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 const editSchema = z.object({
   phoneNumber: z
@@ -81,10 +94,58 @@ const relationships: { value: RelationshipType; label: string }[] = [
 
 export default function PatientEditProfilePage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: profile, isLoading, error } = useMyProfile();
   const updateProfile = useUpdateMyProfile();
-  const [healthInfoOpen, setHealthInfoOpen] = useState(true);
-  const [emergencyOpen, setEmergencyOpen] = useState(true);
+
+  // Upload profile image mutation
+  const uploadImageMutation = useMutation({
+    mutationFn: uploadMyProfileImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+      toast.success("Đã cập nhật ảnh đại diện");
+    },
+    onError: (error: Error) => {
+      toast.error(`Lỗi upload ảnh: ${error.message}`);
+    },
+  });
+
+  // Delete profile image mutation
+  const deleteImageMutation = useMutation({
+    mutationFn: deleteMyProfileImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+      toast.success("Đã xóa ảnh đại diện");
+    },
+    onError: (error: Error) => {
+      toast.error(`Lỗi xóa ảnh: ${error.message}`);
+    },
+  });
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Kích thước file tối đa 2MB");
+        return;
+      }
+      if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+        toast.error("Chỉ chấp nhận file JPEG, PNG hoặc WebP");
+        return;
+      }
+      uploadImageMutation.mutate(file);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDeleteImage = () => {
+    if (confirm("Bạn có chắc muốn xóa ảnh đại diện?")) {
+      deleteImageMutation.mutate();
+    }
+  };
 
   const form = useForm<EditFormValues>({
     resolver: zodResolver(editSchema),
@@ -154,160 +215,238 @@ export default function PatientEditProfilePage() {
     );
   }
 
+  const isMale = profile.gender?.toUpperCase() !== "FEMALE";
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/patient/profile">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Chỉnh sửa hồ sơ</h1>
-            <p className="text-muted-foreground">
-              Cập nhật thông tin cá nhân của {profile.fullName}
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/patient/profile">Hủy</Link>
-          </Button>
-          <Button
-            onClick={form.handleSubmit(onSubmit)}
-            disabled={updateProfile.isPending}
-            className="bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-600 hover:to-teal-600"
-          >
-            {updateProfile.isPending ? (
-              <>
-                <Spinner size="sm" className="mr-2" />
-                Đang lưu...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Lưu thay đổi
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
+      {/* Enhanced Gradient Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-sky-600 via-cyan-500 to-teal-500 p-6 text-white shadow-xl">
+        {/* Background decorations */}
+        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
+        <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/5" />
+        <div className="absolute top-1/2 right-1/4 h-20 w-20 rounded-full bg-white/5" />
 
-      {/* Readonly Info Notice */}
-      <Alert className="bg-amber-50 border-amber-200">
-        <Lock className="h-4 w-4 text-amber-600" />
-        <AlertDescription className="text-amber-800">
-          Một số thông tin như họ tên, ngày sinh, giới tính, nhóm máu chỉ có thể được cập nhật bởi nhân viên y tế.
-        </AlertDescription>
-      </Alert>
+        <div className="relative">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            {/* Profile Info */}
+            <div className="flex items-center gap-5">
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                className="text-white hover:bg-white/10 rounded-xl"
+              >
+                <Link href="/patient/profile">
+                  <ArrowLeft className="h-5 w-5" />
+                </Link>
+              </Button>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Readonly Personal Information */}
-          <div className="form-section-card">
-            <div className="form-section-card-title">
-              <Lock className="h-5 w-5 text-slate-400" />
-              Thông tin cá nhân (Chỉ xem)
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 pt-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Họ và tên</p>
-                <p className="font-medium text-foreground">{profile.fullName || "—"}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium text-foreground">{profile.email || "—"}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Ngày sinh</p>
-                <p className="font-medium text-foreground">
-                  {profile.dateOfBirth
-                    ? new Date(profile.dateOfBirth).toLocaleDateString("vi-VN")
-                    : "—"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Giới tính</p>
-                <p className="font-medium text-foreground">
-                  {profile.gender === "MALE" ? "Nam" : profile.gender === "FEMALE" ? "Nữ" : profile.gender || "—"}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Nhóm máu</p>
-                <p className="font-medium text-foreground">{profile.bloodType || "—"}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">CCCD/CMND</p>
-                <p className="font-medium text-foreground">{profile.identificationNumber || "—"}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Editable Contact Information */}
-          <div className="form-section-card">
-            <div className="form-section-card-title">
-              <User className="h-5 w-5 text-sky-500" />
-              Thông tin liên hệ
-            </div>
-            <div className="space-y-4 pt-4">
-              <div className="form-grid">
-                <FormField
-                  control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="form-label form-label-required">Số điện thoại</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nhập số điện thoại" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+              {/* Avatar with upload overlay */}
+              <div className="relative group">
+                <Avatar className={cn(
+                  "h-20 w-20 ring-4 ring-white/30 shadow-xl",
+                  isMale ? "ring-offset-2 ring-offset-cyan-500" : "ring-offset-2 ring-offset-pink-500"
+                )}>
+                  <AvatarImage src={profile.profileImageUrl || undefined} alt={profile.fullName} />
+                  <AvatarFallback className={cn(
+                    "text-2xl font-bold text-white",
+                    isMale 
+                      ? "bg-gradient-to-br from-sky-400 to-cyan-500" 
+                      : "bg-gradient-to-br from-pink-400 to-rose-500"
+                  )}>
+                    {profile.fullName.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                {/* Upload overlay */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  disabled={uploadImageMutation.isPending}
+                >
+                  {uploadImageMutation.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Camera className="h-5 w-5" />
                   )}
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem className="form-full-width">
-                    <FormLabel className="form-label">Địa chỉ</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Nhập địa chỉ" rows={3} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                  Chỉnh sửa hồ sơ
+                  <Badge className="bg-white/20 text-white border-0">
+                    <Edit className="h-3 w-3 mr-1" />
+                    Đang chỉnh sửa
+                  </Badge>
+                </h1>
+                <p className="mt-1 text-cyan-100">
+                  Cập nhật thông tin cá nhân của {profile.fullName}
+                </p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              {profile.profileImageUrl && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeleteImage}
+                  disabled={deleteImageMutation.isPending}
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+                >
+                  {deleteImageMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+              >
+                <Link href="/patient/profile">Hủy</Link>
+              </Button>
+              <Button
+                onClick={form.handleSubmit(onSubmit)}
+                disabled={updateProfile.isPending}
+                size="sm"
+                className="bg-white text-cyan-700 hover:bg-white/90"
+              >
+                {updateProfile.isPending ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Đang lưu...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Lưu thay đổi
+                  </>
                 )}
-              />
+              </Button>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Health Information - Collapsible */}
-          <Collapsible open={healthInfoOpen} onOpenChange={setHealthInfoOpen}>
-            <div className="form-section-card">
-              <CollapsibleTrigger asChild>
-                <div className="form-section-card-title cursor-pointer hover:text-sky-600 transition-colors">
-                  <Heart className="h-5 w-5 text-rose-500" />
-                  Thông tin sức khỏe
-                  <div className="ml-auto">
-                    {healthInfoOpen ? (
-                      <ChevronUp className="h-5 w-5 text-slate-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-slate-400" />
-                    )}
-                  </div>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Form Area */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Readonly Notice */}
+          <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
+            <CardContent className="py-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-amber-100">
+                  <Lock className="h-4 w-4 text-amber-600" />
                 </div>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="space-y-4 pt-4">
+                <div>
+                  <h3 className="font-semibold text-amber-800">Lưu ý</h3>
+                  <p className="text-sm text-amber-700">
+                    Một số thông tin như họ tên, ngày sinh, giới tính, nhóm máu chỉ có thể được cập nhật bởi nhân viên y tế.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Readonly Personal Information */}
+              <Card className="border-2 border-slate-200 shadow-sm overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-slate-400 to-slate-500" />
+                <CardContent className="pt-5">
+                  <h3 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
+                    <Lock className="h-5 w-5 text-slate-400" />
+                    Thông tin cá nhân (Chỉ xem)
+                  </h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <ReadonlyField icon={User} label="Họ và tên" value={profile.fullName} />
+                    <ReadonlyField icon={Mail} label="Email" value={profile.email} />
+                    <ReadonlyField icon={Calendar} label="Ngày sinh" value={profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString("vi-VN") : null} />
+                    <ReadonlyField icon={User} label="Giới tính" value={profile.gender === "MALE" ? "Nam" : profile.gender === "FEMALE" ? "Nữ" : profile.gender} />
+                    <ReadonlyField icon={Heart} label="Nhóm máu" value={profile.bloodType} />
+                    <ReadonlyField icon={CreditCard} label="CCCD/CMND" value={profile.identificationNumber} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Editable Contact Information */}
+              <Card className="border-2 border-slate-200 shadow-sm overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-sky-500 to-cyan-500" />
+                <CardContent className="pt-5">
+                  <h3 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
+                    <User className="h-5 w-5 text-sky-600" />
+                    Thông tin liên hệ
+                    <Badge variant="secondary" className="ml-2">Có thể chỉnh sửa</Badge>
+                  </h3>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-slate-400" />
+                            Số điện thoại <span className="text-red-500">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nhập số điện thoại (VD: 0901234567)" className="border-2" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-slate-400" />
+                            Địa chỉ
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Nhập địa chỉ đầy đủ" rows={3} className="border-2" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Health Information */}
+              <Card className="border-2 border-slate-200 shadow-sm overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-rose-500 to-pink-500" />
+                <CardContent className="pt-5">
+                  <h3 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
+                    <Heart className="h-5 w-5 text-rose-600" />
+                    Thông tin sức khỏe
+                    <Badge variant="secondary" className="ml-2">Có thể chỉnh sửa</Badge>
+                  </h3>
                   <FormField
                     control={form.control}
                     name="allergies"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="form-label">Dị ứng</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          Dị ứng
+                        </FormLabel>
                         <FormControl>
                           <TagInput
                             value={field.value || []}
@@ -319,6 +458,8 @@ export default function PatientEditProfilePage() {
                               "Seafood",
                               "Dust",
                               "NSAIDs",
+                              "Aspirin",
+                              "Sulfa",
                             ]}
                           />
                         </FormControl>
@@ -326,117 +467,203 @@ export default function PatientEditProfilePage() {
                       </FormItem>
                     )}
                   />
-                </div>
-              </CollapsibleContent>
-            </div>
-          </Collapsible>
+                </CardContent>
+              </Card>
 
-          {/* Emergency Contact - Collapsible */}
-          <Collapsible open={emergencyOpen} onOpenChange={setEmergencyOpen}>
-            <div className="form-section-card">
-              <CollapsibleTrigger asChild>
-                <div className="form-section-card-title cursor-pointer hover:text-sky-600 transition-colors">
-                  <Phone className="h-5 w-5 text-emerald-500" />
-                  Liên hệ khẩn cấp
-                  <div className="ml-auto">
-                    {emergencyOpen ? (
-                      <ChevronUp className="h-5 w-5 text-slate-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-slate-400" />
-                    )}
-                  </div>
-                </div>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="space-y-4 pt-4">
-                  <FormField
-                    control={form.control}
-                    name="relativeFullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="form-label">Tên người liên hệ</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nhập tên người liên hệ" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="form-grid">
+              {/* Emergency Contact */}
+              <Card className="border-2 border-slate-200 shadow-sm overflow-hidden">
+                <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+                <CardContent className="pt-5">
+                  <h3 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
+                    <Users className="h-5 w-5 text-emerald-600" />
+                    Liên hệ khẩn cấp
+                    <Badge variant="secondary" className="ml-2">Có thể chỉnh sửa</Badge>
+                  </h3>
+                  <div className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="relativeRelationship"
+                      name="relativeFullName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="form-label">Mối quan hệ</FormLabel>
-                          <Select
-                            onValueChange={(v) => field.onChange(v === "NONE" ? "" : v)}
-                            value={field.value || "NONE"}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Chọn mối quan hệ" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="NONE">Chưa chọn</SelectItem>
-                              {relationships.map((r) => (
-                                <SelectItem key={r.value} value={r.value}>
-                                  {r.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="relativePhoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="form-label">Số điện thoại</FormLabel>
+                          <FormLabel className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-slate-400" />
+                            Tên người liên hệ
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Nhập số điện thoại" {...field} />
+                            <Input placeholder="Nhập tên người liên hệ" className="border-2" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </div>
-                </div>
-              </CollapsibleContent>
-            </div>
-          </Collapsible>
 
-          {/* Action buttons (mobile) */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 md:hidden">
-            <Button type="button" variant="outline" asChild>
-              <Link href="/patient/profile">Hủy</Link>
-            </Button>
-            <Button
-              type="submit"
-              disabled={updateProfile.isPending}
-              className="bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-600 hover:to-teal-600"
-            >
-              {updateProfile.isPending ? (
-                <>
-                  <Spinner size="sm" className="mr-2" />
-                  Đang lưu...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Lưu thay đổi
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="relativeRelationship"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              <Heart className="h-4 w-4 text-slate-400" />
+                              Mối quan hệ
+                            </FormLabel>
+                            <Select
+                              onValueChange={(v) => field.onChange(v === "NONE" ? "" : v)}
+                              value={field.value || "NONE"}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="border-2">
+                                  <SelectValue placeholder="Chọn mối quan hệ" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="NONE">Chưa chọn</SelectItem>
+                                {relationships.map((r) => (
+                                  <SelectItem key={r.value} value={r.value}>
+                                    {r.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="relativePhoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2">
+                              <Phone className="h-4 w-4 text-slate-400" />
+                              Số điện thoại
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nhập số điện thoại" className="border-2" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Mobile Action buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 lg:hidden">
+                <Button type="button" variant="outline" asChild>
+                  <Link href="/patient/profile">Hủy</Link>
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={updateProfile.isPending}
+                  className="bg-gradient-to-r from-sky-500 to-teal-500 hover:from-sky-600 hover:to-teal-600"
+                >
+                  {updateProfile.isPending ? (
+                    <>
+                      <Spinner size="sm" className="mr-2" />
+                      Đang lưu...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Lưu thay đổi
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-4">
+          {/* Info Card */}
+          <Card className="border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-white shadow-sm">
+            <CardContent className="pt-5">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-sky-100">
+                  <Info className="h-4 w-4 text-sky-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-2">Hướng dẫn</h3>
+                  <ul className="space-y-2 text-sm text-slate-600">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                      Di chuột vào ảnh để thay đổi
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                      Điền đầy đủ thông tin liên hệ
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                      Nhấn Enter để thêm dị ứng
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                      Nhấn "Lưu thay đổi" để hoàn tất
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Editable Fields Card */}
+          <Card className="border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white shadow-sm">
+            <CardContent className="pt-5">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-emerald-100">
+                  <Edit className="h-4 w-4 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-2">Có thể chỉnh sửa</h3>
+                  <ul className="space-y-1 text-sm text-slate-600">
+                    <li>• Ảnh đại diện</li>
+                    <li>• Số điện thoại</li>
+                    <li>• Địa chỉ</li>
+                    <li>• Danh sách dị ứng</li>
+                    <li>• Thông tin liên hệ khẩn cấp</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Support Card */}
+          <Card className="border-2 border-violet-200 bg-gradient-to-br from-violet-50 to-white shadow-sm">
+            <CardContent className="pt-5">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-violet-100">
+                  <Shield className="h-4 w-4 text-violet-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-2">Cần hỗ trợ?</h3>
+                  <p className="text-sm text-slate-600">
+                    Để cập nhật họ tên, ngày sinh, giới tính hoặc nhóm máu, vui lòng liên hệ quầy tiếp nhận.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Helper component for readonly fields
+function ReadonlyField({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | null }) {
+  return (
+    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+      <Icon className="h-4 w-4 text-slate-400 flex-shrink-0" />
+      <div className="min-w-0">
+        <p className="text-xs text-slate-500">{label}</p>
+        <p className="font-medium text-slate-800 truncate">{value || "—"}</p>
+      </div>
     </div>
   );
 }

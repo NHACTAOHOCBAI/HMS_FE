@@ -123,6 +123,12 @@ const navigationGroups = [
     label: "Administrative",
     items: [
       {
+        title: "Hồ sơ của tôi",
+        href: "/admin/my-profile",
+        icon: NAV_ICONS.patients,
+        roles: ["NURSE", "DOCTOR", "RECEPTIONIST"],
+      },
+      {
         title: "HR Management",
         href: "/admin/hr",
         icon: NAV_ICONS.hr,
