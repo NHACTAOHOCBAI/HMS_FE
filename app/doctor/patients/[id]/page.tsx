@@ -7,7 +7,7 @@ import { usePatient } from "@/hooks/queries/usePatient";
 import { useQuery } from "@tanstack/react-query";
 import { appointmentService } from "@/services/appointment.service";
 import { getMedicalExams } from "@/services/medical-exam.service";
-import { getPatientInvoices } from "@/services/billing.service";
+import api from "@/config/axios";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,12 +66,21 @@ export default function DoctorPatientDetailPage() {
     enabled: !!patientId,
   });
 
-  // Fetch invoices for this patient
-  const { data: invoicesData, isLoading: loadingInvoices } = useQuery({
-    queryKey: ["patient-invoices", patientId],
-    queryFn: () => getPatientInvoices(patientId),
+  // Fetch prescriptions directly from backend (since /exams/all doesn't include full prescription data)
+  const { data: prescriptionsData, isLoading: loadingPrescriptions } = useQuery({
+    queryKey: ["patient-prescriptions", patientId],
+    queryFn: async () => {
+      try {
+        const res = await api.get(`/exams/prescriptions/by-patient/${patientId}`, { params: { size: 50 } });
+        return res.data.data?.content || res.data.data || [];
+      } catch {
+        return [];
+      }
+    },
     enabled: !!patientId,
   });
+
+  // NOTE: Invoices removed - doctor role doesn't have permission to access /invoices/by-patient
 
   const calculateAge = (dob: string | null) => {
     if (!dob) return null;
@@ -160,21 +169,12 @@ export default function DoctorPatientDetailPage() {
   }
 
   const appointments = appointmentsData?.content || [];
-  const exams = examsData?.data?.content || [];
-  const invoices = (invoicesData?.data as any) || [];
+  const exams = examsData?.data?.content || examsData?.content || [];
   const age = calculateAge(patient.dateOfBirth);
 
-  // Extract prescriptions from exams
-  const prescriptions = exams
-    .filter((exam: any) => exam.hasPrescription && exam.prescription)
-    .map((exam: any) => ({
-      ...exam.prescription,
-      examDate: exam.examDate,
-      diagnosis: exam.diagnosis,
-      doctor: exam.doctor,
-    }));
+  // Use prescriptions from dedicated API endpoint
+  const prescriptions = prescriptionsData || [];
   const allergyList = patient.allergies?.split(",").map((s) => s.trim()).filter(Boolean) || [];
-  const totalBalance = invoices.reduce((sum: number, inv: any) => sum + (inv.balance || inv.balanceDue || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -195,21 +195,7 @@ export default function DoctorPatientDetailPage() {
           age ? { icon: <Calendar className="h-4 w-4" />, text: `${age} tuổi` } : null,
         ].filter(Boolean) as any}
         statusBadge={patient.bloodType && <BloodTypeBadge bloodType={patient.bloodType as any} />}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20"
-            >
-              <Link href={`/doctor/appointments/new?patientId=${patientId}`}>
-                <Calendar className="h-4 w-4 mr-2" />
-                Đặt lịch
-              </Link>
-            </Button>
-          </div>
-        }
+        /* NOTE: "Đặt lịch" button removed - doctors typically don't book appointments */
       />
 
       {/* Stats Summary */}
@@ -218,7 +204,6 @@ export default function DoctorPatientDetailPage() {
           { label: "Lịch hẹn", value: appointments.length, icon: <Calendar className="h-5 w-5" />, color: "violet" },
           { label: "Lần khám", value: exams.length, icon: <Stethoscope className="h-5 w-5" />, color: "teal" },
           { label: "Đơn thuốc", value: prescriptions.length, icon: <Pill className="h-5 w-5" />, color: "amber" },
-          { label: "Hóa đơn", value: invoices.length, icon: <Receipt className="h-5 w-5" />, color: totalBalance > 0 ? "rose" : "emerald" },
         ]}
       />
 
@@ -234,7 +219,7 @@ export default function DoctorPatientDetailPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="info" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Thông tin</span>
@@ -253,11 +238,6 @@ export default function DoctorPatientDetailPage() {
             <Pill className="h-4 w-4" />
             <span className="hidden sm:inline">Đơn thuốc</span>
             {prescriptions.length > 0 && <Badge variant="secondary" className="ml-1">{prescriptions.length}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="invoices" className="flex items-center gap-2">
-            <Receipt className="h-4 w-4" />
-            <span className="hidden sm:inline">Hóa đơn</span>
-            {invoices.length > 0 && <Badge variant="secondary" className="ml-1">{invoices.length}</Badge>}
           </TabsTrigger>
         </TabsList>
 
@@ -501,59 +481,7 @@ export default function DoctorPatientDetailPage() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        {/* Tab: Hóa đơn */}
-        <TabsContent value="invoices" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Receipt className="h-5 w-5" />
-                Hóa đơn ({invoices.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loadingInvoices ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-24 w-full" />
-                </div>
-              ) : invoices.length === 0 ? (
-                <EmptyState icon={Receipt} message="Chưa có hóa đơn" description="Bệnh nhân chưa có hóa đơn nào được ghi nhận" />
-              ) : (
-                <div className="space-y-3">
-                  {invoices.map((invoice: any) => (
-                    <div
-                      key={invoice.id}
-                      className="relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md hover:border-emerald-200"
-                    >
-                      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-400 to-green-500 rounded-l-xl" />
-                      <div className="flex items-start justify-between pl-3">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{invoice.invoiceNumber}</span>
-                            {getStatusBadge(invoice.status)}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Ngày: {formatDateTime(invoice.invoiceDate)}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-lg text-emerald-600">
-                            {formatCurrency(invoice.totalAmount)}
-                          </p>
-                          {invoice.balance > 0 && (
-                            <p className="text-sm text-destructive">
-                              Còn nợ: {formatCurrency(invoice.balance)}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* NOTE: Invoice tab removed - doctor role doesn't have permission to access billing data */}
       </Tabs>
     </div>
   );

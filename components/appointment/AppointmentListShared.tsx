@@ -201,7 +201,8 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
   );
 
   // Permission checks - PATIENT can create appointments after verification
-  const canCreate = role === "ADMIN" || role === "NURSE" || role === "DOCTOR" || role === "PATIENT";
+  // NOTE: DOCTOR removed - doctors typically don't book appointments (receptionist/admin do)
+  const canCreate = role === "ADMIN" || role === "NURSE" || role === "PATIENT";
   const canFilterByStatus = true; // All roles can filter by status
 
   const appointments = data?.content || [];
@@ -397,10 +398,7 @@ export function AppointmentListShared({ role }: AppointmentListSharedProps) {
           onEmptySlotClick={
             canCreate
               ? (date) => {
-                  const basePath =
-                    role === "DOCTOR"
-                      ? "/admin/appointments/new"
-                      : `/${role.toLowerCase()}/appointments/new`;
+                  const basePath = `/${role.toLowerCase()}/appointments/new`;
                   router.push(`${basePath}?date=${format(date, "yyyy-MM-dd")}&time=${format(date, "HH:mm")}`);
                 }
               : undefined

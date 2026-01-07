@@ -39,8 +39,8 @@ export default function ManagePrescriptionPage() {
         medicineId: item.medicineId,
         quantity: item.quantity,
         dosage: item.dosage,
-        duration: item.duration,
-        notes: item.notes,
+        durationDays: item.durationDays,
+        instructions: item.instructions,
       })),
       notes: data.notes,
     };
@@ -48,10 +48,10 @@ export default function ManagePrescriptionPage() {
     try {
       if (isEditing) {
         await updatePrescription({ examId: id, data: payload });
-        toast.success("Prescription updated successfully");
+        toast.success("Đã cập nhật đơn thuốc thành công!");
       } else {
         await createPrescription({ examId: id, data: payload });
-        toast.success("Prescription created successfully");
+        toast.success("Đã tạo đơn thuốc thành công!");
       }
       router.push(`/admin/exams/${id}`);
     } catch (error) {
@@ -65,7 +65,7 @@ export default function ManagePrescriptionPage() {
       <div className="flex items-center justify-center py-20">
         <Spinner className="text-muted-foreground" />
         <span className="ml-2 text-muted-foreground">
-          Loading exam details...
+          Đang tải thông tin...
         </span>
       </div>
     );
@@ -74,9 +74,9 @@ export default function ManagePrescriptionPage() {
   if (!exam) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
-        <p className="text-muted-foreground">Medical Exam not found</p>
+        <p className="text-muted-foreground">Không tìm thấy phiếu khám</p>
         <Button variant="outline" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+          <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
         </Button>
       </div>
     );
@@ -88,8 +88,8 @@ export default function ManagePrescriptionPage() {
           medicineId: item.medicine.id.toString(),
           quantity: item.quantity,
           dosage: item.dosage,
-          duration: item.durationDays ? String(item.durationDays) : "",
-          notes: item.instructions,
+          durationDays: item.durationDays || undefined,
+          instructions: item.instructions || "",
         })),
         notes: exam.prescription.notes,
       }

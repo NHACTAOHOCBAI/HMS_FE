@@ -357,13 +357,12 @@ export const updatePrescriptionMock = async (
   data: PrescriptionCreateRequest
 ) => {
   if (!USE_MOCK) {
-    // Current Backend PrescriptionController likely DOES NOT support update.
-    // I will try standard PATCH /prescriptions/{id} if I can find ID.
-    // But if controller doesn't have it, it will 404.
-    // Let's assume for now we cannot update or we try a hypothetical endpoint.
-    // If user didn't ask to implement missing backend features, I should just try best guess or throw.
-    // Throwing is safer to avoid confusion.
-    throw new Error("Update prescription not implemented in backend yet");
+    // Backend supports: PUT /exams/{examId}/prescription (only for ACTIVE prescriptions)
+    const response = await axiosInstance.put(
+      `${BASE_URL_EXAMS}/${examId}/prescription`,
+      data
+    );
+    return response.data.data;
   }
 
   await delay(500);

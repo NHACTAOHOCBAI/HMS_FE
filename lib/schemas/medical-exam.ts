@@ -25,18 +25,17 @@ export const medicalExamSchema = z.object({
   followUpDate: z.string().optional(),
 });
 
+// Schema matching backend PrescriptionItemRequest
+export const prescriptionItemSchema = z.object({
+  medicineId: z.string().min(1, "Vui lòng chọn thuốc"),
+  quantity: z.coerce.number().min(1, "Số lượng tối thiểu là 1"),
+  dosage: z.string().min(1, "Vui lòng nhập liều dùng"),
+  durationDays: z.coerce.number().min(1, "Số ngày tối thiểu là 1").optional(),
+  instructions: z.string().optional(),
+});
+
 export const prescriptionSchema = z.object({
-  items: z
-    .array(
-      z.object({
-        medicineId: z.string().min(1, "Medicine is required"),
-        quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
-        dosage: z.string().min(1, "Dosage is required"),
-        duration: z.string().min(1, "Duration is required"),
-        notes: z.string().optional(),
-      })
-    )
-    .min(1, "At least one medicine is required"),
+  items: z.array(prescriptionItemSchema).min(1, "Cần ít nhất một loại thuốc"),
   notes: z.string().optional(),
 });
 
@@ -55,13 +54,14 @@ export type MedicalExamFormValues = {
   followUpDate?: string;
 };
 
+// Type matching backend PrescriptionCreateRequest
 export type PrescriptionFormValues = {
   items: {
     medicineId: string;
     quantity: number;
     dosage: string;
-    duration: string;
-    notes?: string;
+    durationDays?: number;
+    instructions?: string;
   }[];
   notes?: string;
 };

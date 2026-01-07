@@ -35,9 +35,7 @@ type PrescriptionItemPayload = {
   medicineId: string;
   quantity: number;
   dosage: string;
-  duration?: string;
   durationDays?: number;
-  notes?: string;
   instructions?: string;
 };
 
@@ -55,14 +53,8 @@ function mapPrescriptionPayloadToRequest(
       medicineId: String(item.medicineId),
       quantity: item.quantity,
       dosage: item.dosage,
-      durationDays:
-        ("durationDays" in item ? item.durationDays : undefined) ??
-        parseDurationDays(item.duration),
-      instructions:
-        ("instructions" in item ? item.instructions : undefined) ??
-        item.notes ??
-        item.duration ??
-        undefined,
+      durationDays: item.durationDays,
+      instructions: item.instructions,
     })),
   };
 }
