@@ -1,0 +1,33 @@
+{
+	"color": {
+		"primary": {
+			"blue-100": { "$value": "#E6F0FA" },
+			"blue-300": { "$value": "#80BFFF" },
+			"blue-500": { "$value": "#1E90FF" },
+			"blue-600": { "$value": "#2563EB" },
+			"blue-700": { "$value": "#1565C0" },
+			"blue-900": { "$value": "#0D47A1" }
+		},
+		"secondary": {
+			"teal-500": { "$value": "#009688" },
+			"teal-700": { "$value": "#00695C" }
+		},
+		"accent": {
+			"purple-500": { "$value": "#7E57C2" },
+			"orange-500": { "$value": "#FF9800" }
+		},
+		"neutral": {
+			"gray-100": { "$value": "#F5F5F5" },
+			"gray-200": { "$value": "#FFFFFF" },
+			"gray-300": { "$value": "#E0E0E0" },
+			"gray-700": { "$value": "#616161" },
+			"gray-900": { "$value": "#212121" }
+		},
+		"feedback": {
+			"success": { "$value": "#4CAF50" },
+			"warning": { "$value": "#FFC107" },
+			"error": { "$value": "#F44336" },
+			"info": { "$value": "#2196F3" }
+		}
+	}
+}
