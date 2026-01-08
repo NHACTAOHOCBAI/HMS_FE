@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { authService } from "@/services/auth.service";
 
 const PasswordResetPage = () => {
   const router = useRouter();
@@ -32,11 +33,15 @@ const PasswordResetPage = () => {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await authService.sendPasswordResetToken(email);
       setSubmittedEmail(email);
       setShowConfirmation(true);
     } catch (error) {
-      setErrorMessage("Không thể gửi liên kết đặt lại. Vui lòng thử lại.");
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Không thể gửi liên kết đặt lại. Vui lòng thử lại.");
+      }
       console.error("Password reset error:", error);
     } finally {
       setIsLoading(false);

@@ -150,5 +150,32 @@ export const authService = {
   deleteAccount: async (id: string): Promise<void> => {
     await axiosInstance.delete(`/auth/accounts/${id}`);
   },
+
+  // Password Reset APIs
+  sendPasswordResetToken: async (email: string): Promise<void> => {
+    await axiosInstance.post("/auth/send-password-reset-token", null, {
+      params: { email },
+    });
+  },
+
+  resetPassword: async (token: string, newPassword: string): Promise<void> => {
+    await axiosInstance.post("/auth/reset-password", {
+      token,
+      newPassword,
+    });
+  },
+
+  // Email Verification APIs
+  sendVerificationEmail: async (email: string): Promise<void> => {
+    await axiosInstance.post("/auth/send-verification-email", null, {
+      params: { email },
+    });
+  },
+
+  verifyEmail: async (token: string): Promise<void> => {
+    await axiosInstance.post("/auth/verify-email", null, {
+      params: { token },
+    });
+  },
 };
 

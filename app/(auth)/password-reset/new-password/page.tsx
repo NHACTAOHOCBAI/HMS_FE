@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { authService } from "@/services/auth.service";
 
 const ResetPasswordPage = () => {
   const router = useRouter();
@@ -64,6 +65,11 @@ const ResetPasswordPage = () => {
     e.preventDefault();
     setErrorMessage("");
 
+    if (!token) {
+      setErrorMessage("Token không hợp lệ. Vui lòng yêu cầu liên kết đặt lại mới.");
+      return;
+    }
+
     if (!passwordsMatch) {
       setErrorMessage("Mật khẩu không khớp");
       return;
@@ -77,10 +83,14 @@ const ResetPasswordPage = () => {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await authService.resetPassword(token, passwords.newPassword);
       router.push("/password-reset/new-password/success");
     } catch (error) {
-      setErrorMessage("Không thể đặt lại mật khẩu. Vui lòng thử lại.");
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Không thể đặt lại mật khẩu. Vui lòng thử lại.");
+      }
       console.error("Password reset error:", error);
     } finally {
       setIsLoading(false);
