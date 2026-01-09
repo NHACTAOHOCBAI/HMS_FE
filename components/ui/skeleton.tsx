@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { cn } from "@/lib/utils"
+=======
+import { cn } from "./utils";
+>>>>>>> repoB/master
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -7,7 +11,14 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("bg-accent animate-pulse rounded-md", className)}
       {...props}
     />
+<<<<<<< HEAD
   )
 }
 
 export { Skeleton }
+=======
+  );
+}
+
+export { Skeleton };
+>>>>>>> repoB/master

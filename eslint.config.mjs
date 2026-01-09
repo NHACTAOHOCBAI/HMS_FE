@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+<<<<<<< HEAD
+=======
+    "QuanLyBenhVien/**", // Add this line
+>>>>>>> repoB/master
   ]),
 ]);
 

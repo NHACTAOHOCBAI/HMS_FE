@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client"
 
 import * as React from "react"
@@ -8,24 +9,48 @@ import { cn } from "@/lib/utils"
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
+=======
+"use client";
+
+import * as React from "react";
+import * as SheetPrimitive from "@radix-ui/react-dialog";
+import { XIcon } from "lucide-react";
+
+import { cn } from "./utils";
+
+function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />;
+>>>>>>> repoB/master
 }
 
 function SheetTrigger({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
+<<<<<<< HEAD
   return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+=======
+  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
+>>>>>>> repoB/master
 }
 
 function SheetClose({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Close>) {
+<<<<<<< HEAD
   return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+=======
+  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
+>>>>>>> repoB/master
 }
 
 function SheetPortal({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+<<<<<<< HEAD
   return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+=======
+  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
+>>>>>>> repoB/master
 }
 
 function SheetOverlay({
@@ -37,11 +62,19 @@ function SheetOverlay({
       data-slot="sheet-overlay"
       className={cn(
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+<<<<<<< HEAD
         className
       )}
       {...props}
     />
   )
+=======
+        className,
+      )}
+      {...props}
+    />
+  );
+>>>>>>> repoB/master
 }
 
 function SheetContent({
@@ -50,7 +83,11 @@ function SheetContent({
   side = "right",
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
+<<<<<<< HEAD
   side?: "top" | "right" | "bottom" | "left"
+=======
+  side?: "top" | "right" | "bottom" | "left";
+>>>>>>> repoB/master
 }) {
   return (
     <SheetPortal>
@@ -67,7 +104,11 @@ function SheetContent({
             "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
           side === "bottom" &&
             "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
+<<<<<<< HEAD
           className
+=======
+          className,
+>>>>>>> repoB/master
         )}
         {...props}
       >
@@ -78,7 +119,11 @@ function SheetContent({
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>
     </SheetPortal>
+<<<<<<< HEAD
   )
+=======
+  );
+>>>>>>> repoB/master
 }
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -88,7 +133,11 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("flex flex-col gap-1.5 p-4", className)}
       {...props}
     />
+<<<<<<< HEAD
   )
+=======
+  );
+>>>>>>> repoB/master
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
@@ -98,7 +147,11 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("mt-auto flex flex-col gap-2 p-4", className)}
       {...props}
     />
+<<<<<<< HEAD
   )
+=======
+  );
+>>>>>>> repoB/master
 }
 
 function SheetTitle({
@@ -111,7 +164,11 @@ function SheetTitle({
       className={cn("text-foreground font-semibold", className)}
       {...props}
     />
+<<<<<<< HEAD
   )
+=======
+  );
+>>>>>>> repoB/master
 }
 
 function SheetDescription({
@@ -124,7 +181,11 @@ function SheetDescription({
       className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
+<<<<<<< HEAD
   )
+=======
+  );
+>>>>>>> repoB/master
 }
 
 export {
@@ -136,4 +197,8 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
+<<<<<<< HEAD
 }
+=======
+};
+>>>>>>> repoB/master

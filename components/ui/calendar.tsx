@@ -1,15 +1,29 @@
+<<<<<<< HEAD
 "use client"
 
 import * as React from "react"
+=======
+"use client";
+
+import * as React from "react";
+>>>>>>> repoB/master
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+<<<<<<< HEAD
 } from "lucide-react"
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+=======
+} from "lucide-react";
+import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
+
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
+>>>>>>> repoB/master
 
 function Calendar({
   className,
@@ -21,15 +35,25 @@ function Calendar({
   components,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
+<<<<<<< HEAD
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
 }) {
   const defaultClassNames = getDefaultClassNames()
+=======
+  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+}) {
+  const defaultClassNames = getDefaultClassNames();
+>>>>>>> repoB/master
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
+<<<<<<< HEAD
         "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+=======
+        "bg-background group/calendar p-3 border-2 rounded-lg [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+>>>>>>> repoB/master
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
@@ -136,13 +160,21 @@ function Calendar({
               className={cn(className)}
               {...props}
             />
+<<<<<<< HEAD
           )
+=======
+          );
+>>>>>>> repoB/master
         },
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
               <ChevronLeftIcon className={cn("size-4", className)} {...props} />
+<<<<<<< HEAD
             )
+=======
+            );
+>>>>>>> repoB/master
           }
 
           if (orientation === "right") {
@@ -151,12 +183,20 @@ function Calendar({
                 className={cn("size-4", className)}
                 {...props}
               />
+<<<<<<< HEAD
             )
+=======
+            );
+>>>>>>> repoB/master
           }
 
           return (
             <ChevronDownIcon className={cn("size-4", className)} {...props} />
+<<<<<<< HEAD
           )
+=======
+          );
+>>>>>>> repoB/master
         },
         DayButton: CalendarDayButton,
         WeekNumber: ({ children, ...props }) => {
@@ -166,13 +206,21 @@ function Calendar({
                 {children}
               </div>
             </td>
+<<<<<<< HEAD
           )
+=======
+          );
+>>>>>>> repoB/master
         },
         ...components,
       }}
       {...props}
     />
+<<<<<<< HEAD
   )
+=======
+  );
+>>>>>>> repoB/master
 }
 
 function CalendarDayButton({
@@ -181,12 +229,21 @@ function CalendarDayButton({
   modifiers,
   ...props
 }: React.ComponentProps<typeof DayButton>) {
+<<<<<<< HEAD
   const defaultClassNames = getDefaultClassNames()
 
   const ref = React.useRef<HTMLButtonElement>(null)
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus()
   }, [modifiers.focused])
+=======
+  const defaultClassNames = getDefaultClassNames();
+
+  const ref = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => {
+    if (modifiers.focused) ref.current?.focus();
+  }, [modifiers.focused]);
+>>>>>>> repoB/master
 
   return (
     <Button
@@ -210,7 +267,14 @@ function CalendarDayButton({
       )}
       {...props}
     />
+<<<<<<< HEAD
   )
 }
 
 export { Calendar, CalendarDayButton }
+=======
+  );
+}
+
+export { Calendar, CalendarDayButton };
+>>>>>>> repoB/master

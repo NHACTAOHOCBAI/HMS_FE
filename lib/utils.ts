@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+<<<<<<< HEAD
 export const formatTime = (isoString: string) => {
   const date = new Date(isoString);
   return date.toLocaleTimeString("vi-VN", {
@@ -24,4 +25,22 @@ export function formatDateTimeVi(value?: string | null): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
+=======
+
+/**
+ * Format number as Vietnamese currency (VND)
+ */
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+}
+
+/**
+ * Format number with thousand separators
+ */
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat("vi-VN").format(num);
+>>>>>>> repoB/master
 }

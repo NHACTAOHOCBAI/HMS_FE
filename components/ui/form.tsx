@@ -13,25 +13,42 @@ import {
   type FieldValues,
 } from "react-hook-form";
 
+<<<<<<< HEAD
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+=======
+import { cn } from "./utils";
+import { Label } from "./label";
+>>>>>>> repoB/master
 
 const Form = FormProvider;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
+<<<<<<< HEAD
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+=======
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>>>>>>> repoB/master
 > = {
   name: TName;
 };
 
 const FormFieldContext = React.createContext<FormFieldContextValue>(
+<<<<<<< HEAD
   {} as FormFieldContextValue
+=======
+  {} as FormFieldContextValue,
+>>>>>>> repoB/master
 );
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
+<<<<<<< HEAD
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+=======
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>>>>>>> repoB/master
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
@@ -70,7 +87,11 @@ type FormItemContextValue = {
 };
 
 const FormItemContext = React.createContext<FormItemContextValue>(
+<<<<<<< HEAD
   {} as FormItemContextValue
+=======
+  {} as FormItemContextValue,
+>>>>>>> repoB/master
 );
 
 function FormItem({ className, ...props }: React.ComponentProps<"div">) {
@@ -155,6 +176,7 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
     </p>
   );
 }
+<<<<<<< HEAD
 function RequiredLabel({ children }: { children: string }) {
   return (
     <span>
@@ -162,6 +184,9 @@ function RequiredLabel({ children }: { children: string }) {
     </span>
   );
 }
+=======
+
+>>>>>>> repoB/master
 export {
   useFormField,
   Form,
@@ -171,5 +196,8 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+<<<<<<< HEAD
   RequiredLabel,
+=======
+>>>>>>> repoB/master
 };

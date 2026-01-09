@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+<<<<<<< HEAD
 import { ChevronsUpDown, ChevronUp, ChevronDown } from "lucide-react";
+=======
+
+>>>>>>> repoB/master
 import {
   Table,
   TableBody,
@@ -10,7 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+<<<<<<< HEAD
 import { ChevronLeft, ChevronRight } from "lucide-react";
+=======
+>>>>>>> repoB/master
 import {
   Select,
   SelectContent,
@@ -18,14 +25,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+<<<<<<< HEAD
+=======
+import { Skeleton } from "@/components/ui/skeleton";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
+>>>>>>> repoB/master
 
 export type Column<T> = {
   key: keyof T | string;
   label: React.ReactNode;
   render?: (row: T) => React.ReactNode;
+<<<<<<< HEAD
 
   // 🆕 Thêm vào đây
   sortable?: boolean;
+=======
+>>>>>>> repoB/master
 };
 
 type PaginationInfo = {
@@ -38,6 +53,7 @@ type PaginationInfo = {
 type Props<T> = {
   data: T[];
   columns: Column<T>[];
+<<<<<<< HEAD
   pagination: PaginationInfo;
 
   onPageChange: (page: number) => void;
@@ -64,6 +80,34 @@ function getPaginationNumbers(current: number, total: number) {
 
   return pages;
 }
+=======
+
+  // Pagination từ server
+  pagination: PaginationInfo;
+
+  // React Query triggers
+  onPageChange: (page: number) => void;
+  onRowsPerPageChange: (size: number) => void;
+
+  // Loading từ React Query
+  loading?: boolean;
+  onRowClick?: (row: T) => void;
+  
+  // Hide pagination (render it separately)
+  hidePagination?: boolean;
+};
+
+// Skeleton row component
+const TableRowSkeleton = ({ columnsLength }: { columnsLength: number }) => (
+  <TableRow>
+    {Array.from({ length: columnsLength }).map((_, i) => (
+      <TableCell key={i}>
+        <Skeleton className="h-6 w-full" />
+      </TableCell>
+    ))}
+  </TableRow>
+);
+>>>>>>> repoB/master
 
 export function ReusableTable<T>({
   data,
@@ -72,6 +116,7 @@ export function ReusableTable<T>({
   onPageChange,
   onRowsPerPageChange,
   loading = false,
+<<<<<<< HEAD
 
   // 🆕 thêm 2 props
   onSort,
@@ -98,10 +143,21 @@ export function ReusableTable<T>({
   return (
     <div className="flex flex-col justify-between min-h-[500px] gap-5">
       <div className="border-app-azure-100 rounded-[10px] border">
+=======
+  onRowClick,
+  hidePagination = false,
+}: Props<T>) {
+  const { currentPage, totalPages, rowsPerPage, totalItems } = pagination;
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="overflow-hidden">
+>>>>>>> repoB/master
         <Table>
           <TableHeader>
             <TableRow>
               {columns.map((col, idx) => (
+<<<<<<< HEAD
                 <TableHead
                   key={idx}
                   className={
@@ -114,11 +170,15 @@ export function ReusableTable<T>({
                     {renderSortIcon(String(col.key), col.sortable)}
                   </div>
                 </TableHead>
+=======
+                <TableHead key={idx}>{col.label}</TableHead>
+>>>>>>> repoB/master
               ))}
             </TableRow>
           </TableHeader>
 
           <TableBody>
+<<<<<<< HEAD
             {/* Loading */}
             {loading && (
               <TableRow>
@@ -133,6 +193,15 @@ export function ReusableTable<T>({
 
             {/* Empty state */}
             {!loading && data.length === 0 && (
+=======
+            {/* Loading skeleton */}
+            {loading ? (
+              Array.from({ length: rowsPerPage }).map((_, i) => (
+                <TableRowSkeleton key={i} columnsLength={columns.length} />
+              ))
+            ) : data.length === 0 ? (
+              // Empty state
+>>>>>>> repoB/master
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
@@ -141,24 +210,43 @@ export function ReusableTable<T>({
                   No data available
                 </TableCell>
               </TableRow>
+<<<<<<< HEAD
             )}
 
             {/* Data */}
             {!loading &&
               data.map((row, i) => (
                 <TableRow key={i}>
+=======
+            ) : (
+              // Data rows
+              data.map((row, i) => (
+                <TableRow
+                  key={i}
+                  className={
+                    onRowClick ? "cursor-pointer hover:bg-muted/60" : ""
+                  }
+                  onClick={() => onRowClick?.(row)}
+                >
+>>>>>>> repoB/master
                   {columns.map((col, idx) => (
                     <TableCell key={idx}>
                       {col.render ? col.render(row) : (row as any)[col.key]}
                     </TableCell>
                   ))}
                 </TableRow>
+<<<<<<< HEAD
               ))}
+=======
+              ))
+            )}
+>>>>>>> repoB/master
           </TableBody>
         </Table>
       </div>
 
       {/* Pagination */}
+<<<<<<< HEAD
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 text-sm">
           <span>Rows per page</span>
@@ -224,3 +312,23 @@ export function ReusableTable<T>({
     </div>
   );
 }
+=======
+      {!hidePagination && (
+        <DataTablePagination
+          currentPage={currentPage - 1} // Convert from 1-indexed to 0-indexed
+          totalPages={totalPages}
+          totalElements={totalItems}
+          pageSize={rowsPerPage}
+          onPageChange={(page) => onPageChange(page + 1)} // Convert back to 1-indexed
+          showRowsPerPage={true}
+          rowsPerPageOptions={[10, 20, 50]}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={onRowsPerPageChange}
+        />
+      )}
+    </div>
+  );
+}
+
+export default ReusableTable;
+>>>>>>> repoB/master
