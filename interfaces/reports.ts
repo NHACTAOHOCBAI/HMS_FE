@@ -19,31 +19,16 @@ export interface RevenueByPaymentMethod {
   percentage?: number;
 }
 
-export interface RevenueByDepartment {
-  departmentId: string;
-  departmentName: string;
-  revenue: number;
-  percentage: number;
-}
-
-export interface ReportPeriod {
-  startDate: string;
-  endDate: string;
-}
-
 export interface RevenueReport {
-  period?: ReportPeriod;
   totalRevenue: number;
   paidRevenue: number;
   unpaidRevenue: number;
   invoiceCount: InvoiceCount;
-  revenueByDepartment?: RevenueByDepartment[];
+  collectionRate: number;
   revenueByPaymentMethod: RevenueByPaymentMethod[];
   generatedAt: string;
-  // Cache fields - may not be present in all responses
-  cached?: boolean;
+  cached: boolean;
   cacheExpiresAt?: string;
-  collectionRate?: number;
 }
 
 // Appointment Statistics Types

@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-<<<<<<< HEAD
-  /* config options here */
-=======
   output: 'standalone', // Optimized for Docker - creates minimal production build
   async rewrites() {
     return [
@@ -14,7 +11,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
->>>>>>> repoB/master
 };
 
 export default nextConfig;

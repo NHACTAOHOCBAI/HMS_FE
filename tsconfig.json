@@ -9,18 +9,12 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
-<<<<<<< HEAD
-=======
     "baseUrl": ".",
->>>>>>> repoB/master
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-<<<<<<< HEAD
-=======
     "forceConsistentCasingInFileNames": true,
->>>>>>> repoB/master
     "plugins": [
       {
         "name": "next"

@@ -351,14 +351,8 @@ export function MedicalExamDetailView({
             patientId={medicalExam.patient.id}
             patientName={medicalExam.patient.fullName}
             userRole={userRole}
-            labOrdersBasePath={
-              examBaseHref.includes('/patient') ? '/patient/lab-orders' :
-              examBaseHref.includes('/doctor') ? '/doctor/lab-orders' : '/admin/lab-orders'
-            }
-            labResultsBasePath={
-              examBaseHref.includes('/patient') ? '/patient/lab-results' :
-              examBaseHref.includes('/doctor') ? '/doctor/lab-results' : '/admin/lab-results'
-            }
+            labOrdersBasePath={examBaseHref.includes('/doctor') ? '/doctor/lab-orders' : '/admin/lab-orders'}
+            labResultsBasePath={examBaseHref.includes('/doctor') ? '/doctor/lab-results' : '/admin/lab-results'}
           />
 
           {/* Prescription - Enhanced */}

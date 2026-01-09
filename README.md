@@ -1,41 +1,3 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
 # Hospital Management System (HMS) - Frontend
 
 Hệ thống Quản lý Bệnh viện - Ứng dụng web toàn diện được xây dựng với Next.js, React và TypeScript.
@@ -178,13 +140,13 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Truy cập `http://localhost:3000`
-2. Redirect tự động đến `/login`
-3. Giới thiệu giao diện đăng nhập:
-   - Logo HMS
-   - Form đăng nhập với validation
-   - Link "Quên mật khẩu"
-   - Link "Đăng ký tài khoản"
+1.  Truy cập `http://localhost:3000`
+2.  Redirect tự động đến `/login`
+3.  Giới thiệu giao diện đăng nhập:
+    - Logo HMS
+    - Form đăng nhập với validation
+    - Link "Quên mật khẩu"
+    - Link "Đăng ký tài khoản"
 
 **Tính năng**:
 
@@ -197,12 +159,12 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Bấm "Đăng ký tài khoản mới"
-2. Điền thông tin:
-   - Họ tên, Email, Mật khẩu
-   - SĐT, Ngày sinh, Giới tính
-   - Địa chỉ
-3. Submit form
+1.  Bấm "Đăng ký tài khoản mới"
+2.  Điền thông tin:
+    - Họ tên, Email, Mật khẩu
+    - SĐT, Ngày sinh, Giới tính
+    - Địa chỉ
+3.  Submit form
 
 **Tính năng**:
 
@@ -215,10 +177,10 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Từ login, bấm "Quên mật khẩu"
-2. Nhập email
-3. Nhận link reset (giả lập)
-4. Tạo mật khẩu mới
+1.  Từ login, bấm "Quên mật khẩu"
+2.  Nhập email
+3.  Nhận link reset (giả lập)
+4.  Tạo mật khẩu mới
 
 ---
 
@@ -230,33 +192,33 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo các thành phần**:
 
-1. **Statistics Cards** (4 thẻ):
-   - Tổng số bệnh nhân (real-time từ API)
-   - Lịch hẹn hôm nay
-   - Thuốc sắp hết hàng
-   - Doanh thu hôm nay
+1.  **Statistics Cards** (4 thẻ):
+    - Tổng số bệnh nhân (real-time từ API)
+    - Lịch hẹn hôm nay
+    - Thuốc sắp hết hàng
+    - Doanh thu hôm nay
 
-2. **Quick Actions** (4 nút):
-   - Đăng ký bệnh nhân mới
-   - Tạo lịch hẹn
-   - Bắt đầu khám
-   - Thêm thuốc
+2.  **Quick Actions** (4 nút):
+    - Đăng ký bệnh nhân mới
+    - Tạo lịch hẹn
+    - Bắt đầu khám
+    - Thêm thuốc
 
-3. **Today's Appointments**:
-   - Danh sách 5 lịch hẹn gần nhất
-   - Hiển thị giờ, tên BN, bác sĩ, trạng thái
-   - Link "View all"
+3.  **Today's Appointments**:
+    - Danh sách 5 lịch hẹn gần nhất
+    - Hiển thị giờ, tên BN, bác sĩ, trạng thái
+    - Link "View all"
 
-4. **Low Stock Alert**:
-   - Thuốc có số lượng < 50
-   - Progress bar màu (đỏ/xanh)
-   - Nút "Restock Inventory"
+4.  **Low Stock Alert**:
+    - Thuốc có số lượng < 50
+    - Progress bar màu (đỏ/xanh)
+    - Nút "Restock Inventory"
 
-5. **Footer Stats**:
-   - Tổng bệnh nhân
-   - Lịch hẹn hôm nay
-   - Loại thuốc
-   - Doanh thu hôm nay
+5.  **Footer Stats**:
+    - Tổng bệnh nhân
+    - Lịch hẹn hôm nay
+    - Loại thuốc
+    - Doanh thu hôm nay
 
 ---
 
@@ -266,10 +228,10 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem danh sách với pagination
-2. Tìm kiếm theo tên/SĐT
-3. Filter theo trạng thái verified
-4. Sort theo các cột
+1.  Xem danh sách với pagination
+2.  Tìm kiếm theo tên/SĐT
+3.  Filter theo trạng thái verified
+4.  Sort theo các cột
 
 **Tính năng bảng**:
 
@@ -283,13 +245,13 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Bấm "Add Patient"
-2. Điền form thông tin:
-   - Thông tin cá nhân: Họ tên, SĐT, Email
-   - Ngày sinh, Giới tính, CCCD
-   - Địa chỉ, Nhóm máu
-   - Liên hệ khẩn cấp
-3. Submit
+1.  Bấm "Add Patient"
+2.  Điền form thông tin:
+    - Thông tin cá nhân: Họ tên, SĐT, Email
+    - Ngày sinh, Giới tính, CCCD
+    - Địa chỉ, Nhóm máu
+    - Liên hệ khẩn cấp
+3.  Submit
 
 **Validation**:
 
@@ -301,26 +263,26 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Bấm vào tên bệnh nhân
-2. Xem thông tin chi tiết:
-   - Thông tin cá nhân
-   - Thông tin y tế (nhóm máu, dị ứng)
-   - Liên hệ khẩn cấp
-3. Các tab:
-   - Overview
-   - Lịch sử khám
-   - Lịch hẹn
+1.  Bấm vào tên bệnh nhân
+2.  Xem thông tin chi tiết:
+    - Thông tin cá nhân
+    - Thông tin y tế (nhóm máu, dị ứng)
+    - Liên hệ khẩn cấp
+3.  Các tab:
+    - Overview
+    - Lịch sử khám
+    - Lịch hẹn
 
 #### C4. Lịch sử Khám bệnh (`/admin/patients/[id]/history`)
 
 **Demo**:
 
-1. Xem danh sách các lần khám
-2. Mỗi lần khám hiển thị:
-   - Ngày khám
-   - Bác sĩ
-   - Chẩn đoán
-   - Đơn thuốc
+1.  Xem danh sách các lần khám
+2.  Mỗi lần khám hiển thị:
+    - Ngày khám
+    - Bác sĩ
+    - Chẩn đoán
+    - Đơn thuốc
 
 ---
 
@@ -330,12 +292,12 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem danh sách với filters:
-   - Theo ngày (date picker)
-   - Theo trạng thái (SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED)
-   - Theo bác sĩ
-2. Sort theo thời gian
-3. Actions: View, Edit, Cancel
+1.  Xem danh sách với filters:
+    - Theo ngày (date picker)
+    - Theo trạng thái (SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED)
+    - Theo bác sĩ
+2.  Sort theo thời gian
+3.  Actions: View, Edit, Cancel
 
 **Status badges**:
 
@@ -349,13 +311,13 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Tìm và chọn bệnh nhân (search dropdown)
-2. Chọn bác sĩ (search dropdown)
-3. Chọn ngày khám (date picker)
-4. Chọn khung giờ (time slots grid)
-5. Chọn loại khám (CONSULTATION, FOLLOW_UP, EMERGENCY)
-6. Nhập lý do khám
-7. Submit
+1.  Tìm và chọn bệnh nhân (search dropdown)
+2.  Chọn bác sĩ (search dropdown)
+3.  Chọn ngày khám (date picker)
+4.  Chọn khung giờ (time slots grid)
+5.  Chọn loại khám (CONSULTATION, FOLLOW_UP, EMERGENCY)
+6.  Nhập lý do khám
+7.  Submit
 
 **Time Slots**:
 
@@ -368,10 +330,10 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Bấm Edit từ danh sách
-2. Thay đổi khung giờ
-3. Thay đổi bác sĩ
-4. Save
+1.  Bấm Edit từ danh sách
+2.  Thay đổi khung giờ
+3.  Thay đổi bác sĩ
+4.  Save
 
 **Lưu ý**:
 
@@ -382,10 +344,10 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Bấm Cancel từ dropdown
-2. Nhập lý do hủy
-3. Confirm
-4. Lịch hẹn chuyển CANCELLED
+1.  Bấm Cancel từ dropdown
+2.  Nhập lý do hủy
+3.  Confirm
+4.  Lịch hẹn chuyển CANCELLED
 
 ---
 
@@ -395,16 +357,16 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo cho vai trò RECEPTIONIST**:
 
-1. Đăng nhập receptionist
-2. Bệnh nhân mới:
-   - Nhập thông tin cá nhân
-   - Chọn bác sĩ
-   - Chọn giờ khám
-   - Tạo lịch hẹn ngay
-3. Bệnh nhân đã có:
-   - Tìm kiếm theo tên/SĐT
-   - Chọn từ danh sách
-   - Tạo lịch hẹn
+1.  Đăng nhập receptionist
+2.  Bệnh nhân mới:
+    - Nhập thông tin cá nhân
+    - Chọn bác sĩ
+    - Chọn giờ khám
+    - Tạo lịch hẹn ngay
+3.  Bệnh nhân đã có:
+    - Tìm kiếm theo tên/SĐT
+    - Chọn từ danh sách
+    - Tạo lịch hẹn
 
 **Tính năng**:
 
@@ -416,15 +378,15 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem danh sách bệnh nhân chờ khám
-2. Sắp xếp theo giờ hẹn
-3. Trạng thái:
-   - Chờ vital signs
-   - Đã có vital signs - sẵn sàng khám
-   - Đang khám
-4. Actions:
-   - Điền Vital Signs (Nurse)
-   - Bắt đầu khám (Doctor)
+1.  Xem danh sách bệnh nhân chờ khám
+2.  Sắp xếp theo giờ hẹn
+3.  Trạng thái:
+    - Chờ vital signs
+    - Đã có vital signs - sẵn sàng khám
+    - Đang khám
+4.  Actions:
+    - Điền Vital Signs (Nurse)
+    - Bắt đầu khám (Doctor)
 
 ---
 
@@ -434,19 +396,19 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo với vai trò NURSE**:
 
-1. Đăng nhập nurse@hms.com
-2. Vào Lịch hẹn hoặc Hàng đợi
-3. Tìm lịch hẹn SCHEDULED
-4. Bấm dropdown ⋮ → "Điền Vital Signs"
-5. Dialog mở ra:
-   - Huyết áp (systolic/diastolic)
-   - Nhịp tim (bpm)
-   - Nhiệt độ (°C)
-   - Cân nặng (kg)
-   - Chiều cao (cm)
-   - SpO2 (%)
-   - Ghi chú
-6. Lưu
+1.  Đăng nhập nurse@hms.com
+2.  Vào Lịch hẹn hoặc Hàng đợi
+3.  Tìm lịch hẹn SCHEDULED
+4.  Bấm dropdown ⋮ → "Điền Vital Signs"
+5.  Dialog mở ra:
+    - Huyết áp (systolic/diastolic)
+    - Nhịp tim (bpm)
+    - Nhiệt độ (°C)
+    - Cân nặng (kg)
+    - Chiều cao (cm)
+    - SpO2 (%)
+    - Ghi chú
+6.  Lưu
 
 **Tính năng**:
 
@@ -458,45 +420,45 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem danh sách các ca khám
-2. Filter theo trạng thái:
-   - IN_PROGRESS - Đang khám
-   - COMPLETED - Hoàn thành
-3. Filter theo ngày
-4. Tìm kiếm theo tên BN
+1.  Xem danh sách các ca khám
+2.  Filter theo trạng thái:
+    - IN_PROGRESS - Đang khám
+    - COMPLETED - Hoàn thành
+3.  Filter theo ngày
+4.  Tìm kiếm theo tên BN
 
 #### F3. Thực hiện Khám bệnh (`/doctor/exams/[id]/edit`)
 
 **Demo với vai trò DOCTOR**:
 
-1. Đăng nhập doctor@hms.com
-2. Vào Hàng đợi → Bắt đầu khám
-3. Màn hình khám bệnh:
-   - **Bên trái**: Form nhập
-     - Triệu chứng (symptoms)
-     - Chẩn đoán (diagnosis)
-     - Ghi chú (notes)
-   - **Bên phải**: Thông tin BN
-     - Thông tin cá nhân
-     - Vital signs (nếu đã điền)
-     - Lịch sử khám gần đây
-4. Lưu
+1.  Đăng nhập doctor@hms.com
+2.  Vào Hàng đợi → Bắt đầu khám
+3.  Màn hình khám bệnh:
+    - **Bên trái**: Form nhập
+    - Triệu chứng (symptoms)
+    - Chẩn đoán (diagnosis)
+    - Ghi chú (notes)
+    - **Bên phải**: Thông tin BN
+    - Thông tin cá nhân
+    - Vital signs (nếu đã điền)
+    - Lịch sử khám gần đây
+4.  Lưu
 
 #### F4. Kê Đơn thuốc (`/doctor/exams/[id]/prescription`)
 
 **Demo**:
 
-1. Từ màn hình khám → Tab "Đơn thuốc"
-2. Hoặc bấm "Kê đơn thuốc"
-3. Form:
-   - Tìm kiếm thuốc (auto-complete)
-   - Số lượng
-   - Liều dùng (dosage)
-   - Thời gian dùng (duration)
-   - Ghi chú
-4. Bấm "Thêm vào đơn"
-5. Xem danh sách thuốc đã thêm
-6. Lưu đơn thuốc
+1.  Từ màn hình khám → Tab "Đơn thuốc"
+2.  Hoặc bấm "Kê đơn thuốc"
+3.  Form:
+    - Tìm kiếm thuốc (auto-complete)
+    - Số lượng
+    - Liều dùng (dosage)
+    - Thời gian dùng (duration)
+    - Ghi chú
+4.  Bấm "Thêm vào đơn"
+5.  Xem danh sách thuốc đã thêm
+6.  Lưu đơn thuốc
 
 **Tính năng**:
 
@@ -509,23 +471,23 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem đơn thuốc đã kê
-2. Thông tin:
-   - Tên bệnh nhân
-   - Ngày kê đơn
-   - Bác sĩ kê
-   - Danh sách thuốc
-   - Tổng tiền
-3. In đơn thuốc (PDF)
+1.  Xem đơn thuốc đã kê
+2.  Thông tin:
+    - Tên bệnh nhân
+    - Ngày kê đơn
+    - Bác sĩ kê
+    - Danh sách thuốc
+    - Tổng tiền
+3.  In đơn thuốc (PDF)
 
 #### F6. Hoàn thành Khám
 
 **Demo**:
 
-1. Sau khi đã nhập chẩn đoán và kê đơn
-2. Bấm "Hoàn thành khám"
-3. Lịch hẹn chuyển COMPLETED
-4. Hóa đơn tự động tạo
+1.  Sau khi đã nhập chẩn đoán và kê đơn
+2.  Bấm "Hoàn thành khám"
+3.  Lịch hẹn chuyển COMPLETED
+4.  Hóa đơn tự động tạo
 
 ---
 
@@ -535,15 +497,15 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem danh sách hóa đơn
-2. Filter theo trạng thái:
-   - UNPAID - Chưa thanh toán
-   - PARTIALLY_PAID - Thanh toán một phần
-   - PAID - Đã thanh toán
-   - OVERDUE - Quá hạn
-   - CANCELLED - Đã hủy
-3. Filter theo ngày
-4. Tìm kiếm theo mã hóa đơn/tên BN
+1.  Xem danh sách hóa đơn
+2.  Filter theo trạng thái:
+    - UNPAID - Chưa thanh toán
+    - PARTIALLY_PAID - Thanh toán một phần
+    - PAID - Đã thanh toán
+    - OVERDUE - Quá hạn
+    - CANCELLED - Đã hủy
+3.  Filter theo ngày
+4.  Tìm kiếm theo mã hóa đơn/tên BN
 
 **Thông tin hiển thị**:
 
@@ -559,41 +521,41 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Bấm vào mã hóa đơn
-2. Xem chi tiết:
-   - Thông tin bệnh nhân
-   - Ngày hóa đơn
-   - Items (phí khám, thuốc, xét nghiệm...)
-   - Tổng cộng
-   - Đã thanh toán
-   - Còn lại
-3. Lịch sử thanh toán (nếu có)
+1.  Bấm vào mã hóa đơn
+2.  Xem chi tiết:
+    - Thông tin bệnh nhân
+    - Ngày hóa đơn
+    - Items (phí khám, thuốc, xét nghiệm...)
+    - Tổng cộng
+    - Đã thanh toán
+    - Còn lại
+3.  Lịch sử thanh toán (nếu có)
 
 #### G3. Thanh toán Hóa đơn (`/admin/billing/[id]/payment`)
 
 **Demo**:
 
-1. Bấm "Thanh toán" từ danh sách
-2. Chọn phương thức:
-   - **Tiền mặt**: Xác nhận số tiền → Done
-   - **VNPay**: Redirect đến VNPay → Quay lại
-3. Hóa đơn cập nhật trạng thái
+1.  Bấm "Thanh toán" từ danh sách
+2.  Chọn phương thức:
+    - **Tiền mặt**: Xác nhận số tiền → Done
+    - **VNPay**: Redirect đến VNPay → Quay lại
+3.  Hóa đơn cập nhật trạng thái
 
 #### G4. Lịch sử Thanh toán (`/admin/billing/payments`)
 
 **Demo**:
 
-1. Vào menu Billing → Payments
-2. Xem danh sách tất cả payments:
-   - Payment ID
-   - Mã hóa đơn
-   - Tên bệnh nhân
-   - Số tiền
-   - Phương thức (Cash/VNPay)
-   - Ngày thanh toán
-   - Trạng thái
-3. Filter theo phương thức
-4. Filter theo ngày
+1.  Vào menu Billing → Payments
+2.  Xem danh sách tất cả payments:
+    - Payment ID
+    - Mã hóa đơn
+    - Tên bệnh nhân
+    - Số tiền
+    - Phương thức (Cash/VNPay)
+    - Ngày thanh toán
+    - Trạng thái
+3.  Filter theo phương thức
+4.  Filter theo ngày
 
 **Summary Cards**:
 
@@ -610,63 +572,63 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Card tổng quan:
-   - Tổng nhân viên
-   - Tổng phòng ban
-   - Lịch làm việc hôm nay
+1.  Card tổng quan:
+    - Tổng nhân viên
+    - Tổng phòng ban
+    - Lịch làm việc hôm nay
 
 #### H2. Quản lý Phòng ban (`/admin/hr/departments`)
 
 **Demo**:
 
-1. Danh sách phòng ban
-2. Thông tin: Tên, Mô tả, Số nhân viên
-3. CRUD operations:
-   - Thêm phòng ban mới
-   - Sửa thông tin
-   - Xem chi tiết (nhân viên thuộc phòng)
-   - Xóa (nếu không có nhân viên)
+1.  Danh sách phòng ban
+2.  Thông tin: Tên, Mô tả, Số nhân viên
+3.  CRUD operations:
+    - Thêm phòng ban mới
+    - Sửa thông tin
+    - Xem chi tiết (nhân viên thuộc phòng)
+    - Xóa (nếu không có nhân viên)
 
 #### H3. Quản lý Nhân viên (`/admin/hr/employees`)
 
 **Demo**:
 
-1. Danh sách nhân viên với filter:
-   - Theo phòng ban
-   - Theo vai trò (Doctor, Nurse, Receptionist)
-   - Theo trạng thái (Active/Inactive)
-2. Thông tin hiển thị:
-   - Họ tên, Email, SĐT
-   - Phòng ban
-   - Chức vụ
-   - Chuyên môn (cho Doctor)
+1.  Danh sách nhân viên với filter:
+    - Theo phòng ban
+    - Theo vai trò (Doctor, Nurse, Receptionist)
+    - Theo trạng thái (Active/Inactive)
+2.  Thông tin hiển thị:
+    - Họ tên, Email, SĐT
+    - Phòng ban
+    - Chức vụ
+    - Chuyên môn (cho Doctor)
 
 #### H4. Thêm Nhân viên (`/admin/hr/employees/new`)
 
 **Demo**:
 
-1. Điền thông tin cá nhân
-2. Chọn phòng ban
-3. Chọn vai trò
-4. Nhập chuyên môn (nếu là Doctor)
-5. Submit
+1.  Điền thông tin cá nhân
+2.  Chọn phòng ban
+3.  Chọn vai trò
+4.  Nhập chuyên môn (nếu là Doctor)
+5.  Submit
 
 #### H5. Chi tiết Nhân viên (`/admin/hr/employees/[id]`)
 
 **Demo**:
 
-1. Thông tin cá nhân đầy đủ
-2. Thông tin công việc
-3. Lịch làm việc
-4. Lịch hẹn (nếu là Doctor)
+1.  Thông tin cá nhân đầy đủ
+2.  Thông tin công việc
+3.  Lịch làm việc
+4.  Lịch hẹn (nếu là Doctor)
 
 #### H6. Lịch làm việc (`/admin/hr/schedules`)
 
 **Demo**:
 
-1. Xem lịch làm việc theo tuần/tháng
-2. Filter theo nhân viên/phòng ban
-3. Hiển thị dạng calendar hoặc list
+1.  Xem lịch làm việc theo tuần/tháng
+2.  Filter theo nhân viên/phòng ban
+3.  Hiển thị dạng calendar hoặc list
 
 ---
 
@@ -676,18 +638,18 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem danh sách thuốc với:
-   - Tìm kiếm theo tên
-   - Filter theo danh mục
-   - Sort theo tên/giá/số lượng
-2. Thông tin hiển thị:
-   - Tên thuốc
-   - Hoạt chất
-   - Đơn vị
-   - Số lượng tồn
-   - Giá nhập/bán
-   - Hạn sử dụng
-   - Danh mục
+1.  Xem danh sách thuốc với:
+    - Tìm kiếm theo tên
+    - Filter theo danh mục
+    - Sort theo tên/giá/số lượng
+2.  Thông tin hiển thị:
+    - Tên thuốc
+    - Hoạt chất
+    - Đơn vị
+    - Số lượng tồn
+    - Giá nhập/bán
+    - Hạn sử dụng
+    - Danh mục
 
 **Cảnh báo**:
 
@@ -698,40 +660,40 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Điền thông tin:
-   - Tên thuốc
-   - Hoạt chất
-   - Đơn vị (viên, hộp, chai...)
-   - Mô tả
-   - Số lượng nhập
-   - Giá nhập, Giá bán
-   - Hạn sử dụng
-   - Danh mục
-2. Submit
+1.  Điền thông tin:
+    - Tên thuốc
+    - Hoạt chất
+    - Đơn vị (viên, hộp, chai...)
+    - Mô tả
+    - Số lượng nhập
+    - Giá nhập, Giá bán
+    - Hạn sử dụng
+    - Danh mục
+2.  Submit
 
 #### I3. Chi tiết Thuốc (`/admin/medicines/[id]`)
 
 **Demo**:
 
-1. Thông tin đầy đủ
-2. Lịch sử nhập/xuất
-3. Biểu đồ tồn kho
+1.  Thông tin đầy đủ
+2.  Lịch sử nhập/xuất
+3.  Biểu đồ tồn kho
 
 #### I4. Sửa Thuốc (`/admin/medicines/[id]/edit`)
 
 **Demo**:
 
-1. Cập nhật thông tin
-2. Cập nhật số lượng (nhập thêm)
-3. Cập nhật giá
+1.  Cập nhật thông tin
+2.  Cập nhật số lượng (nhập thêm)
+3.  Cập nhật giá
 
 #### I5. Quản lý Danh mục (trong `/admin/medicines`)
 
 **Demo**:
 
-1. Tab Danh mục
-2. CRUD danh mục thuốc
-3. Assign thuốc vào danh mục
+1.  Tab Danh mục
+2.  CRUD danh mục thuốc
+3.  Assign thuốc vào danh mục
 
 ---
 
@@ -741,42 +703,42 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Danh sách các loại xét nghiệm
-2. Thông tin: Tên, Mô tả, Giá
-3. CRUD operations
+1.  Danh sách các loại xét nghiệm
+2.  Thông tin: Tên, Mô tả, Giá
+3.  CRUD operations
 
 #### J2. Lab Orders (`/admin/lab-orders`)
 
 **Demo**:
 
-1. Danh sách yêu cầu xét nghiệm
-2. Trạng thái:
-   - PENDING - Chờ xử lý
-   - IN_PROGRESS - Đang thực hiện
-   - COMPLETED - Hoàn thành
-3. Actions:
-   - Xem chi tiết
-   - Cập nhật trạng thái
-   - Nhập kết quả
+1.  Danh sách yêu cầu xét nghiệm
+2.  Trạng thái:
+    - PENDING - Chờ xử lý
+    - IN_PROGRESS - Đang thực hiện
+    - COMPLETED - Hoàn thành
+3.  Actions:
+    - Xem chi tiết
+    - Cập nhật trạng thái
+    - Nhập kết quả
 
 #### J3. Chi tiết Lab Order (`/admin/lab-orders/[id]`)
 
 **Demo**:
 
-1. Thông tin yêu cầu:
-   - Bệnh nhân
-   - Bác sĩ yêu cầu
-   - Loại xét nghiệm
-   - Ngày yêu cầu
-2. Kết quả (nếu có)
+1.  Thông tin yêu cầu:
+    - Bệnh nhân
+    - Bác sĩ yêu cầu
+    - Loại xét nghiệm
+    - Ngày yêu cầu
+2.  Kết quả (nếu có)
 
 #### J4. Lab Results (`/admin/lab-results`)
 
 **Demo**:
 
-1. Danh sách kết quả xét nghiệm
-2. Filter theo ngày, trạng thái
-3. Xem/In kết quả
+1.  Danh sách kết quả xét nghiệm
+2.  Filter theo ngày, trạng thái
+3.  Xem/In kết quả
 
 ---
 
@@ -786,26 +748,26 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Overview cards:
-   - Tổng doanh thu
-   - Tổng lịch hẹn
-   - Bệnh nhân mới
-   - Doanh thu trung bình/ngày
-2. Biểu đồ:
-   - Revenue trend
-   - Appointment distribution
-   - Top doctors
+1.  Overview cards:
+    - Tổng doanh thu
+    - Tổng lịch hẹn
+    - Bệnh nhân mới
+    - Doanh thu trung bình/ngày
+2.  Biểu đồ:
+    - Revenue trend
+    - Appointment distribution
+    - Top doctors
 
 #### K2. Báo cáo Doanh thu (`/admin/reports/revenue`)
 
 **Demo**:
 
-1. Filter theo khoảng thời gian
-2. Biểu đồ doanh thu theo ngày/tuần/tháng
-3. Breakdown theo:
-   - Phương thức thanh toán
-   - Loại dịch vụ
-4. Export CSV
+1.  Filter theo khoảng thời gian
+2.  Biểu đồ doanh thu theo ngày/tuần/tháng
+3.  Breakdown theo:
+    - Phương thức thanh toán
+    - Loại dịch vụ
+4.  Export CSV
 
 **Số liệu**:
 
@@ -818,13 +780,13 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Filter theo khoảng thời gian
-2. Filter theo phòng ban/bác sĩ
-3. Biểu đồ:
-   - Số lượng theo ngày
-   - Phân bố theo trạng thái
-   - Phân bố theo loại khám
-4. Export CSV
+1.  Filter theo khoảng thời gian
+2.  Filter theo phòng ban/bác sĩ
+3.  Biểu đồ:
+    - Số lượng theo ngày
+    - Phân bố theo trạng thái
+    - Phân bố theo loại khám
+4.  Export CSV
 
 **Số liệu**:
 
@@ -836,26 +798,26 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Filter theo khoảng thời gian
-2. Filter theo phòng ban
-3. Bảng hiệu suất:
-   - Tên bác sĩ
-   - Số lượng khám
-   - Doanh thu
-   - Tỷ lệ hoàn thành
-4. Export CSV
+1.  Filter theo khoảng thời gian
+2.  Filter theo phòng ban
+3.  Bảng hiệu suất:
+    - Tên bác sĩ
+    - Số lượng khám
+    - Doanh thu
+    - Tỷ lệ hoàn thành
+4.  Export CSV
 
 #### K5. Hoạt động Bệnh nhân (`/admin/reports/patients/activity`)
 
 **Demo**:
 
-1. Filter theo khoảng thời gian
-2. Biểu đồ:
-   - Bệnh nhân mới theo ngày
-   - Phân bố theo giới tính
-   - Phân bố theo nhóm máu
-   - Độ tuổi
-3. Export CSV
+1.  Filter theo khoảng thời gian
+2.  Biểu đồ:
+    - Bệnh nhân mới theo ngày
+    - Phân bố theo giới tính
+    - Phân bố theo nhóm máu
+    - Độ tuổi
+3.  Export CSV
 
 ---
 
@@ -867,38 +829,38 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo với vai trò DOCTOR**:
 
-1. Xem lịch hẹn của mình
-2. Filter theo ngày
-3. Actions: Xem, Bắt đầu khám, Tạo lịch mới
+1.  Xem lịch hẹn của mình
+2.  Filter theo ngày
+3.  Actions: Xem, Bắt đầu khám, Tạo lịch mới
 
 #### L2. Hàng đợi Doctor (`/doctor/queue`)
 
 **Demo**:
 
-1. Danh sách BN chờ khám (của mình)
-2. Bắt đầu khám
-3. Xem vital signs
+1.  Danh sách BN chờ khám (của mình)
+2.  Bắt đầu khám
+3.  Xem vital signs
 
 #### L3. Khám bệnh Doctor (`/doctor/exams`)
 
 **Demo**:
 
-1. Danh sách ca khám của mình
-2. Khám bệnh, kê đơn
-3. Hoàn thành khám
-4. Xem chi tiết ca khám (`/doctor/exams/[id]`)
-5. Chỉnh sửa khám (`/doctor/exams/[id]/edit`)
-6. Kê đơn thuốc (`/doctor/exams/[id]/prescription`)
-7. Xem đơn thuốc (`/doctor/exams/[id]/prescription/view`)
+1.  Danh sách ca khám của mình
+2.  Khám bệnh, kê đơn
+3.  Hoàn thành khám
+4.  Xem chi tiết ca khám (`/doctor/exams/[id]`)
+5.  Chỉnh sửa khám (`/doctor/exams/[id]/edit`)
+6.  Kê đơn thuốc (`/doctor/exams/[id]/prescription`)
+7.  Xem đơn thuốc (`/doctor/exams/[id]/prescription/view`)
 
 #### L4. Bệnh nhân Doctor (`/doctor/patients`)
 
 **Demo**:
 
-1. Xem danh sách BN đã khám
-2. Xem chi tiết bệnh nhân (`/doctor/patients/[id]`)
-3. Xem lịch sử khám (`/doctor/patients/[id]/history`)
-4. Chỉnh sửa thông tin (`/doctor/patients/[id]/edit`)
+1.  Xem danh sách BN đã khám
+2.  Xem chi tiết bệnh nhân (`/doctor/patients/[id]`)
+3.  Xem lịch sử khám (`/doctor/patients/[id]/history`)
+4.  Chỉnh sửa thông tin (`/doctor/patients/[id]/edit`)
 
 #### L5. Xét nghiệm Doctor
 
@@ -906,40 +868,40 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem chi tiết yêu cầu xét nghiệm
-2. Theo dõi trạng thái xử lý
+1.  Xem chi tiết yêu cầu xét nghiệm
+2.  Theo dõi trạng thái xử lý
 
 **L5.2. Lab Results (`/doctor/lab-results`)**
 
 **Demo**:
 
-1. Xem danh sách kết quả xét nghiệm
-2. Xem chi tiết kết quả (`/doctor/lab-results/[id]`)
-3. Phân tích và đánh giá kết quả
+1.  Xem danh sách kết quả xét nghiệm
+2.  Xem chi tiết kết quả (`/doctor/lab-results/[id]`)
+3.  Phân tích và đánh giá kết quả
 
 #### L6. Lịch làm việc (`/doctor/schedules`)
 
 **Demo**:
 
-1. Xem lịch làm việc của mình
-2. Theo tuần/tháng
-3. Lịch trình chi tiết
+1.  Xem lịch làm việc của mình
+2.  Theo tuần/tháng
+3.  Lịch trình chi tiết
 
 #### L7. Báo cáo Doctor (`/doctor/reports/appointments`)
 
 **Demo**:
 
-1. Thống kê lịch hẹn của mình
-2. Biểu đồ, số liệu
-3. Hiệu suất cá nhân
+1.  Thống kê lịch hẹn của mình
+2.  Biểu đồ, số liệu
+3.  Hiệu suất cá nhân
 
 #### L8. Hồ sơ Doctor (`/doctor/profile`)
 
 **Demo**:
 
-1. Xem thông tin cá nhân
-2. Cập nhật thông tin
-3. Đổi mật khẩu
+1.  Xem thông tin cá nhân
+2.  Cập nhật thông tin
+3.  Đổi mật khẩu
 
 ---
 
@@ -951,19 +913,19 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo với vai trò NURSE**:
 
-1. Xem lịch hẹn hôm nay
-2. Điền Vital Signs cho bệnh nhân
-3. Xem thông tin BN
-4. Cập nhật trạng thái
+1.  Xem lịch hẹn hôm nay
+2.  Điền Vital Signs cho bệnh nhân
+3.  Xem thông tin BN
+4.  Cập nhật trạng thái
 
 #### M2. Lab Orders Nurse (`/nurse/lab-orders`)
 
 **Demo**:
 
-1. Xem yêu cầu xét nghiệm
-2. Cập nhật trạng thái xử lý
-3. Nhập kết quả xét nghiệm
-4. Ghi chú kết quả
+1.  Xem yêu cầu xét nghiệm
+2.  Cập nhật trạng thái xử lý
+3.  Nhập kết quả xét nghiệm
+4.  Ghi chú kết quả
 
 ---
 
@@ -975,152 +937,152 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo với vai trò PATIENT**:
 
-1. Xem danh sách lịch hẹn (quá khứ + tương lai)
-2. Filter theo trạng thái
-3. Tìm kiếm theo ngày
+1.  Xem danh sách lịch hẹn (quá khứ + tương lai)
+2.  Filter theo trạng thái
+3.  Tìm kiếm theo ngày
 
 #### N2. Đặt lịch Online (`/patient/appointments/new`)
 
 **Demo**:
 
-1. Chọn phòng khám/chuyên khoa
-2. Chọn bác sĩ (với thông tin chi tiết)
-3. Chọn ngày
-4. Chọn khung giờ (grid visual)
-5. Nhập lý do khám
-6. Xác nhận đặt lịch
+1.  Chọn phòng khám/chuyên khoa
+2.  Chọn bác sĩ (với thông tin chi tiết)
+3.  Chọn ngày
+4.  Chọn khung giờ (grid visual)
+5.  Nhập lý do khám
+6.  Xác nhận đặt lịch
 
 #### N3. Chi tiết Lịch hẹn (`/patient/appointments/[id]`)
 
 **Demo**:
 
-1. Thông tin lịch hẹn
-2. Thông tin bác sĩ
-3. Hủy lịch (nếu còn cho phép)
+1.  Thông tin lịch hẹn
+2.  Thông tin bác sĩ
+3.  Hủy lịch (nếu còn cho phép)
 
 #### N4. Xem ca khám từ lịch hẹn (`/patient/appointments/[id]/exam`)
 
 **Demo**:
 
-1. Xem thông tin ca khám liên kết với lịch hẹn
-2. Kết quả khám bệnh
-3. Chẩn đoán và điều trị
+1.  Xem thông tin ca khám liên kết với lịch hẹn
+2.  Kết quả khám bệnh
+3.  Chẩn đoán và điều trị
 
 #### N5. Hồ sơ Y tế (`/patient/medical-records`)
 
 **Demo**:
 
-1. Danh sách các lần khám
-2. Thông tin: Ngày, Bác sĩ, Chẩn đoán
+1.  Danh sách các lần khám
+2.  Thông tin: Ngày, Bác sĩ, Chẩn đoán
 
 #### N6. Chi tiết Khám bệnh (`/patient/medical-records/[id]`)
 
 **Demo**:
 
-1. Thông tin khám:
-   - Triệu chứng
-   - Chẩn đoán
-   - Ghi chú
-2. Vital signs
-3. Link đến đơn thuốc
+1.  Thông tin khám:
+    - Triệu chứng
+    - Chẩn đoán
+    - Ghi chú
+2.  Vital signs
+3.  Link đến đơn thuốc
 
 #### N7. Đơn thuốc từ Hồ sơ (`/patient/medical-records/[id]/prescription`)
 
 **Demo**:
 
-1. Xem đơn thuốc của ca khám cụ thể
-2. Danh sách thuốc đã kê
-3. Liều dùng và hướng dẫn
+1.  Xem đơn thuốc của ca khám cụ thể
+2.  Danh sách thuốc đã kê
+3.  Liều dùng và hướng dẫn
 
 #### N7a. Xem chi tiết Đơn thuốc (`/patient/medical-records/[id]/prescription/view`)
 
 **Demo**:
 
-1. Xem đầy đủ thông tin đơn thuốc
-2. In đơn thuốc PDF
-3. Thông tin bác sĩ kê đơn
-4. Thông tin bệnh nhân
+1.  Xem đầy đủ thông tin đơn thuốc
+2.  In đơn thuốc PDF
+3.  Thông tin bác sĩ kê đơn
+4.  Thông tin bệnh nhân
 
 #### N8. Danh sách Đơn thuốc (`/patient/prescriptions`)
 
 **Demo**:
 
-1. Xem tất cả đơn thuốc đã được kê
-2. Tìm kiếm theo ngày
-3. Filter theo bác sĩ
+1.  Xem tất cả đơn thuốc đã được kê
+2.  Tìm kiếm theo ngày
+3.  Filter theo bác sĩ
 
 #### N9. Chi tiết Đơn thuốc (`/patient/prescriptions/[id]`)
 
 **Demo**:
 
-1. Xem chi tiết đơn thuốc cụ thể
-2. In đơn thuốc
-3. Thông tin thuốc và liều dùng chi tiết
+1.  Xem chi tiết đơn thuốc cụ thể
+2.  In đơn thuốc
+3.  Thông tin thuốc và liều dùng chi tiết
 
 #### N10. Thanh toán (`/patient/billing`)
 
 **Demo**:
 
-1. Danh sách hóa đơn của tôi
-2. Filter theo trạng thái thanh toán
-3. Xem tổng quan chi phí
-4. Lịch sử thanh toán
+1.  Danh sách hóa đơn của tôi
+2.  Filter theo trạng thái thanh toán
+3.  Xem tổng quan chi phí
+4.  Lịch sử thanh toán
 
 #### N11. Chi tiết Hóa đơn (`/patient/billing/[id]`)
 
 **Demo**:
 
-1. Xem chi tiết hóa đơn
-2. Danh mục chi phí (khám, thuốc, xét nghiệm)
-3. Lịch sử các lần thanh toán
-4. Số tiền còn nợ
+1.  Xem chi tiết hóa đơn
+2.  Danh mục chi phí (khám, thuốc, xét nghiệm)
+3.  Lịch sử các lần thanh toán
+4.  Số tiền còn nợ
 
 #### N12. Thanh toán Hóa đơn (`/patient/billing/[id]/pay`)
 
 **Demo**:
 
-1. Chọn phương thức thanh toán
-2. Nhập số tiền thanh toán
-3. Thanh toán VNPay online
-4. Xác nhận và nhận biên lai
+1.  Chọn phương thức thanh toán
+2.  Nhập số tiền thanh toán
+3.  Thanh toán VNPay online
+4.  Xác nhận và nhận biên lai
 
 #### N13. Kết quả Xét nghiệm (`/patient/lab-results`)
 
 **Demo**:
 
-1. Xem danh sách kết quả xét nghiệm
-2. Filter theo ngày và loại xét nghiệm
-3. Trạng thái kết quả (Pending/Completed)
-4. Tìm kiếm theo tên xét nghiệm
+1.  Xem danh sách kết quả xét nghiệm
+2.  Filter theo ngày và loại xét nghiệm
+3.  Trạng thái kết quả (Pending/Completed)
+4.  Tìm kiếm theo tên xét nghiệm
 
 #### N14. Chi tiết Kết quả Xét nghiệm (`/patient/lab-results/[id]`)
 
 **Demo**:
 
-1. Xem chi tiết kết quả đầy đủ
-2. Chỉ số và đơn vị đo
-3. Tải PDF kết quả
-4. Ghi chú và nhận xét của bác sĩ
-5. So sánh với chỉ số bình thường
+1.  Xem chi tiết kết quả đầy đủ
+2.  Chỉ số và đơn vị đo
+3.  Tải PDF kết quả
+4.  Ghi chú và nhận xét của bác sĩ
+5.  So sánh với chỉ số bình thường
 
 #### N15. Hồ sơ cá nhân (`/patient/profile`)
 
 **Demo**:
 
-1. Xem thông tin cá nhân
-2. Thông tin y tế (nhóm máu, dị ứng, tiền sử bệnh)
-3. Liên hệ khẩn cấp
-4. Ảnh đại diện
+1.  Xem thông tin cá nhân
+2.  Thông tin y tế (nhóm máu, dị ứng, tiền sử bệnh)
+3.  Liên hệ khẩn cấp
+4.  Ảnh đại diện
 
 #### N16. Cập nhật Hồ sơ (`/patient/profile/edit`)
 
 **Demo**:
 
-1. Chỉnh sửa thông tin cá nhân
-2. Cập nhật thông tin y tế
-3. Đổi mật khẩu
-4. Cập nhật ảnh đại diện
-5. Cập nhật liên hệ khẩn cấp
+1.  Chỉnh sửa thông tin cá nhân
+2.  Cập nhật thông tin y tế
+3.  Đổi mật khẩu
+4.  Cập nhật ảnh đại diện
+5.  Cập nhật liên hệ khẩn cấp
 
 ---
 
@@ -1130,10 +1092,10 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo với vai trò ADMIN**:
 
-1. Danh sách tất cả accounts
-2. Filter theo role
-3. Filter theo trạng thái
-4. Actions: Enable/Disable, Reset password
+1.  Danh sách tất cả accounts
+2.  Filter theo role
+3.  Filter theo trạng thái
+4.  Actions: Enable/Disable, Reset password
 
 #### O2. Hồ sơ cá nhân theo vai trò
 
@@ -1146,10 +1108,10 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Xem thông tin cá nhân
-2. Cập nhật avatar
-3. Đổi mật khẩu
-4. Cập nhật thông tin liên hệ
+1.  Xem thông tin cá nhân
+2.  Cập nhật avatar
+3.  Đổi mật khẩu
+4.  Cập nhật thông tin liên hệ
 
 ---
 
@@ -1159,42 +1121,42 @@ Dự án sử dụng MSW để mock API responses trong development mode:
 
 **Demo**:
 
-1. Thu nhỏ trình duyệt
-2. Mobile view:
-   - Sidebar collapse
-   - Table scroll horizontal
-   - Cards stack
+1.  Thu nhỏ trình duyệt
+2.  Mobile view:
+    - Sidebar collapse
+    - Table scroll horizontal
+    - Cards stack
 
 #### P2. Real-time Data
 
 **Demo**:
 
-1. Dashboard auto-refresh
-2. TanStack Query caching
-3. Optimistic updates
+1.  Dashboard auto-refresh
+2.  TanStack Query caching
+3.  Optimistic updates
 
 #### P3. Form Validation
 
 **Demo**:
 
-1. Validation realtime
-2. Error messages
-3. Required fields
+1.  Validation realtime
+2.  Error messages
+3.  Required fields
 
 #### P4. Notifications
 
 **Demo**:
 
-1. Toast notifications (success/error)
-2. Sonner library
+1.  Toast notifications (success/error)
+2.  Sonner library
 
 #### P5. Theme và UI
 
 **Demo**:
 
-1. Shadcn/ui components
-2. Consistent design
-3. Animations
+1.  Shadcn/ui components
+2.  Consistent design
+3.  Animations
 
 ---
 
@@ -1501,25 +1463,25 @@ npx playwright show-report
 
 ### Tính năng mới
 
-1. **Real-time notifications** - WebSocket cho thông báo
-2. **Mobile App** - React Native cho bệnh nhân
-3. **Nhắc nhở SMS/Email** - Tự động nhắc lịch hẹn
-4. **Telemedicine** - Khám từ xa qua video
-5. **Multi-branch** - Hỗ trợ nhiều chi nhánh
+1.  **Real-time notifications** - WebSocket cho thông báo
+2.  **Mobile App** - React Native cho bệnh nhân
+3.  **Nhắc nhở SMS/Email** - Tự động nhắc lịch hẹn
+4.  **Telemedicine** - Khám từ xa qua video
+5.  **Multi-branch** - Hỗ trợ nhiều chi nhánh
 
 ### Cải tiến
 
-1. **Dark mode** - Chế độ tối
-2. **Multi-language** - Đa ngôn ngữ
-3. **PWA** - Progressive Web App
-4. **Offline mode** - Làm việc offline
-5. **Export PDF** - Xuất báo cáo PDF
+1.  **Dark mode** - Chế độ tối
+2.  **Multi-language** - Đa ngôn ngữ
+3.  **PWA** - Progressive Web App
+4.  **Offline mode** - Làm việc offline
+5.  **Export PDF** - Xuất báo cáo PDF
 
 ### Bảo mật
 
-1. **2FA** - Xác thực 2 bước
-2. **Audit log** - Ghi log mọi thao tác
-3. **Data encryption** - Mã hóa dữ liệu
+1.  **2FA** - Xác thực 2 bước
+2.  **Audit log** - Ghi log mọi thao tác
+3.  **Data encryption** - Mã hóa dữ liệu
 
 ---
 
@@ -1536,6 +1498,5 @@ This project is part of academic coursework for Software Engineering course.
 ---
 
 _Cập nhật lần cuối: 03/01/2026_  
-_Phiên bản: 1.0.0_  
-_Next.js 16.0.5 | React 19.2.0 | TypeScript 5.x_
->>>>>>> repoB/master
+ _Phiên bản: 1.0.0_  
+ _Next.js 16.0.5 | React 19.2.0 | TypeScript 5.x_

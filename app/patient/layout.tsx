@@ -63,14 +63,9 @@ const navigationGroups = [
         icon: FileText,
       },
       {
-        title: "Phiếu Xét nghiệm",
+        title: "Yêu cầu XN",
         href: "/patient/lab-orders",
         icon: ClipboardList,
-      },
-      {
-        title: "Kết quả XN",
-        href: "/patient/lab-results",
-        icon: FlaskConical,
       },
     ],
   },

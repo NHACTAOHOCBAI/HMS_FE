@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-const page = () => {
-  return <div>Page</div>;
-};
-export default page;
-=======
 ﻿"use client";
 
 import { useEffect, useMemo } from "react";
@@ -106,4 +100,3 @@ export default function LandingPage() {
     </div>
   );
 }
->>>>>>> repoB/master

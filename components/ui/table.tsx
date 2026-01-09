@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-"use client"
-
-import * as React from "react"
-
-import { cn } from "@/lib/utils"
-
-function Table({ className, ...props }: React.ComponentProps<"table">) {
-=======
 "use client";
 
 import * as React from "react";
@@ -21,7 +12,6 @@ interface TableProps extends React.ComponentProps<"table"> {
 }
 
 function Table({ className, zebra, stickyHeader, ...props }: TableProps) {
->>>>>>> repoB/master
   return (
     <div
       data-slot="table-container"
@@ -29,13 +19,6 @@ function Table({ className, zebra, stickyHeader, ...props }: TableProps) {
     >
       <table
         data-slot="table"
-<<<<<<< HEAD
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
-    </div>
-  )
-=======
         data-zebra={zebra ? "true" : undefined}
         data-sticky-header={stickyHeader ? "true" : undefined}
         className={cn("w-full caption-bottom text-sm border-collapse", className)}
@@ -43,19 +26,12 @@ function Table({ className, zebra, stickyHeader, ...props }: TableProps) {
       />
     </div>
   );
->>>>>>> repoB/master
 }
 
 function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-<<<<<<< HEAD
-      className={cn("[&_tr]:border-b", className)}
-      {...props}
-    />
-  )
-=======
       className={cn(
         "bg-sky-100 border-b border-sky-200",
         // Sticky header support - parent table needs data-sticky-header
@@ -65,19 +41,12 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
       {...props}
     />
   );
->>>>>>> repoB/master
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
   return (
     <tbody
       data-slot="table-body"
-<<<<<<< HEAD
-      className={cn("[&_tr:last-child]:border-0", className)}
-      {...props}
-    />
-  )
-=======
       className={cn(
         "[&_tr:last-child]:border-0",
         // Zebra striping support - parent table needs data-zebra
@@ -87,7 +56,6 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
       {...props}
     />
   );
->>>>>>> repoB/master
 }
 
 function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
@@ -95,27 +63,6 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-<<<<<<< HEAD
-        "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
-  return (
-    <tr
-      data-slot="table-row"
-      className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
-        className
-      )}
-      {...props}
-    />
-  )
-=======
         "bg-slate-50 border-t border-slate-200 font-medium [&>tr]:last:border-b-0",
         className,
       )}
@@ -163,7 +110,6 @@ function TableRow({ className, accent = "sky", ...props }: TableRowProps) {
       {...props}
     />
   );
->>>>>>> repoB/master
 }
 
 function TableHead({ className, ...props }: React.ComponentProps<"th">) {
@@ -171,14 +117,6 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-<<<<<<< HEAD
-        "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-=======
         // Typography
         "text-xs font-semibold uppercase tracking-wider text-slate-600",
         // Spacing
@@ -197,7 +135,6 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
       {...props}
     />
   );
->>>>>>> repoB/master
 }
 
 function TableCell({ className, ...props }: React.ComponentProps<"td">) {
@@ -205,14 +142,6 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-<<<<<<< HEAD
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-=======
         // Spacing
         "px-4 py-3 align-middle",
         // Typography - improved contrast
@@ -230,7 +159,6 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
       {...props}
     />
   );
->>>>>>> repoB/master
 }
 
 function TableCaption({
@@ -240,17 +168,10 @@ function TableCaption({
   return (
     <caption
       data-slot="table-caption"
-<<<<<<< HEAD
-      className={cn("text-muted-foreground mt-4 text-sm", className)}
-      {...props}
-    />
-  )
-=======
       className={cn("text-slate-500 mt-4 text-sm", className)}
       {...props}
     />
   );
->>>>>>> repoB/master
 }
 
 export {
@@ -262,9 +183,5 @@ export {
   TableRow,
   TableCell,
   TableCaption,
-<<<<<<< HEAD
-}
-=======
 };
 
->>>>>>> repoB/master
